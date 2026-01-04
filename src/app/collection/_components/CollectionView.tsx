@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState, useCallback } from 'react';
+import { useEffect, useMemo, useState, useCallback, useRef } from 'react';
 import { api } from '~/trpc/react';
 import Sidebar, { type FlattenedFolder } from './Sidebar';
 import PlaylistTable from './PlaylistTable';
@@ -110,21 +110,27 @@ const CollectionView = ({ initialActivePath }: { initialActivePath?: string }) =
   });
 
   const setStateMutation = api.preferences.setTableConfig.useMutation();
+  const lastSavedPathRef = useRef<string | null>(initialActivePath ?? null);
 
   // Sync activePath if it's still null and queries finish on client
   useEffect(() => {
     if (!activePath && sidebarQuery.data?.tree && stateQuery.isSuccess) {
-      if (stateQuery.data?.lastOpenedPath) {
-        setActivePath(stateQuery.data.lastOpenedPath as string);
+      const pathFromQuery = stateQuery.data?.lastOpenedPath as string | undefined;
+      if (pathFromQuery) {
+        setActivePath(pathFromQuery);
+        lastSavedPathRef.current = pathFromQuery;
       } else {
         const firstPlaylist = findFirstPlaylist(sidebarQuery.data.tree);
-        setActivePath(firstPlaylist?.path ?? sidebarQuery.data.tree.path);
+        const fallbackPath = firstPlaylist?.path ?? sidebarQuery.data.tree.path;
+        setActivePath(fallbackPath);
+        lastSavedPathRef.current = fallbackPath;
       }
     }
   }, [stateQuery.data, stateQuery.isSuccess, sidebarQuery.data, activePath]);
 
   useEffect(() => {
-    if (activePath) {
+    if (activePath && activePath !== lastSavedPathRef.current) {
+      lastSavedPathRef.current = activePath;
       void setStateMutation.mutate({
         tableName: 'collection_view',
         config: { lastOpenedPath: activePath }
