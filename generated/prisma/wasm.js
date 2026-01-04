@@ -87,6 +87,9 @@ Prisma.NullTypes = {
  * Enums
  */
 exports.Prisma.TransactionIsolationLevel = makeStrictEnum({
+  ReadUncommitted: 'ReadUncommitted',
+  ReadCommitted: 'ReadCommitted',
+  RepeatableRead: 'RepeatableRead',
   Serializable: 'Serializable'
 });
 
@@ -155,6 +158,11 @@ exports.Prisma.SortOrder = {
   desc: 'desc'
 };
 
+exports.Prisma.QueryMode = {
+  default: 'default',
+  insensitive: 'insensitive'
+};
+
 exports.Prisma.NullsOrder = {
   first: 'first',
   last: 'last'
@@ -208,18 +216,18 @@ const config = {
   "datasourceNames": [
     "db"
   ],
-  "activeProvider": "sqlite",
+  "activeProvider": "postgresql",
   "postinstall": false,
   "inlineDatasources": {
     "db": {
       "url": {
-        "fromEnvVar": "DATABASE_URL",
-        "value": null
+        "fromEnvVar": null,
+        "value": "postgresql://placeholder:placeholder@localhost:5432/placeholder"
       }
     }
   },
-  "inlineSchema": "// This is your Prisma schema file,\n// learn more about it in the docs: https://pris.ly/d/prisma-schema\n\ngenerator client {\n  provider = \"prisma-client-js\"\n  output   = \"../generated/prisma\"\n}\n\ndatasource db {\n  provider = \"sqlite\"\n  // NOTE: When using mysql or sqlserver, uncomment the @db.Text annotations in model Account below\n  // Further reading:\n  // https://next-auth.js.org/adapters/prisma#create-the-prisma-schema\n  // https://www.prisma.io/docs/reference/api-reference/prisma-schema-reference#string\n  url      = env(\"DATABASE_URL\")\n}\n\n// Necessary for Next auth\nmodel Account {\n  id                       String  @id @default(cuid())\n  userId                   String\n  type                     String\n  provider                 String\n  providerAccountId        String\n  refresh_token            String? // @db.Text\n  access_token             String? // @db.Text\n  expires_at               Int?\n  token_type               String?\n  scope                    String?\n  id_token                 String? // @db.Text\n  session_state            String?\n  user                     User    @relation(fields: [userId], references: [id], onDelete: Cascade)\n  refresh_token_expires_in Int?\n\n  @@unique([provider, providerAccountId])\n}\n\nmodel Session {\n  id           String   @id @default(cuid())\n  sessionToken String   @unique\n  userId       String\n  expires      DateTime\n  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)\n}\n\nmodel User {\n  id                  String               @id @default(cuid())\n  name                String?\n  email               String?              @unique\n  emailVerified       DateTime?\n  image               String?\n  collectionPath      String?\n  accounts            Account[]\n  sessions            Session[]\n  tablePreferences    TablePreference[]\n  standalonePlaylists StandalonePlaylist[]\n}\n\nmodel TablePreference {\n  id        String @id @default(cuid())\n  userId    String\n  user      User   @relation(fields: [userId], references: [id], onDelete: Cascade)\n  tableName String\n  config    String // JSON string containing column widths\n\n  @@unique([userId, tableName])\n}\n\nmodel VerificationToken {\n  identifier String\n  token      String   @unique\n  expires    DateTime\n\n  @@unique([identifier, token])\n}\n\nmodel StandalonePlaylist {\n  id        String         @id @default(cuid())\n  userId    String\n  user      User           @relation(fields: [userId], references: [id], onDelete: Cascade)\n  name      String\n  items     PlaylistItem[]\n  createdAt DateTime       @default(now())\n}\n\nmodel PlaylistItem {\n  id         String             @id @default(cuid())\n  playlistId String\n  playlist   StandalonePlaylist @relation(fields: [playlistId], references: [id], onDelete: Cascade)\n  track      String\n  artist     String\n  order      Int\n}\n",
-  "inlineSchemaHash": "3d4db6d159cec0e6bc9fd3486ca6dcc9f617ad2c55b3d1487885e3b83c868717",
+  "inlineSchema": "// This is your Prisma schema file,\n// learn more about it in the docs: https://pris.ly/d/prisma-schema\n\ngenerator client {\n  provider = \"prisma-client-js\"\n  output   = \"../generated/prisma\"\n}\n\ndatasource db {\n  provider = \"postgresql\"\n  url      = \"postgresql://placeholder:placeholder@localhost:5432/placeholder\"\n}\n\n// Necessary for Next auth\nmodel Account {\n  id                       String  @id @default(cuid())\n  userId                   String\n  type                     String\n  provider                 String\n  providerAccountId        String\n  refresh_token            String? // @db.Text\n  access_token             String? // @db.Text\n  expires_at               Int?\n  token_type               String?\n  scope                    String?\n  id_token                 String? // @db.Text\n  session_state            String?\n  user                     User    @relation(fields: [userId], references: [id], onDelete: Cascade)\n  refresh_token_expires_in Int?\n\n  @@unique([provider, providerAccountId])\n}\n\nmodel Session {\n  id           String   @id @default(cuid())\n  sessionToken String   @unique\n  userId       String\n  expires      DateTime\n  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)\n}\n\nmodel User {\n  id                  String               @id @default(cuid())\n  name                String?\n  email               String?              @unique\n  emailVerified       DateTime?\n  image               String?\n  collectionPath      String?\n  accounts            Account[]\n  sessions            Session[]\n  tablePreferences    TablePreference[]\n  standalonePlaylists StandalonePlaylist[]\n}\n\nmodel TablePreference {\n  id        String @id @default(cuid())\n  userId    String\n  user      User   @relation(fields: [userId], references: [id], onDelete: Cascade)\n  tableName String\n  config    String // JSON string containing column widths\n\n  @@unique([userId, tableName])\n}\n\nmodel VerificationToken {\n  identifier String\n  token      String   @unique\n  expires    DateTime\n\n  @@unique([identifier, token])\n}\n\nmodel StandalonePlaylist {\n  id        String         @id @default(cuid())\n  userId    String\n  user      User           @relation(fields: [userId], references: [id], onDelete: Cascade)\n  name      String\n  items     PlaylistItem[]\n  createdAt DateTime       @default(now())\n}\n\nmodel PlaylistItem {\n  id         String             @id @default(cuid())\n  playlistId String\n  playlist   StandalonePlaylist @relation(fields: [playlistId], references: [id], onDelete: Cascade)\n  track      String\n  artist     String\n  order      Int\n}\n",
+  "inlineSchemaHash": "9ec271e84f5eddcda34d5f5675ae97a0c993f01c975c92aa5a6c3b04483c631a",
   "copyEngine": true
 }
 config.dirname = '/'
@@ -237,9 +245,7 @@ config.engineWasm = {
 config.compilerWasm = undefined
 
 config.injectableEdgeEnv = () => ({
-  parsed: {
-    DATABASE_URL: typeof globalThis !== 'undefined' && globalThis['DATABASE_URL'] || typeof process !== 'undefined' && process.env && process.env.DATABASE_URL || undefined
-  }
+  parsed: {}
 })
 
 if (typeof globalThis !== 'undefined' && globalThis['DEBUG'] || typeof process !== 'undefined' && process.env && process.env.DEBUG || undefined) {
