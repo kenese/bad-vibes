@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import { api } from '~/trpc/react';
 
 const UploadPrompt = ({ onUploadSuccess }: { onUploadSuccess: () => void }) => {
   const [file, setFile] = useState<File | null>(null);
@@ -36,7 +35,7 @@ const UploadPrompt = ({ onUploadSuccess }: { onUploadSuccess: () => void }) => {
       }
 
       onUploadSuccess();
-    } catch (err) {
+    } catch {
       setError('Failed to upload collection. Please try again.');
     } finally {
       setIsUploading(false);

@@ -1,6 +1,7 @@
 import { auth } from "~/server/auth";
 import { api, HydrateClient } from "~/trpc/server";
 import CollectionView from './_components/CollectionView';
+import { type SidebarTreeNode } from '~/server/services/collectionService';
 import './../collection/collection.css';
 
 export default async function CollectionPage() {
@@ -14,15 +15,16 @@ export default async function CollectionPage() {
     
     if (hasCollection) {
       void api.collection.sidebar.prefetch();
+      const tree = await api.collection.sidebar(); // Fetch tree here
       
       void api.preferences.getTableConfig.prefetch({ tableName: 'collection_view' });
       void api.preferences.getTableConfig.prefetch({ tableName: 'playlist_tracks' });
       const prefs = await api.preferences.getTableConfig({ tableName: 'collection_view' });
-      lastPath = prefs?.lastOpenedPath as string | undefined;
+      lastPath = (prefs as { lastOpenedPath?: string })?.lastOpenedPath;
       
       if (!lastPath) {
-        const tree = await api.collection.sidebar();
-        lastPath = findFirstPlaylistId(tree?.tree)?.path ?? tree?.tree?.path;
+        const root = tree?.tree;
+        lastPath = findFirstPlaylistId(root)?.path ?? root?.path;
       }
 
       if (lastPath) {
@@ -39,7 +41,7 @@ export default async function CollectionPage() {
 }
 
 // Minimal helper for server-side path resolution
-function findFirstPlaylistId(node: any): any {
+function findFirstPlaylistId(node: SidebarTreeNode | null): SidebarTreeNode | null {
   if (!node) return null;
   if (node.type === 'PLAYLIST') return node;
   for (const child of node.children ?? []) {

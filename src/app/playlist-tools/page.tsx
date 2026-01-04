@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { api } from '~/trpc/react';
 
 export default function PlaylistToolsPage() {
@@ -49,8 +49,8 @@ export default function PlaylistToolsPage() {
             const clean = line.replace(/[^a-zA-Z0-9\s-]/g, "");
             const parts = clean.split('-').map(p => p.trim());
             return {
-                track: parts[0] || 'Unknown Track',
-                artist: parts[1] || 'Unknown Artist'
+                track: parts[0] ?? 'Unknown Track',
+                artist: parts[1] ?? 'Unknown Artist'
             };
         });
         setHistory(parsedItems);
@@ -102,13 +102,13 @@ export default function PlaylistToolsPage() {
         }
     };
 
-    const handleUndo = () => {
+    const handleUndo = useCallback(() => {
         if (history) {
             const current = [...parsedItems];
             setParsedItems(history);
             setHistory(current);
         }
-    };
+    }, [history, parsedItems]);
 
     useEffect(() => {
         const handleKeyDown = (e: KeyboardEvent) => {
@@ -119,7 +119,7 @@ export default function PlaylistToolsPage() {
         };
         window.addEventListener('keydown', handleKeyDown);
         return () => window.removeEventListener('keydown', handleKeyDown);
-    }, [history, parsedItems]);
+    }, [handleUndo]);
 
     return (
         <main className="p-8 max-w-7xl mx-auto text-[#f0f6fc]">

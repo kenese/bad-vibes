@@ -2,8 +2,18 @@ import { TRPCError } from '@trpc/server';
 import { z } from 'zod';
 import { createTRPCRouter, protectedProcedure } from '~/server/api/trpc';
 import { collectionManager } from '~/server/services/collectionManager';
+import { type db } from '~/server/db';
 
-const getServiceForUser = async (ctx: { db: any; session: { user: { id: string } } }) => {
+interface TRPCContext {
+  db: typeof db;
+  session: {
+    user: {
+      id: string;
+    };
+  };
+}
+
+const getServiceForUser = async (ctx: TRPCContext) => {
   const user = await ctx.db.user.findUnique({
     where: { id: ctx.session.user.id },
     select: { collectionPath: true }

@@ -2,6 +2,113 @@ import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
 import { TRPCError } from "@trpc/server";
 
+interface SpotifyTrack {
+  title?: string;
+  subtitle?: string;
+}
+
+interface SpotifyData {
+  props?: {
+    pageProps?: {
+      state?: {
+        data?: {
+          entity?: {
+            name?: string;
+            trackList?: SpotifyTrack[];
+          }
+        }
+      }
+    }
+  }
+}
+
+interface YTMTextRun {
+  text?: string;
+}
+
+interface YTMText {
+  runs?: YTMTextRun[];
+}
+
+interface YTMColumn {
+  musicResponsiveListItemFlexColumnRenderer?: {
+    text?: YTMText;
+  }
+}
+
+interface YTMItem {
+  musicResponsiveListItemRenderer?: {
+    flexColumns?: YTMColumn[];
+  }
+}
+
+interface YTMData {
+  contents?: {
+    twoColumnBrowseResultsRenderer?: {
+      secondaryContents?: {
+        sectionListRenderer?: {
+          contents?: Array<{
+            musicPlaylistShelfRenderer?: {
+              contents?: YTMItem[];
+            }
+          }>
+        }
+      }
+    };
+    singleColumnBrowseResultsRenderer?: {
+      tabs?: Array<{
+        tabRenderer?: {
+          content?: {
+            sectionListRenderer?: {
+              contents?: Array<{
+                musicPlaylistShelfRenderer?: {
+                  contents?: YTMItem[];
+                }
+              }>
+            }
+          }
+        }
+      }>
+    }
+  }
+}
+
+interface YTVideo {
+  playlistVideoRenderer?: {
+    title?: YTMText;
+    shortBylineText?: YTMText;
+  }
+}
+
+interface YTData {
+  metadata?: {
+    playlistMetadataRenderer?: {
+      title?: string;
+    }
+  };
+  contents?: {
+    twoColumnBrowseResultsRenderer?: {
+      tabs?: Array<{
+        tabRenderer?: {
+          content?: {
+            sectionListRenderer?: {
+              contents?: Array<{
+                itemSectionRenderer?: {
+                  contents?: Array<{
+                    playlistVideoListRenderer?: {
+                      contents?: YTVideo[];
+                    }
+                  }>
+                }
+              }>
+            }
+          }
+        }
+      }>
+    }
+  }
+}
+
 export const playlistToolsRouter = createTRPCRouter({
   parseText: protectedProcedure
     .input(z.object({ text: z.string() }))
@@ -14,8 +121,8 @@ export const playlistToolsRouter = createTRPCRouter({
         const parts = clean.split("-").map(p => p.trim());
         
         return {
-          track: parts[0] || "Unknown Track",
-          artist: parts[1] || "Unknown Artist"
+          track: parts[0] ?? "Unknown Track",
+          artist: parts[1] ?? "Unknown Artist"
         };
       });
       return parsed;
@@ -67,17 +174,17 @@ export const playlistToolsRouter = createTRPCRouter({
           if (start !== -1 && contentEnd > contentStart) {
             try {
               const jsonStr = embedHtml.slice(contentStart, contentEnd);
-              const data = JSON.parse(jsonStr);
+              const data = JSON.parse(jsonStr) as SpotifyData;
               const entity = data.props?.pageProps?.state?.data?.entity;
               
               if (entity) {
-                playlistName = entity.name || playlistName;
+                playlistName = entity.name ?? playlistName;
                 const items = entity.trackList;
                 if (items && Array.isArray(items)) {
-                  items.forEach((item: any) => {
+                  items.forEach((item) => {
                     tracks.push({
-                      track: item.title || "Unknown Track",
-                      artist: item.subtitle || "Unknown Artist"
+                      track: item.title ?? "Unknown Track",
+                      artist: item.subtitle ?? "Unknown Artist"
                     });
                   });
                 }
@@ -100,26 +207,28 @@ export const playlistToolsRouter = createTRPCRouter({
           }
         }
       } else if (input.url.includes("music.youtube.com")) {
-        const titleMatch = html.match(/<title>([^<]+)<\/title>/i);
+        const titleRegex = /<title>([^<]+)<\/title>/i;
+        const titleMatch = titleRegex.exec(html);
         if (titleMatch?.[1]) {
             playlistName = titleMatch[1].replace(" - YouTube Music", "").trim();
         }
 
         // Try hydration blocks first
         const blocks = html.split('initialData.push(');
-        let correctBlock = blocks.find(b => b.includes('musicPlaylistShelfRenderer'));
+        const correctBlock = blocks.find(b => b.includes('musicPlaylistShelfRenderer'));
         
-        let jsonData: any = null;
+        let jsonData: YTMData | null = null;
 
         if (correctBlock) {
           console.log("[fetchExternal] Found initialData block with musicPlaylistShelfRenderer");
-          const dataMatch = correctBlock.match(/data:\s*'([^']+)'/);
+          const dataRegex = /data:\s*'([^']+)'/;
+          const dataMatch = dataRegex.exec(correctBlock);
           if (dataMatch?.[1]) {
             try {
-              const decodedData = dataMatch[1].replace(/\\x([0-9a-fA-F]{2})/g, (_, hex) => 
+              const decodedData = dataMatch[1].replace(/\\x([0-9a-fA-F]{2})/g, (_, hex: string) => 
                  String.fromCharCode(parseInt(hex, 16))
               );
-              jsonData = JSON.parse(decodedData);
+              jsonData = JSON.parse(decodedData) as YTMData;
             } catch (e) {
               console.error("[fetchExternal] YTM JSON parse error (block):", e);
             }
@@ -134,7 +243,7 @@ export const playlistToolsRouter = createTRPCRouter({
              const end = html.indexOf(";</script>", start);
              if (end > start) {
                 try {
-                  jsonData = JSON.parse(html.slice(start, end));
+                  jsonData = JSON.parse(html.slice(start, end)) as YTMData;
                   console.log("[fetchExternal] Found YTM data via ytInitialData fallback");
                 } catch (e) {
                   console.error("[fetchExternal] YTM JSON parse error (fallback):", e);
@@ -146,13 +255,13 @@ export const playlistToolsRouter = createTRPCRouter({
         if (jsonData) {
           // The structure can be content or secondaryContents
           const shelf = 
-            jsonData.contents?.twoColumnBrowseResultsRenderer?.secondaryContents?.sectionListRenderer?.contents?.[0]?.musicPlaylistShelfRenderer ||
+            jsonData.contents?.twoColumnBrowseResultsRenderer?.secondaryContents?.sectionListRenderer?.contents?.[0]?.musicPlaylistShelfRenderer ??
             jsonData.contents?.singleColumnBrowseResultsRenderer?.tabs?.[0]?.tabRenderer?.content?.sectionListRenderer?.contents?.[0]?.musicPlaylistShelfRenderer;
           
-          const items = shelf?.contents || [];
+          const items = shelf?.contents ?? [];
           console.log(`[fetchExternal] YTM tracks found: ${items.length}`);
           
-          items.forEach((item: any) => {
+          items.forEach((item) => {
             const r = item.musicResponsiveListItemRenderer;
             if (r) {
               const title = r.flexColumns?.[0]?.musicResponsiveListItemFlexColumnRenderer?.text?.runs?.[0]?.text;
@@ -160,7 +269,7 @@ export const playlistToolsRouter = createTRPCRouter({
               if (title) {
                 tracks.push({
                   track: title,
-                  artist: artist || "Unknown Artist"
+                  artist: artist ?? "Unknown Artist"
                 });
               }
             }
@@ -177,19 +286,19 @@ export const playlistToolsRouter = createTRPCRouter({
         if (start > "ytInitialData = ".length && end > start) {
           try {
             const jsonStr = html.slice(start, end);
-            const data = JSON.parse(jsonStr);
+            const data = JSON.parse(jsonStr) as YTData;
             
-            playlistName = data.metadata?.playlistMetadataRenderer?.title || playlistName;
+            playlistName = data.metadata?.playlistMetadataRenderer?.title ?? playlistName;
 
             const contents = data.contents?.twoColumnBrowseResultsRenderer?.tabs?.[0]?.tabRenderer?.content?.sectionListRenderer?.contents?.[0]?.itemSectionRenderer?.contents?.[0]?.playlistVideoListRenderer?.contents;
             
             if (contents && Array.isArray(contents)) {
-              contents.forEach((c: any) => {
+              contents.forEach((c) => {
                 const v = c.playlistVideoRenderer;
                 if (!v) return;
 
-                const fullTitle = v.title?.runs?.[0]?.text || "";
-                const channel = v.shortBylineText?.runs?.[0]?.text || "";
+                const fullTitle = v.title?.runs?.[0]?.text ?? "";
+                const channel = v.shortBylineText?.runs?.[0]?.text ?? "";
                 
                 const splitters = [" - ", " – ", " — ", " | "];
                 let track = fullTitle;
@@ -198,8 +307,8 @@ export const playlistToolsRouter = createTRPCRouter({
                 for (const s of splitters) {
                   if (fullTitle.includes(s)) {
                     const parts = fullTitle.split(s);
-                    artist = parts[0]?.trim() || channel;
-                    track = parts[1]?.trim() || fullTitle;
+                    artist = parts[0]?.trim() ?? channel;
+                    track = parts[1]?.trim() ?? fullTitle;
                     break;
                   }
                 }
@@ -298,7 +407,7 @@ export const playlistToolsRouter = createTRPCRouter({
         const playlist = await ctx.db.standalonePlaylist.findUnique({
             where: { id: input.id }
         });
-        if (!playlist || playlist.userId !== ctx.session.user.id) {
+        if (playlist?.userId !== ctx.session.user.id) {
             throw new TRPCError({ code: "NOT_FOUND" });
         }
         return ctx.db.standalonePlaylist.delete({ where: { id: input.id } });

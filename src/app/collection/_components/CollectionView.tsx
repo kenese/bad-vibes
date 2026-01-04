@@ -115,7 +115,7 @@ const CollectionView = ({ initialActivePath }: { initialActivePath?: string }) =
   // Sync activePath if it's still null and queries finish on client
   useEffect(() => {
     if (!activePath && sidebarQuery.data?.tree && stateQuery.isSuccess) {
-      const pathFromQuery = stateQuery.data?.lastOpenedPath as string | undefined;
+      const pathFromQuery = (stateQuery.data as { lastOpenedPath?: string })?.lastOpenedPath;
       if (pathFromQuery) {
         setActivePath(pathFromQuery);
         lastSavedPathRef.current = pathFromQuery;

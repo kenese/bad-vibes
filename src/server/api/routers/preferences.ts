@@ -20,7 +20,7 @@ export const preferencesRouter = createTRPCRouter({
         },
       });
 
-      return pref ? (JSON.parse(pref.config) as any) : null;
+      return pref ? (JSON.parse(pref.config) as Record<string, unknown>) : null;
     }),
 
   setTableConfig: protectedProcedure

@@ -1,8 +1,7 @@
-import { NextRequest, NextResponse } from "next/server";
+import { type NextRequest, NextResponse } from "next/server";
 import { auth } from "~/server/auth";
 import { db } from "~/server/db";
 import { collectionManager } from "~/server/services/collectionManager";
-import fs from "fs/promises";
 import { createWriteStream } from "fs";
 import { pipeline } from "stream/promises";
 
@@ -26,7 +25,7 @@ export async function POST(req: NextRequest) {
     const stream = file.stream();
     const writeStream = createWriteStream(storagePath);
     
-    // @ts-ignore - ReadableStream to WriteStream pipeline
+    // @ts-expect-error - ReadableStream to WriteStream pipeline
     await pipeline(stream, writeStream);
 
     // Update user in DB
