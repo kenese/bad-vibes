@@ -1,67 +1,98 @@
+import { TRPCError } from '@trpc/server';
 import { z } from 'zod';
-import { createTRPCRouter, publicProcedure } from '~/server/api/trpc';
-import collectionService from '~/server/services/collectionService';
+import { createTRPCRouter, protectedProcedure } from '~/server/api/trpc';
+import { collectionManager } from '~/server/services/collectionManager';
+
+const getServiceForUser = async (ctx: { db: any; session: { user: { id: string } } }) => {
+  const user = await ctx.db.user.findUnique({
+    where: { id: ctx.session.user.id },
+    select: { collectionPath: true }
+  });
+
+  if (!user?.collectionPath) {
+    throw new TRPCError({
+      code: 'NOT_FOUND',
+      message: 'No collection uploaded. Please upload your collection.nml file.'
+    });
+  }
+
+  return collectionManager.getService(ctx.session.user.id, user.collectionPath);
+};
 
 export const collectionRouter = createTRPCRouter({
-  sidebar: publicProcedure.query(async () => {
-    return collectionService.getSidebar();
+  hasCollection: protectedProcedure.query(async ({ ctx }) => {
+    const user = await ctx.db.user.findUnique({
+      where: { id: ctx.session.user.id },
+      select: { collectionPath: true }
+    });
+    return !!user?.collectionPath;
   }),
 
-  playlistTracks: publicProcedure
+  sidebar: protectedProcedure.query(async ({ ctx }) => {
+    const service = await getServiceForUser(ctx);
+    return service.getSidebar();
+  }),
+
+  playlistTracks: protectedProcedure
     .input(
       z.object({
         path: z.string().min(1)
       })
     )
-    .query(({ input }) => {
-      return collectionService.getPlaylistTracks(input.path);
+    .query(async ({ ctx, input }) => {
+      const service = await getServiceForUser(ctx);
+      return service.getPlaylistTracks(input.path);
     }),
 
-  createFolder: publicProcedure
+  createFolder: protectedProcedure
     .input(
       z.object({
         parentPath: z.string().min(1),
         name: z.string().min(1)
       })
     )
-    .mutation(({ input }) => {
-      return collectionService.createFolder(input);
+    .mutation(async ({ ctx, input }) => {
+      const service = await getServiceForUser(ctx);
+      return service.createFolder(input);
     }),
 
-  createPlaylist: publicProcedure
+  createPlaylist: protectedProcedure
     .input(
       z.object({
         folderPath: z.string().min(1),
         name: z.string().min(1)
       })
     )
-    .mutation(({ input }) => {
-      return collectionService.createPlaylist(input);
+    .mutation(async ({ ctx, input }) => {
+      const service = await getServiceForUser(ctx);
+      return service.createPlaylist(input);
     }),
 
-  movePlaylist: publicProcedure
+  movePlaylist: protectedProcedure
     .input(
       z.object({
         sourcePath: z.string().min(1),
         targetFolderPath: z.string().min(1)
       })
     )
-    .mutation(({ input }) => {
-      return collectionService.movePlaylist(input);
+    .mutation(async ({ ctx, input }) => {
+      const service = await getServiceForUser(ctx);
+      return service.movePlaylist(input);
     }),
 
-  createOrphansPlaylist: publicProcedure
+  createOrphansPlaylist: protectedProcedure
     .input(
       z.object({
         targetFolderPath: z.string().min(1),
         name: z.string().optional()
       })
     )
-    .mutation(({ input }) => {
-      return collectionService.createOrphansPlaylist(input);
+    .mutation(async ({ ctx, input }) => {
+      const service = await getServiceForUser(ctx);
+      return service.createOrphansPlaylist(input);
     }),
 
-  createReleaseCompanionPlaylist: publicProcedure
+  createReleaseCompanionPlaylist: protectedProcedure
     .input(
       z.object({
         sourcePath: z.string().min(1),
@@ -69,23 +100,27 @@ export const collectionRouter = createTRPCRouter({
         name: z.string().optional()
       })
     )
-    .mutation(({ input }) => {
-      return collectionService.createReleaseCompanion(input);
+    .mutation(async ({ ctx, input }) => {
+      const service = await getServiceForUser(ctx);
+      return service.createReleaseCompanion(input);
     }),
 
-  renamePlaylist: publicProcedure
+  renamePlaylist: protectedProcedure
     .input(
       z.object({
         path: z.string().min(1),
         name: z.string().min(1)
       })
     )
-    .mutation(({ input }) => {
-      return collectionService.renamePlaylist(input);
+    .mutation(async ({ ctx, input }) => {
+      const service = await getServiceForUser(ctx);
+      return service.renamePlaylist(input);
     }),
-  deleteNodes: publicProcedure
+
+  deleteNodes: protectedProcedure
     .input(z.object({ paths: z.array(z.string()) }))
-    .mutation(({ input }) => {
-      return collectionService.deleteNodes(input.paths);
+    .mutation(async ({ ctx, input }) => {
+      const service = await getServiceForUser(ctx);
+      return service.deleteNodes(input.paths);
     })
 });

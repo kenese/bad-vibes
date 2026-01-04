@@ -154,7 +154,15 @@ exports.Prisma.UserScalarFieldEnum = {
   name: 'name',
   email: 'email',
   emailVerified: 'emailVerified',
-  image: 'image'
+  image: 'image',
+  collectionPath: 'collectionPath'
+};
+
+exports.Prisma.TablePreferenceScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  tableName: 'tableName',
+  config: 'config'
 };
 
 exports.Prisma.VerificationTokenScalarFieldEnum = {
@@ -179,6 +187,7 @@ exports.Prisma.ModelName = {
   Account: 'Account',
   Session: 'Session',
   User: 'User',
+  TablePreference: 'TablePreference',
   VerificationToken: 'VerificationToken'
 };
 

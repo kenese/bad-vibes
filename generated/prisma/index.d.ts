@@ -34,6 +34,11 @@ export type Session = $Result.DefaultSelection<Prisma.$SessionPayload>
  */
 export type User = $Result.DefaultSelection<Prisma.$UserPayload>
 /**
+ * Model TablePreference
+ * 
+ */
+export type TablePreference = $Result.DefaultSelection<Prisma.$TablePreferencePayload>
+/**
  * Model VerificationToken
  * 
  */
@@ -196,6 +201,16 @@ export class PrismaClient<
     * ```
     */
   get user(): Prisma.UserDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.tablePreference`: Exposes CRUD operations for the **TablePreference** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more TablePreferences
+    * const tablePreferences = await prisma.tablePreference.findMany()
+    * ```
+    */
+  get tablePreference(): Prisma.TablePreferenceDelegate<ExtArgs, ClientOptions>;
 
   /**
    * `prisma.verificationToken`: Exposes CRUD operations for the **VerificationToken** model.
@@ -651,6 +666,7 @@ export namespace Prisma {
     Account: 'Account',
     Session: 'Session',
     User: 'User',
+    TablePreference: 'TablePreference',
     VerificationToken: 'VerificationToken'
   };
 
@@ -670,7 +686,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "post" | "account" | "session" | "user" | "verificationToken"
+      modelProps: "post" | "account" | "session" | "user" | "tablePreference" | "verificationToken"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -970,6 +986,80 @@ export namespace Prisma {
           }
         }
       }
+      TablePreference: {
+        payload: Prisma.$TablePreferencePayload<ExtArgs>
+        fields: Prisma.TablePreferenceFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.TablePreferenceFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TablePreferencePayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.TablePreferenceFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TablePreferencePayload>
+          }
+          findFirst: {
+            args: Prisma.TablePreferenceFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TablePreferencePayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.TablePreferenceFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TablePreferencePayload>
+          }
+          findMany: {
+            args: Prisma.TablePreferenceFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TablePreferencePayload>[]
+          }
+          create: {
+            args: Prisma.TablePreferenceCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TablePreferencePayload>
+          }
+          createMany: {
+            args: Prisma.TablePreferenceCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.TablePreferenceCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TablePreferencePayload>[]
+          }
+          delete: {
+            args: Prisma.TablePreferenceDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TablePreferencePayload>
+          }
+          update: {
+            args: Prisma.TablePreferenceUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TablePreferencePayload>
+          }
+          deleteMany: {
+            args: Prisma.TablePreferenceDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.TablePreferenceUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.TablePreferenceUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TablePreferencePayload>[]
+          }
+          upsert: {
+            args: Prisma.TablePreferenceUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TablePreferencePayload>
+          }
+          aggregate: {
+            args: Prisma.TablePreferenceAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateTablePreference>
+          }
+          groupBy: {
+            args: Prisma.TablePreferenceGroupByArgs<ExtArgs>
+            result: $Utils.Optional<TablePreferenceGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.TablePreferenceCountArgs<ExtArgs>
+            result: $Utils.Optional<TablePreferenceCountAggregateOutputType> | number
+          }
+        }
+      }
       VerificationToken: {
         payload: Prisma.$VerificationTokenPayload<ExtArgs>
         fields: Prisma.VerificationTokenFieldRefs
@@ -1144,6 +1234,7 @@ export namespace Prisma {
     account?: AccountOmit
     session?: SessionOmit
     user?: UserOmit
+    tablePreference?: TablePreferenceOmit
     verificationToken?: VerificationTokenOmit
   }
 
@@ -1228,12 +1319,14 @@ export namespace Prisma {
     accounts: number
     sessions: number
     posts: number
+    tablePreferences: number
   }
 
   export type UserCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     accounts?: boolean | UserCountOutputTypeCountAccountsArgs
     sessions?: boolean | UserCountOutputTypeCountSessionsArgs
     posts?: boolean | UserCountOutputTypeCountPostsArgs
+    tablePreferences?: boolean | UserCountOutputTypeCountTablePreferencesArgs
   }
 
   // Custom InputTypes
@@ -1266,6 +1359,13 @@ export namespace Prisma {
    */
   export type UserCountOutputTypeCountPostsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: PostWhereInput
+  }
+
+  /**
+   * UserCountOutputType without action
+   */
+  export type UserCountOutputTypeCountTablePreferencesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: TablePreferenceWhereInput
   }
 
 
@@ -4620,6 +4720,7 @@ export namespace Prisma {
     email: string | null
     emailVerified: Date | null
     image: string | null
+    collectionPath: string | null
   }
 
   export type UserMaxAggregateOutputType = {
@@ -4628,6 +4729,7 @@ export namespace Prisma {
     email: string | null
     emailVerified: Date | null
     image: string | null
+    collectionPath: string | null
   }
 
   export type UserCountAggregateOutputType = {
@@ -4636,6 +4738,7 @@ export namespace Prisma {
     email: number
     emailVerified: number
     image: number
+    collectionPath: number
     _all: number
   }
 
@@ -4646,6 +4749,7 @@ export namespace Prisma {
     email?: true
     emailVerified?: true
     image?: true
+    collectionPath?: true
   }
 
   export type UserMaxAggregateInputType = {
@@ -4654,6 +4758,7 @@ export namespace Prisma {
     email?: true
     emailVerified?: true
     image?: true
+    collectionPath?: true
   }
 
   export type UserCountAggregateInputType = {
@@ -4662,6 +4767,7 @@ export namespace Prisma {
     email?: true
     emailVerified?: true
     image?: true
+    collectionPath?: true
     _all?: true
   }
 
@@ -4743,6 +4849,7 @@ export namespace Prisma {
     email: string | null
     emailVerified: Date | null
     image: string | null
+    collectionPath: string | null
     _count: UserCountAggregateOutputType | null
     _min: UserMinAggregateOutputType | null
     _max: UserMaxAggregateOutputType | null
@@ -4768,9 +4875,11 @@ export namespace Prisma {
     email?: boolean
     emailVerified?: boolean
     image?: boolean
+    collectionPath?: boolean
     accounts?: boolean | User$accountsArgs<ExtArgs>
     sessions?: boolean | User$sessionsArgs<ExtArgs>
     posts?: boolean | User$postsArgs<ExtArgs>
+    tablePreferences?: boolean | User$tablePreferencesArgs<ExtArgs>
     _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["user"]>
 
@@ -4780,6 +4889,7 @@ export namespace Prisma {
     email?: boolean
     emailVerified?: boolean
     image?: boolean
+    collectionPath?: boolean
   }, ExtArgs["result"]["user"]>
 
   export type UserSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
@@ -4788,6 +4898,7 @@ export namespace Prisma {
     email?: boolean
     emailVerified?: boolean
     image?: boolean
+    collectionPath?: boolean
   }, ExtArgs["result"]["user"]>
 
   export type UserSelectScalar = {
@@ -4796,13 +4907,15 @@ export namespace Prisma {
     email?: boolean
     emailVerified?: boolean
     image?: boolean
+    collectionPath?: boolean
   }
 
-  export type UserOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "email" | "emailVerified" | "image", ExtArgs["result"]["user"]>
+  export type UserOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "email" | "emailVerified" | "image" | "collectionPath", ExtArgs["result"]["user"]>
   export type UserInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     accounts?: boolean | User$accountsArgs<ExtArgs>
     sessions?: boolean | User$sessionsArgs<ExtArgs>
     posts?: boolean | User$postsArgs<ExtArgs>
+    tablePreferences?: boolean | User$tablePreferencesArgs<ExtArgs>
     _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type UserIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {}
@@ -4814,6 +4927,7 @@ export namespace Prisma {
       accounts: Prisma.$AccountPayload<ExtArgs>[]
       sessions: Prisma.$SessionPayload<ExtArgs>[]
       posts: Prisma.$PostPayload<ExtArgs>[]
+      tablePreferences: Prisma.$TablePreferencePayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -4821,6 +4935,7 @@ export namespace Prisma {
       email: string | null
       emailVerified: Date | null
       image: string | null
+      collectionPath: string | null
     }, ExtArgs["result"]["user"]>
     composites: {}
   }
@@ -5218,6 +5333,7 @@ export namespace Prisma {
     accounts<T extends User$accountsArgs<ExtArgs> = {}>(args?: Subset<T, User$accountsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AccountPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     sessions<T extends User$sessionsArgs<ExtArgs> = {}>(args?: Subset<T, User$sessionsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SessionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     posts<T extends User$postsArgs<ExtArgs> = {}>(args?: Subset<T, User$postsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PostPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    tablePreferences<T extends User$tablePreferencesArgs<ExtArgs> = {}>(args?: Subset<T, User$tablePreferencesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$TablePreferencePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -5252,6 +5368,7 @@ export namespace Prisma {
     readonly email: FieldRef<"User", 'String'>
     readonly emailVerified: FieldRef<"User", 'DateTime'>
     readonly image: FieldRef<"User", 'String'>
+    readonly collectionPath: FieldRef<"User", 'String'>
   }
     
 
@@ -5710,6 +5827,30 @@ export namespace Prisma {
   }
 
   /**
+   * User.tablePreferences
+   */
+  export type User$tablePreferencesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TablePreference
+     */
+    select?: TablePreferenceSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the TablePreference
+     */
+    omit?: TablePreferenceOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TablePreferenceInclude<ExtArgs> | null
+    where?: TablePreferenceWhereInput
+    orderBy?: TablePreferenceOrderByWithRelationInput | TablePreferenceOrderByWithRelationInput[]
+    cursor?: TablePreferenceWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: TablePreferenceScalarFieldEnum | TablePreferenceScalarFieldEnum[]
+  }
+
+  /**
    * User without action
    */
   export type UserDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -5725,6 +5866,1049 @@ export namespace Prisma {
      * Choose, which related nodes to fetch as well
      */
     include?: UserInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model TablePreference
+   */
+
+  export type AggregateTablePreference = {
+    _count: TablePreferenceCountAggregateOutputType | null
+    _min: TablePreferenceMinAggregateOutputType | null
+    _max: TablePreferenceMaxAggregateOutputType | null
+  }
+
+  export type TablePreferenceMinAggregateOutputType = {
+    id: string | null
+    userId: string | null
+    tableName: string | null
+    config: string | null
+  }
+
+  export type TablePreferenceMaxAggregateOutputType = {
+    id: string | null
+    userId: string | null
+    tableName: string | null
+    config: string | null
+  }
+
+  export type TablePreferenceCountAggregateOutputType = {
+    id: number
+    userId: number
+    tableName: number
+    config: number
+    _all: number
+  }
+
+
+  export type TablePreferenceMinAggregateInputType = {
+    id?: true
+    userId?: true
+    tableName?: true
+    config?: true
+  }
+
+  export type TablePreferenceMaxAggregateInputType = {
+    id?: true
+    userId?: true
+    tableName?: true
+    config?: true
+  }
+
+  export type TablePreferenceCountAggregateInputType = {
+    id?: true
+    userId?: true
+    tableName?: true
+    config?: true
+    _all?: true
+  }
+
+  export type TablePreferenceAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which TablePreference to aggregate.
+     */
+    where?: TablePreferenceWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of TablePreferences to fetch.
+     */
+    orderBy?: TablePreferenceOrderByWithRelationInput | TablePreferenceOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: TablePreferenceWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` TablePreferences from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` TablePreferences.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned TablePreferences
+    **/
+    _count?: true | TablePreferenceCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: TablePreferenceMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: TablePreferenceMaxAggregateInputType
+  }
+
+  export type GetTablePreferenceAggregateType<T extends TablePreferenceAggregateArgs> = {
+        [P in keyof T & keyof AggregateTablePreference]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateTablePreference[P]>
+      : GetScalarType<T[P], AggregateTablePreference[P]>
+  }
+
+
+
+
+  export type TablePreferenceGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: TablePreferenceWhereInput
+    orderBy?: TablePreferenceOrderByWithAggregationInput | TablePreferenceOrderByWithAggregationInput[]
+    by: TablePreferenceScalarFieldEnum[] | TablePreferenceScalarFieldEnum
+    having?: TablePreferenceScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: TablePreferenceCountAggregateInputType | true
+    _min?: TablePreferenceMinAggregateInputType
+    _max?: TablePreferenceMaxAggregateInputType
+  }
+
+  export type TablePreferenceGroupByOutputType = {
+    id: string
+    userId: string
+    tableName: string
+    config: string
+    _count: TablePreferenceCountAggregateOutputType | null
+    _min: TablePreferenceMinAggregateOutputType | null
+    _max: TablePreferenceMaxAggregateOutputType | null
+  }
+
+  type GetTablePreferenceGroupByPayload<T extends TablePreferenceGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<TablePreferenceGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof TablePreferenceGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], TablePreferenceGroupByOutputType[P]>
+            : GetScalarType<T[P], TablePreferenceGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type TablePreferenceSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    userId?: boolean
+    tableName?: boolean
+    config?: boolean
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["tablePreference"]>
+
+  export type TablePreferenceSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    userId?: boolean
+    tableName?: boolean
+    config?: boolean
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["tablePreference"]>
+
+  export type TablePreferenceSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    userId?: boolean
+    tableName?: boolean
+    config?: boolean
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["tablePreference"]>
+
+  export type TablePreferenceSelectScalar = {
+    id?: boolean
+    userId?: boolean
+    tableName?: boolean
+    config?: boolean
+  }
+
+  export type TablePreferenceOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "tableName" | "config", ExtArgs["result"]["tablePreference"]>
+  export type TablePreferenceInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }
+  export type TablePreferenceIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }
+  export type TablePreferenceIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }
+
+  export type $TablePreferencePayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "TablePreference"
+    objects: {
+      user: Prisma.$UserPayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      userId: string
+      tableName: string
+      config: string
+    }, ExtArgs["result"]["tablePreference"]>
+    composites: {}
+  }
+
+  type TablePreferenceGetPayload<S extends boolean | null | undefined | TablePreferenceDefaultArgs> = $Result.GetResult<Prisma.$TablePreferencePayload, S>
+
+  type TablePreferenceCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<TablePreferenceFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: TablePreferenceCountAggregateInputType | true
+    }
+
+  export interface TablePreferenceDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['TablePreference'], meta: { name: 'TablePreference' } }
+    /**
+     * Find zero or one TablePreference that matches the filter.
+     * @param {TablePreferenceFindUniqueArgs} args - Arguments to find a TablePreference
+     * @example
+     * // Get one TablePreference
+     * const tablePreference = await prisma.tablePreference.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends TablePreferenceFindUniqueArgs>(args: SelectSubset<T, TablePreferenceFindUniqueArgs<ExtArgs>>): Prisma__TablePreferenceClient<$Result.GetResult<Prisma.$TablePreferencePayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one TablePreference that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {TablePreferenceFindUniqueOrThrowArgs} args - Arguments to find a TablePreference
+     * @example
+     * // Get one TablePreference
+     * const tablePreference = await prisma.tablePreference.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends TablePreferenceFindUniqueOrThrowArgs>(args: SelectSubset<T, TablePreferenceFindUniqueOrThrowArgs<ExtArgs>>): Prisma__TablePreferenceClient<$Result.GetResult<Prisma.$TablePreferencePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first TablePreference that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {TablePreferenceFindFirstArgs} args - Arguments to find a TablePreference
+     * @example
+     * // Get one TablePreference
+     * const tablePreference = await prisma.tablePreference.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends TablePreferenceFindFirstArgs>(args?: SelectSubset<T, TablePreferenceFindFirstArgs<ExtArgs>>): Prisma__TablePreferenceClient<$Result.GetResult<Prisma.$TablePreferencePayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first TablePreference that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {TablePreferenceFindFirstOrThrowArgs} args - Arguments to find a TablePreference
+     * @example
+     * // Get one TablePreference
+     * const tablePreference = await prisma.tablePreference.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends TablePreferenceFindFirstOrThrowArgs>(args?: SelectSubset<T, TablePreferenceFindFirstOrThrowArgs<ExtArgs>>): Prisma__TablePreferenceClient<$Result.GetResult<Prisma.$TablePreferencePayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more TablePreferences that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {TablePreferenceFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all TablePreferences
+     * const tablePreferences = await prisma.tablePreference.findMany()
+     * 
+     * // Get first 10 TablePreferences
+     * const tablePreferences = await prisma.tablePreference.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const tablePreferenceWithIdOnly = await prisma.tablePreference.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends TablePreferenceFindManyArgs>(args?: SelectSubset<T, TablePreferenceFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$TablePreferencePayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a TablePreference.
+     * @param {TablePreferenceCreateArgs} args - Arguments to create a TablePreference.
+     * @example
+     * // Create one TablePreference
+     * const TablePreference = await prisma.tablePreference.create({
+     *   data: {
+     *     // ... data to create a TablePreference
+     *   }
+     * })
+     * 
+     */
+    create<T extends TablePreferenceCreateArgs>(args: SelectSubset<T, TablePreferenceCreateArgs<ExtArgs>>): Prisma__TablePreferenceClient<$Result.GetResult<Prisma.$TablePreferencePayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many TablePreferences.
+     * @param {TablePreferenceCreateManyArgs} args - Arguments to create many TablePreferences.
+     * @example
+     * // Create many TablePreferences
+     * const tablePreference = await prisma.tablePreference.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends TablePreferenceCreateManyArgs>(args?: SelectSubset<T, TablePreferenceCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many TablePreferences and returns the data saved in the database.
+     * @param {TablePreferenceCreateManyAndReturnArgs} args - Arguments to create many TablePreferences.
+     * @example
+     * // Create many TablePreferences
+     * const tablePreference = await prisma.tablePreference.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many TablePreferences and only return the `id`
+     * const tablePreferenceWithIdOnly = await prisma.tablePreference.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends TablePreferenceCreateManyAndReturnArgs>(args?: SelectSubset<T, TablePreferenceCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$TablePreferencePayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a TablePreference.
+     * @param {TablePreferenceDeleteArgs} args - Arguments to delete one TablePreference.
+     * @example
+     * // Delete one TablePreference
+     * const TablePreference = await prisma.tablePreference.delete({
+     *   where: {
+     *     // ... filter to delete one TablePreference
+     *   }
+     * })
+     * 
+     */
+    delete<T extends TablePreferenceDeleteArgs>(args: SelectSubset<T, TablePreferenceDeleteArgs<ExtArgs>>): Prisma__TablePreferenceClient<$Result.GetResult<Prisma.$TablePreferencePayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one TablePreference.
+     * @param {TablePreferenceUpdateArgs} args - Arguments to update one TablePreference.
+     * @example
+     * // Update one TablePreference
+     * const tablePreference = await prisma.tablePreference.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends TablePreferenceUpdateArgs>(args: SelectSubset<T, TablePreferenceUpdateArgs<ExtArgs>>): Prisma__TablePreferenceClient<$Result.GetResult<Prisma.$TablePreferencePayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more TablePreferences.
+     * @param {TablePreferenceDeleteManyArgs} args - Arguments to filter TablePreferences to delete.
+     * @example
+     * // Delete a few TablePreferences
+     * const { count } = await prisma.tablePreference.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends TablePreferenceDeleteManyArgs>(args?: SelectSubset<T, TablePreferenceDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more TablePreferences.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {TablePreferenceUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many TablePreferences
+     * const tablePreference = await prisma.tablePreference.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends TablePreferenceUpdateManyArgs>(args: SelectSubset<T, TablePreferenceUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more TablePreferences and returns the data updated in the database.
+     * @param {TablePreferenceUpdateManyAndReturnArgs} args - Arguments to update many TablePreferences.
+     * @example
+     * // Update many TablePreferences
+     * const tablePreference = await prisma.tablePreference.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more TablePreferences and only return the `id`
+     * const tablePreferenceWithIdOnly = await prisma.tablePreference.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends TablePreferenceUpdateManyAndReturnArgs>(args: SelectSubset<T, TablePreferenceUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$TablePreferencePayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one TablePreference.
+     * @param {TablePreferenceUpsertArgs} args - Arguments to update or create a TablePreference.
+     * @example
+     * // Update or create a TablePreference
+     * const tablePreference = await prisma.tablePreference.upsert({
+     *   create: {
+     *     // ... data to create a TablePreference
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the TablePreference we want to update
+     *   }
+     * })
+     */
+    upsert<T extends TablePreferenceUpsertArgs>(args: SelectSubset<T, TablePreferenceUpsertArgs<ExtArgs>>): Prisma__TablePreferenceClient<$Result.GetResult<Prisma.$TablePreferencePayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of TablePreferences.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {TablePreferenceCountArgs} args - Arguments to filter TablePreferences to count.
+     * @example
+     * // Count the number of TablePreferences
+     * const count = await prisma.tablePreference.count({
+     *   where: {
+     *     // ... the filter for the TablePreferences we want to count
+     *   }
+     * })
+    **/
+    count<T extends TablePreferenceCountArgs>(
+      args?: Subset<T, TablePreferenceCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], TablePreferenceCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a TablePreference.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {TablePreferenceAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends TablePreferenceAggregateArgs>(args: Subset<T, TablePreferenceAggregateArgs>): Prisma.PrismaPromise<GetTablePreferenceAggregateType<T>>
+
+    /**
+     * Group by TablePreference.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {TablePreferenceGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends TablePreferenceGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: TablePreferenceGroupByArgs['orderBy'] }
+        : { orderBy?: TablePreferenceGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, TablePreferenceGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetTablePreferenceGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the TablePreference model
+   */
+  readonly fields: TablePreferenceFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for TablePreference.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__TablePreferenceClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    user<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the TablePreference model
+   */
+  interface TablePreferenceFieldRefs {
+    readonly id: FieldRef<"TablePreference", 'String'>
+    readonly userId: FieldRef<"TablePreference", 'String'>
+    readonly tableName: FieldRef<"TablePreference", 'String'>
+    readonly config: FieldRef<"TablePreference", 'String'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * TablePreference findUnique
+   */
+  export type TablePreferenceFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TablePreference
+     */
+    select?: TablePreferenceSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the TablePreference
+     */
+    omit?: TablePreferenceOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TablePreferenceInclude<ExtArgs> | null
+    /**
+     * Filter, which TablePreference to fetch.
+     */
+    where: TablePreferenceWhereUniqueInput
+  }
+
+  /**
+   * TablePreference findUniqueOrThrow
+   */
+  export type TablePreferenceFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TablePreference
+     */
+    select?: TablePreferenceSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the TablePreference
+     */
+    omit?: TablePreferenceOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TablePreferenceInclude<ExtArgs> | null
+    /**
+     * Filter, which TablePreference to fetch.
+     */
+    where: TablePreferenceWhereUniqueInput
+  }
+
+  /**
+   * TablePreference findFirst
+   */
+  export type TablePreferenceFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TablePreference
+     */
+    select?: TablePreferenceSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the TablePreference
+     */
+    omit?: TablePreferenceOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TablePreferenceInclude<ExtArgs> | null
+    /**
+     * Filter, which TablePreference to fetch.
+     */
+    where?: TablePreferenceWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of TablePreferences to fetch.
+     */
+    orderBy?: TablePreferenceOrderByWithRelationInput | TablePreferenceOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for TablePreferences.
+     */
+    cursor?: TablePreferenceWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` TablePreferences from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` TablePreferences.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of TablePreferences.
+     */
+    distinct?: TablePreferenceScalarFieldEnum | TablePreferenceScalarFieldEnum[]
+  }
+
+  /**
+   * TablePreference findFirstOrThrow
+   */
+  export type TablePreferenceFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TablePreference
+     */
+    select?: TablePreferenceSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the TablePreference
+     */
+    omit?: TablePreferenceOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TablePreferenceInclude<ExtArgs> | null
+    /**
+     * Filter, which TablePreference to fetch.
+     */
+    where?: TablePreferenceWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of TablePreferences to fetch.
+     */
+    orderBy?: TablePreferenceOrderByWithRelationInput | TablePreferenceOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for TablePreferences.
+     */
+    cursor?: TablePreferenceWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` TablePreferences from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` TablePreferences.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of TablePreferences.
+     */
+    distinct?: TablePreferenceScalarFieldEnum | TablePreferenceScalarFieldEnum[]
+  }
+
+  /**
+   * TablePreference findMany
+   */
+  export type TablePreferenceFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TablePreference
+     */
+    select?: TablePreferenceSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the TablePreference
+     */
+    omit?: TablePreferenceOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TablePreferenceInclude<ExtArgs> | null
+    /**
+     * Filter, which TablePreferences to fetch.
+     */
+    where?: TablePreferenceWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of TablePreferences to fetch.
+     */
+    orderBy?: TablePreferenceOrderByWithRelationInput | TablePreferenceOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing TablePreferences.
+     */
+    cursor?: TablePreferenceWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` TablePreferences from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` TablePreferences.
+     */
+    skip?: number
+    distinct?: TablePreferenceScalarFieldEnum | TablePreferenceScalarFieldEnum[]
+  }
+
+  /**
+   * TablePreference create
+   */
+  export type TablePreferenceCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TablePreference
+     */
+    select?: TablePreferenceSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the TablePreference
+     */
+    omit?: TablePreferenceOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TablePreferenceInclude<ExtArgs> | null
+    /**
+     * The data needed to create a TablePreference.
+     */
+    data: XOR<TablePreferenceCreateInput, TablePreferenceUncheckedCreateInput>
+  }
+
+  /**
+   * TablePreference createMany
+   */
+  export type TablePreferenceCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many TablePreferences.
+     */
+    data: TablePreferenceCreateManyInput | TablePreferenceCreateManyInput[]
+  }
+
+  /**
+   * TablePreference createManyAndReturn
+   */
+  export type TablePreferenceCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TablePreference
+     */
+    select?: TablePreferenceSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the TablePreference
+     */
+    omit?: TablePreferenceOmit<ExtArgs> | null
+    /**
+     * The data used to create many TablePreferences.
+     */
+    data: TablePreferenceCreateManyInput | TablePreferenceCreateManyInput[]
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TablePreferenceIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * TablePreference update
+   */
+  export type TablePreferenceUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TablePreference
+     */
+    select?: TablePreferenceSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the TablePreference
+     */
+    omit?: TablePreferenceOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TablePreferenceInclude<ExtArgs> | null
+    /**
+     * The data needed to update a TablePreference.
+     */
+    data: XOR<TablePreferenceUpdateInput, TablePreferenceUncheckedUpdateInput>
+    /**
+     * Choose, which TablePreference to update.
+     */
+    where: TablePreferenceWhereUniqueInput
+  }
+
+  /**
+   * TablePreference updateMany
+   */
+  export type TablePreferenceUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update TablePreferences.
+     */
+    data: XOR<TablePreferenceUpdateManyMutationInput, TablePreferenceUncheckedUpdateManyInput>
+    /**
+     * Filter which TablePreferences to update
+     */
+    where?: TablePreferenceWhereInput
+    /**
+     * Limit how many TablePreferences to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * TablePreference updateManyAndReturn
+   */
+  export type TablePreferenceUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TablePreference
+     */
+    select?: TablePreferenceSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the TablePreference
+     */
+    omit?: TablePreferenceOmit<ExtArgs> | null
+    /**
+     * The data used to update TablePreferences.
+     */
+    data: XOR<TablePreferenceUpdateManyMutationInput, TablePreferenceUncheckedUpdateManyInput>
+    /**
+     * Filter which TablePreferences to update
+     */
+    where?: TablePreferenceWhereInput
+    /**
+     * Limit how many TablePreferences to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TablePreferenceIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * TablePreference upsert
+   */
+  export type TablePreferenceUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TablePreference
+     */
+    select?: TablePreferenceSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the TablePreference
+     */
+    omit?: TablePreferenceOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TablePreferenceInclude<ExtArgs> | null
+    /**
+     * The filter to search for the TablePreference to update in case it exists.
+     */
+    where: TablePreferenceWhereUniqueInput
+    /**
+     * In case the TablePreference found by the `where` argument doesn't exist, create a new TablePreference with this data.
+     */
+    create: XOR<TablePreferenceCreateInput, TablePreferenceUncheckedCreateInput>
+    /**
+     * In case the TablePreference was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<TablePreferenceUpdateInput, TablePreferenceUncheckedUpdateInput>
+  }
+
+  /**
+   * TablePreference delete
+   */
+  export type TablePreferenceDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TablePreference
+     */
+    select?: TablePreferenceSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the TablePreference
+     */
+    omit?: TablePreferenceOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TablePreferenceInclude<ExtArgs> | null
+    /**
+     * Filter which TablePreference to delete.
+     */
+    where: TablePreferenceWhereUniqueInput
+  }
+
+  /**
+   * TablePreference deleteMany
+   */
+  export type TablePreferenceDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which TablePreferences to delete
+     */
+    where?: TablePreferenceWhereInput
+    /**
+     * Limit how many TablePreferences to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * TablePreference without action
+   */
+  export type TablePreferenceDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TablePreference
+     */
+    select?: TablePreferenceSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the TablePreference
+     */
+    omit?: TablePreferenceOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TablePreferenceInclude<ExtArgs> | null
   }
 
 
@@ -6751,10 +7935,21 @@ export namespace Prisma {
     name: 'name',
     email: 'email',
     emailVerified: 'emailVerified',
-    image: 'image'
+    image: 'image',
+    collectionPath: 'collectionPath'
   };
 
   export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]
+
+
+  export const TablePreferenceScalarFieldEnum: {
+    id: 'id',
+    userId: 'userId',
+    tableName: 'tableName',
+    config: 'config'
+  };
+
+  export type TablePreferenceScalarFieldEnum = (typeof TablePreferenceScalarFieldEnum)[keyof typeof TablePreferenceScalarFieldEnum]
 
 
   export const VerificationTokenScalarFieldEnum: {
@@ -7032,9 +8227,11 @@ export namespace Prisma {
     email?: StringNullableFilter<"User"> | string | null
     emailVerified?: DateTimeNullableFilter<"User"> | Date | string | null
     image?: StringNullableFilter<"User"> | string | null
+    collectionPath?: StringNullableFilter<"User"> | string | null
     accounts?: AccountListRelationFilter
     sessions?: SessionListRelationFilter
     posts?: PostListRelationFilter
+    tablePreferences?: TablePreferenceListRelationFilter
   }
 
   export type UserOrderByWithRelationInput = {
@@ -7043,9 +8240,11 @@ export namespace Prisma {
     email?: SortOrderInput | SortOrder
     emailVerified?: SortOrderInput | SortOrder
     image?: SortOrderInput | SortOrder
+    collectionPath?: SortOrderInput | SortOrder
     accounts?: AccountOrderByRelationAggregateInput
     sessions?: SessionOrderByRelationAggregateInput
     posts?: PostOrderByRelationAggregateInput
+    tablePreferences?: TablePreferenceOrderByRelationAggregateInput
   }
 
   export type UserWhereUniqueInput = Prisma.AtLeast<{
@@ -7057,9 +8256,11 @@ export namespace Prisma {
     name?: StringNullableFilter<"User"> | string | null
     emailVerified?: DateTimeNullableFilter<"User"> | Date | string | null
     image?: StringNullableFilter<"User"> | string | null
+    collectionPath?: StringNullableFilter<"User"> | string | null
     accounts?: AccountListRelationFilter
     sessions?: SessionListRelationFilter
     posts?: PostListRelationFilter
+    tablePreferences?: TablePreferenceListRelationFilter
   }, "id" | "email">
 
   export type UserOrderByWithAggregationInput = {
@@ -7068,6 +8269,7 @@ export namespace Prisma {
     email?: SortOrderInput | SortOrder
     emailVerified?: SortOrderInput | SortOrder
     image?: SortOrderInput | SortOrder
+    collectionPath?: SortOrderInput | SortOrder
     _count?: UserCountOrderByAggregateInput
     _max?: UserMaxOrderByAggregateInput
     _min?: UserMinOrderByAggregateInput
@@ -7082,6 +8284,58 @@ export namespace Prisma {
     email?: StringNullableWithAggregatesFilter<"User"> | string | null
     emailVerified?: DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
     image?: StringNullableWithAggregatesFilter<"User"> | string | null
+    collectionPath?: StringNullableWithAggregatesFilter<"User"> | string | null
+  }
+
+  export type TablePreferenceWhereInput = {
+    AND?: TablePreferenceWhereInput | TablePreferenceWhereInput[]
+    OR?: TablePreferenceWhereInput[]
+    NOT?: TablePreferenceWhereInput | TablePreferenceWhereInput[]
+    id?: StringFilter<"TablePreference"> | string
+    userId?: StringFilter<"TablePreference"> | string
+    tableName?: StringFilter<"TablePreference"> | string
+    config?: StringFilter<"TablePreference"> | string
+    user?: XOR<UserScalarRelationFilter, UserWhereInput>
+  }
+
+  export type TablePreferenceOrderByWithRelationInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    tableName?: SortOrder
+    config?: SortOrder
+    user?: UserOrderByWithRelationInput
+  }
+
+  export type TablePreferenceWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    userId_tableName?: TablePreferenceUserIdTableNameCompoundUniqueInput
+    AND?: TablePreferenceWhereInput | TablePreferenceWhereInput[]
+    OR?: TablePreferenceWhereInput[]
+    NOT?: TablePreferenceWhereInput | TablePreferenceWhereInput[]
+    userId?: StringFilter<"TablePreference"> | string
+    tableName?: StringFilter<"TablePreference"> | string
+    config?: StringFilter<"TablePreference"> | string
+    user?: XOR<UserScalarRelationFilter, UserWhereInput>
+  }, "id" | "userId_tableName">
+
+  export type TablePreferenceOrderByWithAggregationInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    tableName?: SortOrder
+    config?: SortOrder
+    _count?: TablePreferenceCountOrderByAggregateInput
+    _max?: TablePreferenceMaxOrderByAggregateInput
+    _min?: TablePreferenceMinOrderByAggregateInput
+  }
+
+  export type TablePreferenceScalarWhereWithAggregatesInput = {
+    AND?: TablePreferenceScalarWhereWithAggregatesInput | TablePreferenceScalarWhereWithAggregatesInput[]
+    OR?: TablePreferenceScalarWhereWithAggregatesInput[]
+    NOT?: TablePreferenceScalarWhereWithAggregatesInput | TablePreferenceScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"TablePreference"> | string
+    userId?: StringWithAggregatesFilter<"TablePreference"> | string
+    tableName?: StringWithAggregatesFilter<"TablePreference"> | string
+    config?: StringWithAggregatesFilter<"TablePreference"> | string
   }
 
   export type VerificationTokenWhereInput = {
@@ -7344,9 +8598,11 @@ export namespace Prisma {
     email?: string | null
     emailVerified?: Date | string | null
     image?: string | null
+    collectionPath?: string | null
     accounts?: AccountCreateNestedManyWithoutUserInput
     sessions?: SessionCreateNestedManyWithoutUserInput
     posts?: PostCreateNestedManyWithoutCreatedByInput
+    tablePreferences?: TablePreferenceCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateInput = {
@@ -7355,9 +8611,11 @@ export namespace Prisma {
     email?: string | null
     emailVerified?: Date | string | null
     image?: string | null
+    collectionPath?: string | null
     accounts?: AccountUncheckedCreateNestedManyWithoutUserInput
     sessions?: SessionUncheckedCreateNestedManyWithoutUserInput
     posts?: PostUncheckedCreateNestedManyWithoutCreatedByInput
+    tablePreferences?: TablePreferenceUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserUpdateInput = {
@@ -7366,9 +8624,11 @@ export namespace Prisma {
     email?: NullableStringFieldUpdateOperationsInput | string | null
     emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     image?: NullableStringFieldUpdateOperationsInput | string | null
+    collectionPath?: NullableStringFieldUpdateOperationsInput | string | null
     accounts?: AccountUpdateManyWithoutUserNestedInput
     sessions?: SessionUpdateManyWithoutUserNestedInput
     posts?: PostUpdateManyWithoutCreatedByNestedInput
+    tablePreferences?: TablePreferenceUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateInput = {
@@ -7377,9 +8637,11 @@ export namespace Prisma {
     email?: NullableStringFieldUpdateOperationsInput | string | null
     emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     image?: NullableStringFieldUpdateOperationsInput | string | null
+    collectionPath?: NullableStringFieldUpdateOperationsInput | string | null
     accounts?: AccountUncheckedUpdateManyWithoutUserNestedInput
     sessions?: SessionUncheckedUpdateManyWithoutUserNestedInput
     posts?: PostUncheckedUpdateManyWithoutCreatedByNestedInput
+    tablePreferences?: TablePreferenceUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type UserCreateManyInput = {
@@ -7388,6 +8650,7 @@ export namespace Prisma {
     email?: string | null
     emailVerified?: Date | string | null
     image?: string | null
+    collectionPath?: string | null
   }
 
   export type UserUpdateManyMutationInput = {
@@ -7396,6 +8659,7 @@ export namespace Prisma {
     email?: NullableStringFieldUpdateOperationsInput | string | null
     emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     image?: NullableStringFieldUpdateOperationsInput | string | null
+    collectionPath?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type UserUncheckedUpdateManyInput = {
@@ -7404,6 +8668,55 @@ export namespace Prisma {
     email?: NullableStringFieldUpdateOperationsInput | string | null
     emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     image?: NullableStringFieldUpdateOperationsInput | string | null
+    collectionPath?: NullableStringFieldUpdateOperationsInput | string | null
+  }
+
+  export type TablePreferenceCreateInput = {
+    id?: string
+    tableName: string
+    config: string
+    user: UserCreateNestedOneWithoutTablePreferencesInput
+  }
+
+  export type TablePreferenceUncheckedCreateInput = {
+    id?: string
+    userId: string
+    tableName: string
+    config: string
+  }
+
+  export type TablePreferenceUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    tableName?: StringFieldUpdateOperationsInput | string
+    config?: StringFieldUpdateOperationsInput | string
+    user?: UserUpdateOneRequiredWithoutTablePreferencesNestedInput
+  }
+
+  export type TablePreferenceUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    tableName?: StringFieldUpdateOperationsInput | string
+    config?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type TablePreferenceCreateManyInput = {
+    id?: string
+    userId: string
+    tableName: string
+    config: string
+  }
+
+  export type TablePreferenceUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    tableName?: StringFieldUpdateOperationsInput | string
+    config?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type TablePreferenceUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    tableName?: StringFieldUpdateOperationsInput | string
+    config?: StringFieldUpdateOperationsInput | string
   }
 
   export type VerificationTokenCreateInput = {
@@ -7744,6 +9057,12 @@ export namespace Prisma {
     none?: PostWhereInput
   }
 
+  export type TablePreferenceListRelationFilter = {
+    every?: TablePreferenceWhereInput
+    some?: TablePreferenceWhereInput
+    none?: TablePreferenceWhereInput
+  }
+
   export type AccountOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
@@ -7756,12 +9075,17 @@ export namespace Prisma {
     _count?: SortOrder
   }
 
+  export type TablePreferenceOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
   export type UserCountOrderByAggregateInput = {
     id?: SortOrder
     name?: SortOrder
     email?: SortOrder
     emailVerified?: SortOrder
     image?: SortOrder
+    collectionPath?: SortOrder
   }
 
   export type UserMaxOrderByAggregateInput = {
@@ -7770,6 +9094,7 @@ export namespace Prisma {
     email?: SortOrder
     emailVerified?: SortOrder
     image?: SortOrder
+    collectionPath?: SortOrder
   }
 
   export type UserMinOrderByAggregateInput = {
@@ -7778,6 +9103,7 @@ export namespace Prisma {
     email?: SortOrder
     emailVerified?: SortOrder
     image?: SortOrder
+    collectionPath?: SortOrder
   }
 
   export type DateTimeNullableWithAggregatesFilter<$PrismaModel = never> = {
@@ -7792,6 +9118,32 @@ export namespace Prisma {
     _count?: NestedIntNullableFilter<$PrismaModel>
     _min?: NestedDateTimeNullableFilter<$PrismaModel>
     _max?: NestedDateTimeNullableFilter<$PrismaModel>
+  }
+
+  export type TablePreferenceUserIdTableNameCompoundUniqueInput = {
+    userId: string
+    tableName: string
+  }
+
+  export type TablePreferenceCountOrderByAggregateInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    tableName?: SortOrder
+    config?: SortOrder
+  }
+
+  export type TablePreferenceMaxOrderByAggregateInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    tableName?: SortOrder
+    config?: SortOrder
+  }
+
+  export type TablePreferenceMinOrderByAggregateInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    tableName?: SortOrder
+    config?: SortOrder
   }
 
   export type VerificationTokenIdentifierTokenCompoundUniqueInput = {
@@ -7908,6 +9260,13 @@ export namespace Prisma {
     connect?: PostWhereUniqueInput | PostWhereUniqueInput[]
   }
 
+  export type TablePreferenceCreateNestedManyWithoutUserInput = {
+    create?: XOR<TablePreferenceCreateWithoutUserInput, TablePreferenceUncheckedCreateWithoutUserInput> | TablePreferenceCreateWithoutUserInput[] | TablePreferenceUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: TablePreferenceCreateOrConnectWithoutUserInput | TablePreferenceCreateOrConnectWithoutUserInput[]
+    createMany?: TablePreferenceCreateManyUserInputEnvelope
+    connect?: TablePreferenceWhereUniqueInput | TablePreferenceWhereUniqueInput[]
+  }
+
   export type AccountUncheckedCreateNestedManyWithoutUserInput = {
     create?: XOR<AccountCreateWithoutUserInput, AccountUncheckedCreateWithoutUserInput> | AccountCreateWithoutUserInput[] | AccountUncheckedCreateWithoutUserInput[]
     connectOrCreate?: AccountCreateOrConnectWithoutUserInput | AccountCreateOrConnectWithoutUserInput[]
@@ -7927,6 +9286,13 @@ export namespace Prisma {
     connectOrCreate?: PostCreateOrConnectWithoutCreatedByInput | PostCreateOrConnectWithoutCreatedByInput[]
     createMany?: PostCreateManyCreatedByInputEnvelope
     connect?: PostWhereUniqueInput | PostWhereUniqueInput[]
+  }
+
+  export type TablePreferenceUncheckedCreateNestedManyWithoutUserInput = {
+    create?: XOR<TablePreferenceCreateWithoutUserInput, TablePreferenceUncheckedCreateWithoutUserInput> | TablePreferenceCreateWithoutUserInput[] | TablePreferenceUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: TablePreferenceCreateOrConnectWithoutUserInput | TablePreferenceCreateOrConnectWithoutUserInput[]
+    createMany?: TablePreferenceCreateManyUserInputEnvelope
+    connect?: TablePreferenceWhereUniqueInput | TablePreferenceWhereUniqueInput[]
   }
 
   export type NullableDateTimeFieldUpdateOperationsInput = {
@@ -7975,6 +9341,20 @@ export namespace Prisma {
     deleteMany?: PostScalarWhereInput | PostScalarWhereInput[]
   }
 
+  export type TablePreferenceUpdateManyWithoutUserNestedInput = {
+    create?: XOR<TablePreferenceCreateWithoutUserInput, TablePreferenceUncheckedCreateWithoutUserInput> | TablePreferenceCreateWithoutUserInput[] | TablePreferenceUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: TablePreferenceCreateOrConnectWithoutUserInput | TablePreferenceCreateOrConnectWithoutUserInput[]
+    upsert?: TablePreferenceUpsertWithWhereUniqueWithoutUserInput | TablePreferenceUpsertWithWhereUniqueWithoutUserInput[]
+    createMany?: TablePreferenceCreateManyUserInputEnvelope
+    set?: TablePreferenceWhereUniqueInput | TablePreferenceWhereUniqueInput[]
+    disconnect?: TablePreferenceWhereUniqueInput | TablePreferenceWhereUniqueInput[]
+    delete?: TablePreferenceWhereUniqueInput | TablePreferenceWhereUniqueInput[]
+    connect?: TablePreferenceWhereUniqueInput | TablePreferenceWhereUniqueInput[]
+    update?: TablePreferenceUpdateWithWhereUniqueWithoutUserInput | TablePreferenceUpdateWithWhereUniqueWithoutUserInput[]
+    updateMany?: TablePreferenceUpdateManyWithWhereWithoutUserInput | TablePreferenceUpdateManyWithWhereWithoutUserInput[]
+    deleteMany?: TablePreferenceScalarWhereInput | TablePreferenceScalarWhereInput[]
+  }
+
   export type AccountUncheckedUpdateManyWithoutUserNestedInput = {
     create?: XOR<AccountCreateWithoutUserInput, AccountUncheckedCreateWithoutUserInput> | AccountCreateWithoutUserInput[] | AccountUncheckedCreateWithoutUserInput[]
     connectOrCreate?: AccountCreateOrConnectWithoutUserInput | AccountCreateOrConnectWithoutUserInput[]
@@ -8015,6 +9395,34 @@ export namespace Prisma {
     update?: PostUpdateWithWhereUniqueWithoutCreatedByInput | PostUpdateWithWhereUniqueWithoutCreatedByInput[]
     updateMany?: PostUpdateManyWithWhereWithoutCreatedByInput | PostUpdateManyWithWhereWithoutCreatedByInput[]
     deleteMany?: PostScalarWhereInput | PostScalarWhereInput[]
+  }
+
+  export type TablePreferenceUncheckedUpdateManyWithoutUserNestedInput = {
+    create?: XOR<TablePreferenceCreateWithoutUserInput, TablePreferenceUncheckedCreateWithoutUserInput> | TablePreferenceCreateWithoutUserInput[] | TablePreferenceUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: TablePreferenceCreateOrConnectWithoutUserInput | TablePreferenceCreateOrConnectWithoutUserInput[]
+    upsert?: TablePreferenceUpsertWithWhereUniqueWithoutUserInput | TablePreferenceUpsertWithWhereUniqueWithoutUserInput[]
+    createMany?: TablePreferenceCreateManyUserInputEnvelope
+    set?: TablePreferenceWhereUniqueInput | TablePreferenceWhereUniqueInput[]
+    disconnect?: TablePreferenceWhereUniqueInput | TablePreferenceWhereUniqueInput[]
+    delete?: TablePreferenceWhereUniqueInput | TablePreferenceWhereUniqueInput[]
+    connect?: TablePreferenceWhereUniqueInput | TablePreferenceWhereUniqueInput[]
+    update?: TablePreferenceUpdateWithWhereUniqueWithoutUserInput | TablePreferenceUpdateWithWhereUniqueWithoutUserInput[]
+    updateMany?: TablePreferenceUpdateManyWithWhereWithoutUserInput | TablePreferenceUpdateManyWithWhereWithoutUserInput[]
+    deleteMany?: TablePreferenceScalarWhereInput | TablePreferenceScalarWhereInput[]
+  }
+
+  export type UserCreateNestedOneWithoutTablePreferencesInput = {
+    create?: XOR<UserCreateWithoutTablePreferencesInput, UserUncheckedCreateWithoutTablePreferencesInput>
+    connectOrCreate?: UserCreateOrConnectWithoutTablePreferencesInput
+    connect?: UserWhereUniqueInput
+  }
+
+  export type UserUpdateOneRequiredWithoutTablePreferencesNestedInput = {
+    create?: XOR<UserCreateWithoutTablePreferencesInput, UserUncheckedCreateWithoutTablePreferencesInput>
+    connectOrCreate?: UserCreateOrConnectWithoutTablePreferencesInput
+    upsert?: UserUpsertWithoutTablePreferencesInput
+    connect?: UserWhereUniqueInput
+    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutTablePreferencesInput, UserUpdateWithoutTablePreferencesInput>, UserUncheckedUpdateWithoutTablePreferencesInput>
   }
 
   export type NestedIntFilter<$PrismaModel = never> = {
@@ -8211,8 +9619,10 @@ export namespace Prisma {
     email?: string | null
     emailVerified?: Date | string | null
     image?: string | null
+    collectionPath?: string | null
     accounts?: AccountCreateNestedManyWithoutUserInput
     sessions?: SessionCreateNestedManyWithoutUserInput
+    tablePreferences?: TablePreferenceCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutPostsInput = {
@@ -8221,8 +9631,10 @@ export namespace Prisma {
     email?: string | null
     emailVerified?: Date | string | null
     image?: string | null
+    collectionPath?: string | null
     accounts?: AccountUncheckedCreateNestedManyWithoutUserInput
     sessions?: SessionUncheckedCreateNestedManyWithoutUserInput
+    tablePreferences?: TablePreferenceUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutPostsInput = {
@@ -8247,8 +9659,10 @@ export namespace Prisma {
     email?: NullableStringFieldUpdateOperationsInput | string | null
     emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     image?: NullableStringFieldUpdateOperationsInput | string | null
+    collectionPath?: NullableStringFieldUpdateOperationsInput | string | null
     accounts?: AccountUpdateManyWithoutUserNestedInput
     sessions?: SessionUpdateManyWithoutUserNestedInput
+    tablePreferences?: TablePreferenceUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutPostsInput = {
@@ -8257,8 +9671,10 @@ export namespace Prisma {
     email?: NullableStringFieldUpdateOperationsInput | string | null
     emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     image?: NullableStringFieldUpdateOperationsInput | string | null
+    collectionPath?: NullableStringFieldUpdateOperationsInput | string | null
     accounts?: AccountUncheckedUpdateManyWithoutUserNestedInput
     sessions?: SessionUncheckedUpdateManyWithoutUserNestedInput
+    tablePreferences?: TablePreferenceUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type UserCreateWithoutAccountsInput = {
@@ -8267,8 +9683,10 @@ export namespace Prisma {
     email?: string | null
     emailVerified?: Date | string | null
     image?: string | null
+    collectionPath?: string | null
     sessions?: SessionCreateNestedManyWithoutUserInput
     posts?: PostCreateNestedManyWithoutCreatedByInput
+    tablePreferences?: TablePreferenceCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutAccountsInput = {
@@ -8277,8 +9695,10 @@ export namespace Prisma {
     email?: string | null
     emailVerified?: Date | string | null
     image?: string | null
+    collectionPath?: string | null
     sessions?: SessionUncheckedCreateNestedManyWithoutUserInput
     posts?: PostUncheckedCreateNestedManyWithoutCreatedByInput
+    tablePreferences?: TablePreferenceUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutAccountsInput = {
@@ -8303,8 +9723,10 @@ export namespace Prisma {
     email?: NullableStringFieldUpdateOperationsInput | string | null
     emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     image?: NullableStringFieldUpdateOperationsInput | string | null
+    collectionPath?: NullableStringFieldUpdateOperationsInput | string | null
     sessions?: SessionUpdateManyWithoutUserNestedInput
     posts?: PostUpdateManyWithoutCreatedByNestedInput
+    tablePreferences?: TablePreferenceUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutAccountsInput = {
@@ -8313,8 +9735,10 @@ export namespace Prisma {
     email?: NullableStringFieldUpdateOperationsInput | string | null
     emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     image?: NullableStringFieldUpdateOperationsInput | string | null
+    collectionPath?: NullableStringFieldUpdateOperationsInput | string | null
     sessions?: SessionUncheckedUpdateManyWithoutUserNestedInput
     posts?: PostUncheckedUpdateManyWithoutCreatedByNestedInput
+    tablePreferences?: TablePreferenceUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type UserCreateWithoutSessionsInput = {
@@ -8323,8 +9747,10 @@ export namespace Prisma {
     email?: string | null
     emailVerified?: Date | string | null
     image?: string | null
+    collectionPath?: string | null
     accounts?: AccountCreateNestedManyWithoutUserInput
     posts?: PostCreateNestedManyWithoutCreatedByInput
+    tablePreferences?: TablePreferenceCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutSessionsInput = {
@@ -8333,8 +9759,10 @@ export namespace Prisma {
     email?: string | null
     emailVerified?: Date | string | null
     image?: string | null
+    collectionPath?: string | null
     accounts?: AccountUncheckedCreateNestedManyWithoutUserInput
     posts?: PostUncheckedCreateNestedManyWithoutCreatedByInput
+    tablePreferences?: TablePreferenceUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutSessionsInput = {
@@ -8359,8 +9787,10 @@ export namespace Prisma {
     email?: NullableStringFieldUpdateOperationsInput | string | null
     emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     image?: NullableStringFieldUpdateOperationsInput | string | null
+    collectionPath?: NullableStringFieldUpdateOperationsInput | string | null
     accounts?: AccountUpdateManyWithoutUserNestedInput
     posts?: PostUpdateManyWithoutCreatedByNestedInput
+    tablePreferences?: TablePreferenceUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutSessionsInput = {
@@ -8369,8 +9799,10 @@ export namespace Prisma {
     email?: NullableStringFieldUpdateOperationsInput | string | null
     emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     image?: NullableStringFieldUpdateOperationsInput | string | null
+    collectionPath?: NullableStringFieldUpdateOperationsInput | string | null
     accounts?: AccountUncheckedUpdateManyWithoutUserNestedInput
     posts?: PostUncheckedUpdateManyWithoutCreatedByNestedInput
+    tablePreferences?: TablePreferenceUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type AccountCreateWithoutUserInput = {
@@ -8453,6 +9885,27 @@ export namespace Prisma {
 
   export type PostCreateManyCreatedByInputEnvelope = {
     data: PostCreateManyCreatedByInput | PostCreateManyCreatedByInput[]
+  }
+
+  export type TablePreferenceCreateWithoutUserInput = {
+    id?: string
+    tableName: string
+    config: string
+  }
+
+  export type TablePreferenceUncheckedCreateWithoutUserInput = {
+    id?: string
+    tableName: string
+    config: string
+  }
+
+  export type TablePreferenceCreateOrConnectWithoutUserInput = {
+    where: TablePreferenceWhereUniqueInput
+    create: XOR<TablePreferenceCreateWithoutUserInput, TablePreferenceUncheckedCreateWithoutUserInput>
+  }
+
+  export type TablePreferenceCreateManyUserInputEnvelope = {
+    data: TablePreferenceCreateManyUserInput | TablePreferenceCreateManyUserInput[]
   }
 
   export type AccountUpsertWithWhereUniqueWithoutUserInput = {
@@ -8543,6 +9996,96 @@ export namespace Prisma {
     createdById?: StringFilter<"Post"> | string
   }
 
+  export type TablePreferenceUpsertWithWhereUniqueWithoutUserInput = {
+    where: TablePreferenceWhereUniqueInput
+    update: XOR<TablePreferenceUpdateWithoutUserInput, TablePreferenceUncheckedUpdateWithoutUserInput>
+    create: XOR<TablePreferenceCreateWithoutUserInput, TablePreferenceUncheckedCreateWithoutUserInput>
+  }
+
+  export type TablePreferenceUpdateWithWhereUniqueWithoutUserInput = {
+    where: TablePreferenceWhereUniqueInput
+    data: XOR<TablePreferenceUpdateWithoutUserInput, TablePreferenceUncheckedUpdateWithoutUserInput>
+  }
+
+  export type TablePreferenceUpdateManyWithWhereWithoutUserInput = {
+    where: TablePreferenceScalarWhereInput
+    data: XOR<TablePreferenceUpdateManyMutationInput, TablePreferenceUncheckedUpdateManyWithoutUserInput>
+  }
+
+  export type TablePreferenceScalarWhereInput = {
+    AND?: TablePreferenceScalarWhereInput | TablePreferenceScalarWhereInput[]
+    OR?: TablePreferenceScalarWhereInput[]
+    NOT?: TablePreferenceScalarWhereInput | TablePreferenceScalarWhereInput[]
+    id?: StringFilter<"TablePreference"> | string
+    userId?: StringFilter<"TablePreference"> | string
+    tableName?: StringFilter<"TablePreference"> | string
+    config?: StringFilter<"TablePreference"> | string
+  }
+
+  export type UserCreateWithoutTablePreferencesInput = {
+    id?: string
+    name?: string | null
+    email?: string | null
+    emailVerified?: Date | string | null
+    image?: string | null
+    collectionPath?: string | null
+    accounts?: AccountCreateNestedManyWithoutUserInput
+    sessions?: SessionCreateNestedManyWithoutUserInput
+    posts?: PostCreateNestedManyWithoutCreatedByInput
+  }
+
+  export type UserUncheckedCreateWithoutTablePreferencesInput = {
+    id?: string
+    name?: string | null
+    email?: string | null
+    emailVerified?: Date | string | null
+    image?: string | null
+    collectionPath?: string | null
+    accounts?: AccountUncheckedCreateNestedManyWithoutUserInput
+    sessions?: SessionUncheckedCreateNestedManyWithoutUserInput
+    posts?: PostUncheckedCreateNestedManyWithoutCreatedByInput
+  }
+
+  export type UserCreateOrConnectWithoutTablePreferencesInput = {
+    where: UserWhereUniqueInput
+    create: XOR<UserCreateWithoutTablePreferencesInput, UserUncheckedCreateWithoutTablePreferencesInput>
+  }
+
+  export type UserUpsertWithoutTablePreferencesInput = {
+    update: XOR<UserUpdateWithoutTablePreferencesInput, UserUncheckedUpdateWithoutTablePreferencesInput>
+    create: XOR<UserCreateWithoutTablePreferencesInput, UserUncheckedCreateWithoutTablePreferencesInput>
+    where?: UserWhereInput
+  }
+
+  export type UserUpdateToOneWithWhereWithoutTablePreferencesInput = {
+    where?: UserWhereInput
+    data: XOR<UserUpdateWithoutTablePreferencesInput, UserUncheckedUpdateWithoutTablePreferencesInput>
+  }
+
+  export type UserUpdateWithoutTablePreferencesInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: NullableStringFieldUpdateOperationsInput | string | null
+    emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    image?: NullableStringFieldUpdateOperationsInput | string | null
+    collectionPath?: NullableStringFieldUpdateOperationsInput | string | null
+    accounts?: AccountUpdateManyWithoutUserNestedInput
+    sessions?: SessionUpdateManyWithoutUserNestedInput
+    posts?: PostUpdateManyWithoutCreatedByNestedInput
+  }
+
+  export type UserUncheckedUpdateWithoutTablePreferencesInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: NullableStringFieldUpdateOperationsInput | string | null
+    emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    image?: NullableStringFieldUpdateOperationsInput | string | null
+    collectionPath?: NullableStringFieldUpdateOperationsInput | string | null
+    accounts?: AccountUncheckedUpdateManyWithoutUserNestedInput
+    sessions?: SessionUncheckedUpdateManyWithoutUserNestedInput
+    posts?: PostUncheckedUpdateManyWithoutCreatedByNestedInput
+  }
+
   export type AccountCreateManyUserInput = {
     id?: string
     type: string
@@ -8569,6 +10112,12 @@ export namespace Prisma {
     name: string
     createdAt?: Date | string
     updatedAt?: Date | string
+  }
+
+  export type TablePreferenceCreateManyUserInput = {
+    id?: string
+    tableName: string
+    config: string
   }
 
   export type AccountUpdateWithoutUserInput = {
@@ -8652,6 +10201,24 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type TablePreferenceUpdateWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    tableName?: StringFieldUpdateOperationsInput | string
+    config?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type TablePreferenceUncheckedUpdateWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    tableName?: StringFieldUpdateOperationsInput | string
+    config?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type TablePreferenceUncheckedUpdateManyWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    tableName?: StringFieldUpdateOperationsInput | string
+    config?: StringFieldUpdateOperationsInput | string
   }
 
 

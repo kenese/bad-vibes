@@ -125,7 +125,7 @@ const toArray = <T>(maybe: T | T[] | undefined): T[] => {
   return Array.isArray(maybe) ? maybe : [maybe];
 };
 
-class CollectionService {
+export class CollectionService {
   private readonly collectionPath: string;
   private document: NmlDocument | null = null;
   private trackIndex = new Map<string, TrackEntry>();
@@ -136,8 +136,8 @@ class CollectionService {
   private idCounter = 0;
   private loadingPromise: Promise<void> | null = null;
 
-  constructor(filePath?: string) {
-    this.collectionPath = filePath ?? path.resolve(process.cwd(), process.env.COLLECTION_FILE ?? 'collection.nml');
+  constructor(filePath: string) {
+    this.collectionPath = filePath;
   }
 
   async load(): Promise<void> {
@@ -592,6 +592,3 @@ class CollectionService {
   }
 }
 
-const collectionService = new CollectionService(process.env.COLLECTION_FILE);
-
-export default collectionService;

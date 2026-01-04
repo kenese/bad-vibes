@@ -1,7 +1,7 @@
 .app-shell {
   display: grid;
   grid-template-columns: 300px 6px 1fr;
-  height: 100vh;
+  height: 100%;
   overflow: hidden;
   background: #0d1117;
   color: #f0f6fc;
@@ -56,6 +56,25 @@
   display: flex;
   align-items: center;
   gap: 0.25rem;
+}
+.flex-stack {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.download-link {
+  text-decoration: none;
+  font-size: 1.25rem;
+  opacity: 0.6;
+  transition: opacity 0.2s, transform 0.2s;
+  cursor: pointer;
+  padding: 4px;
+}
+
+.download-link:hover {
+  opacity: 1;
+  transform: translateY(-1px);
 }
 
 .tree-node {

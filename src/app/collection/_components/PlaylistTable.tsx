@@ -1,6 +1,7 @@
 'use client';
 
 import { useMemo, useState, useRef, useEffect, useCallback } from 'react';
+import { api } from '~/trpc/react';
 import type { AppRouter } from '~/server/api/root';
 import type { inferRouterOutputs } from '@trpc/server';
 
@@ -8,6 +9,7 @@ type TrackRow = inferRouterOutputs<AppRouter>['collection']['playlistTracks']['t
 type SortKey = keyof Pick<TrackRow, 'title' | 'artist' | 'album' | 'bpm' | 'rating'>;
 type SortState = { key: SortKey; direction: 'asc' | 'desc' };
 
+const TABLE_NAME = 'playlist_tracks';
 const columns: { key: SortKey; label: string; minWidth: number }[] = [
   { key: 'title', label: 'Title', minWidth: 200 },
   { key: 'artist', label: 'Artist', minWidth: 150 },
@@ -28,6 +30,18 @@ const PlaylistTable = ({
   const resizingRef = useRef<{ key: string; startX: number; startWidth: number } | null>(
     null
   );
+
+  const configQuery = api.preferences.getTableConfig.useQuery(
+    { tableName: TABLE_NAME },
+    { staleTime: Infinity }
+  );
+  const setConfigMutation = api.preferences.setTableConfig.useMutation();
+
+  useEffect(() => {
+    if (configQuery.data) {
+      setColumnWidths(configQuery.data);
+    }
+  }, [configQuery.data]);
 
   const sortedTracks = useMemo(() => {
     const list = [...tracks];
@@ -77,8 +91,17 @@ const PlaylistTable = ({
       resizingRef.current = null;
       document.body.style.cursor = '';
       document.body.style.userSelect = '';
+
+      // Save to DB on resize end
+      setColumnWidths((current) => {
+        void setConfigMutation.mutate({
+          tableName: TABLE_NAME,
+          config: current
+        });
+        return current;
+      });
     }
-  }, []);
+  }, [setConfigMutation]);
 
   useEffect(() => {
     window.addEventListener('mousemove', handleResizeMove);

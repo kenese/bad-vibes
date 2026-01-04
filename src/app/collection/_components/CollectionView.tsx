@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState, useCallback } from 'react';
 import { api } from '~/trpc/react';
 import Sidebar, { type FlattenedFolder } from './Sidebar';
 import PlaylistTable from './PlaylistTable';
+import UploadPrompt from './UploadPrompt';
 import type { AppRouter } from '~/server/api/root';
 import type { inferRouterOutputs } from '@trpc/server';
 
@@ -15,7 +16,10 @@ type SidebarNode = NonNullable<
 
 const CollectionView = () => {
   const utils = api.useUtils();
-  const sidebarQuery = api.collection.sidebar.useQuery();
+  const hasCollectionQuery = api.collection.hasCollection.useQuery();
+  const sidebarQuery = api.collection.sidebar.useQuery(undefined, {
+    enabled: !!hasCollectionQuery.data
+  });
   const [activePath, setActivePath] = useState<string | null>(null);
   const [selectedPaths, setSelectedPaths] = useState<string[]>([]);
   const [companionName, setCompanionName] = useState('');
@@ -59,12 +63,6 @@ const CollectionView = () => {
     return null;
   }, [sidebarQuery.data, activePath]);
 
-  useEffect(() => {
-    if (!activePath && sidebarQuery.data?.tree) {
-      const firstPlaylist = findFirstPlaylist(sidebarQuery.data.tree);
-      setActivePath(firstPlaylist?.path ?? sidebarQuery.data.tree.path);
-    }
-  }, [sidebarQuery.data, activePath]);
 
   const playlistQuery = api.collection.playlistTracks.useQuery(
     { path: activePath ?? '' },
@@ -104,6 +102,30 @@ const CollectionView = () => {
       setSelectedPaths([]);
     }
   });
+
+  const stateQuery = api.preferences.getTableConfig.useQuery(
+    { tableName: 'collection_view' },
+    { staleTime: Infinity }
+  );
+  const setStateMutation = api.preferences.setTableConfig.useMutation();
+
+  useEffect(() => {
+    if (stateQuery.data?.lastOpenedPath && !activePath && sidebarQuery.data?.tree) {
+      setActivePath(stateQuery.data.lastOpenedPath as string);
+    } else if (!activePath && sidebarQuery.data?.tree && stateQuery.isSuccess) {
+      const firstPlaylist = findFirstPlaylist(sidebarQuery.data.tree);
+      setActivePath(firstPlaylist?.path ?? sidebarQuery.data.tree.path);
+    }
+  }, [stateQuery.data, stateQuery.isSuccess, sidebarQuery.data, activePath]);
+
+  useEffect(() => {
+    if (activePath) {
+      void setStateMutation.mutate({
+        tableName: 'collection_view',
+        config: { lastOpenedPath: activePath }
+      });
+    }
+  }, [activePath, setStateMutation]);
 
   const selectedFolderPath =
     activeNode?.type === 'FOLDER'
@@ -168,6 +190,12 @@ const CollectionView = () => {
     );
   };
 
+  if (hasCollectionQuery.isLoading) return <div className="p-8 text-center text-[#8b949e]">Loading your collection status...</div>;
+
+  if (!hasCollectionQuery.data) {
+    return <UploadPrompt onUploadSuccess={() => void utils.collection.hasCollection.invalidate()} />;
+  }
+
   return (
     <div
       className={`app-shell ${isResizing ? 'resizing' : ''}`}
@@ -175,7 +203,16 @@ const CollectionView = () => {
     >
       <aside className="sidebar-panel">
         <header>
-          <h1>Traktor Collection</h1>
+          <div className="flex-stack">
+            <h1>Traktor Collection</h1>
+            <a 
+              href="/api/collection/download" 
+              className="download-link"
+              title="Download collection.nml"
+            >
+              📥
+            </a>
+          </div>
           <p className="meta">
             {sidebarQuery.isLoading
               ? 'Loading...'

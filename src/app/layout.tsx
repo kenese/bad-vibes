@@ -16,13 +16,22 @@ const geist = Geist({
   variable: "--font-geist-sans",
 });
 
+import Navbar from "./_components/Navbar";
+
 export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en" className={`${geist.variable}`}>
       <body>
-        <TRPCReactProvider>{children}</TRPCReactProvider>
+        <TRPCReactProvider>
+          <div className="app-container">
+            <Navbar />
+            <main className="content-area">
+              {children}
+            </main>
+          </div>
+        </TRPCReactProvider>
       </body>
     </html>
   );
