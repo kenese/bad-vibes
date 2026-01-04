@@ -1,77 +1,60 @@
 import Link from "next/link";
-
-import { LatestPost } from "~/app/_components/post";
 import { auth } from "~/server/auth";
-import { api, HydrateClient } from "~/trpc/server";
+import { HydrateClient } from "~/trpc/server";
 
 export default async function Home() {
-  const hello = await api.post.hello({ text: "from tRPC" });
   const session = await auth();
-
-  if (session?.user) {
-    void api.post.getLatest.prefetch();
-  }
 
   return (
     <HydrateClient>
-      <main className="flex min-h-full flex-col items-center justify-center bg-gradient-to-b from-[#2e026d] to-[#15162c] text-white">
-        <div className="container flex flex-col items-center justify-center gap-12 px-4 py-16">
-          <h1 className="text-5xl font-extrabold tracking-tight sm:text-[5rem]">
-            Create <span className="text-[hsl(280,100%,70%)]">T3</span> App
-          </h1>
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:gap-8">
-            <Link
-              className="flex max-w-xs flex-col gap-4 rounded-xl bg-white/10 p-4 hover:bg-white/20"
-              href="https://create.t3.gg/en/usage/first-steps"
-              target="_blank"
-            >
-              <h3 className="text-2xl font-bold">First Steps →</h3>
-              <div className="text-lg">
-                Just the basics - Everything you need to know to set up your
-                database and authentication.
-              </div>
-            </Link>
-            <Link
-              className="flex max-w-xs flex-col gap-4 rounded-xl bg-white/10 p-4 hover:bg-white/20"
-              href="https://create.t3.gg/en/introduction"
-              target="_blank"
-            >
-              <h3 className="text-2xl font-bold">Documentation →</h3>
-              <div className="text-lg">
-                Learn more about Create T3 App, the libraries it uses, and how
-                to deploy it.
-              </div>
-            </Link>
-          </div>
-          <div className="flex flex-col items-center gap-2">
-            <p className="text-2xl text-white">
-              {hello ? hello.greeting : "Loading tRPC query..."}
+      <main className="flex min-h-full flex-col items-center justify-center bg-gradient-to-b from-[#0d1117] to-[#161b22] text-[#f0f6fc]">
+        <div className="container flex flex-col items-center justify-center gap-12 px-4 py-16 text-center">
+          <div className="space-y-4">
+            <h1 className="text-6xl font-extrabold tracking-tight sm:text-[6rem] text-[#388bfd]">
+              bad vibes
+            </h1>
+            <p className="text-xl text-[#8b949e] max-w-lg mx-auto leading-relaxed">
+              a vibe coded dj multi tool for me to use with traktor. <br />
+              <span className="italic text-[#f85149]">I wouldn't trust any of it to be honest.</span>
             </p>
+          </div>
 
+          <div className="flex flex-col items-center justify-center gap-8">
             <div className="flex flex-col items-center justify-center gap-4">
-              <p className="text-center text-2xl text-white">
-                {session && <span>Logged in as {session.user?.name}</span>}
+              <p className="text-center text-lg text-[#c9d1d9]">
+                {session && <span>Logged in as <span className="text-[#58a6ff]">{session.user?.name}</span></span>}
               </p>
               <Link
                 href={session ? "/api/auth/signout" : "/api/auth/signin"}
-                className="rounded-full bg-white/10 px-10 py-3 font-semibold no-underline transition hover:bg-white/20"
+                className="rounded-full bg-[#21262d] border border-[#30363d] px-10 py-3 font-semibold text-[#c9d1d9] no-underline transition hover:bg-[#30363d] hover:border-[#8b949e]"
               >
                 {session ? "Sign out" : "Sign in"}
               </Link>
             </div>
-          </div>
 
-          {session?.user && (
-            <>
-              <LatestPost />
-              <Link
-                href="/posts"
-                className="rounded-full bg-[hsl(280,100%,70%)] px-10 py-3 font-semibold text-white no-underline transition hover:bg-[hsl(280,100%,60%)]"
-              >
-                View All Posts →
-              </Link>
-            </>
-          )}
+            {session && (
+              <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:gap-8 max-w-4xl">
+                <Link
+                  className="flex max-w-xs flex-col gap-4 rounded-2xl bg-[#161b22] border border-[#30363d] p-6 hover:bg-[#1c2128] hover:border-[#388bfd] transition-all"
+                  href="/collection"
+                >
+                  <h3 className="text-2xl font-bold text-[#58a6ff]">Traktor Collection →</h3>
+                  <div className="text-sm text-[#8b949e]">
+                    Manage your playlists and folders. Upload your collection.nml and start vibing.
+                  </div>
+                </Link>
+                <Link
+                  className="flex max-w-xs flex-col gap-4 rounded-2xl bg-[#161b22] border border-[#30363d] p-6 hover:bg-[#1c2128] hover:border-[#388bfd] transition-all"
+                  href="/playlist-manager"
+                >
+                  <h3 className="text-2xl font-bold text-[#58a6ff]">Playlist Manager →</h3>
+                  <div className="text-sm text-[#8b949e]">
+                    Advanced batch tools for mass playlist organization and housekeeping.
+                  </div>
+                </Link>
+              </div>
+            )}
+          </div>
         </div>
       </main>
     </HydrateClient>
