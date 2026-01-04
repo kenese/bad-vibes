@@ -24,7 +24,11 @@ export const playlistToolsRouter = createTRPCRouter({
   fetchExternal: protectedProcedure
     .input(z.object({ url: z.string().url() }))
     .mutation(async ({ input }) => {
-      const response = await fetch(input.url);
+      const response = await fetch(input.url, {
+        headers: {
+          "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+        }
+      });
       if (!response.ok) {
         throw new TRPCError({
           code: "BAD_REQUEST",
@@ -32,10 +36,16 @@ export const playlistToolsRouter = createTRPCRouter({
         });
       }
       const html = await response.text();
+      console.log(`[fetchExternal] URL: ${input.url}, HTML Length: ${html.length}`);
+      
+      // Check for common error pages
+      if (html.includes("consent.google.com")) {
+        console.warn("[fetchExternal] Redirected to Google Consent page");
+      }
       const tracks: { track: string; artist: string }[] = [];
 
       if (input.url.includes("spotify.com")) {
-        // Use the embed URL for easier parsing
+        // ... (Spotify logic remains mostly same, just ensuring robustness)
         const embedUrl = input.url.includes("/embed/") 
           ? input.url 
           : input.url.replace("open.spotify.com/", "open.spotify.com/embed/");
@@ -83,12 +93,41 @@ export const playlistToolsRouter = createTRPCRouter({
             });
           }
         }
+      } else if (input.url.includes("music.youtube.com")) {
+        // YouTube Music uses hydration blocks initialData.push(...)
+        const blocks = html.split('initialData.push(');
+        const correctBlock = blocks.find(b => b.includes('musicPlaylistShelfRenderer'));
         
-        if (tracks.length === 0) {
-            throw new TRPCError({
-              code: "NOT_FOUND",
-              message: "No tracks found in Spotify link. Is it a public playlist?"
-            });
+        if (correctBlock) {
+          const dataMatch = correctBlock.match(/data:\s*'([^']+)'/);
+          if (dataMatch?.[1]) {
+            const encodedData = dataMatch[1];
+            const decodedData = encodedData.replace(/\\x([0-9a-fA-F]{2})/g, (_, hex) => 
+               String.fromCharCode(parseInt(hex, 16))
+            );
+            
+            try {
+              const data = JSON.parse(decodedData);
+              const shelf = data.contents?.twoColumnBrowseResultsRenderer?.secondaryContents?.sectionListRenderer?.contents?.[0]?.musicPlaylistShelfRenderer;
+              const items = shelf?.contents || [];
+              
+              items.forEach((item: any) => {
+                const r = item.musicResponsiveListItemRenderer;
+                if (r) {
+                  const title = r.flexColumns?.[0]?.musicResponsiveListItemFlexColumnRenderer?.text?.runs?.[0]?.text;
+                  const artist = r.flexColumns?.[1]?.musicResponsiveListItemFlexColumnRenderer?.text?.runs?.[0]?.text;
+                  if (title) {
+                    tracks.push({
+                      track: title,
+                      artist: artist || "Unknown Artist"
+                    });
+                  }
+                }
+              });
+            } catch (e) {
+              console.error("YouTube Music parse error:", e);
+            }
+          }
         }
       } else if (input.url.includes("youtube.com") || input.url.includes("youtu.be")) {
         const start = html.indexOf("ytInitialData = ") + "ytInitialData = ".length;
@@ -108,7 +147,7 @@ export const playlistToolsRouter = createTRPCRouter({
                 const fullTitle = v.title?.runs?.[0]?.text || "";
                 const channel = v.shortBylineText?.runs?.[0]?.text || "";
                 
-                // YouTube music titles are usually Artist - Track
+                // Try to split title if it contains artist
                 const splitters = [" - ", " – ", " — ", " | "];
                 let track = fullTitle;
                 let artist = channel;
@@ -129,17 +168,17 @@ export const playlistToolsRouter = createTRPCRouter({
             console.error("YouTube parse error:", e);
           }
         }
-        
-        if (tracks.length === 0) {
-          throw new TRPCError({
-            code: "NOT_FOUND",
-            message: "No tracks found in YouTube link. Is it a public playlist?"
-          });
-        }
       } else {
         throw new TRPCError({
           code: "BAD_REQUEST",
-          message: "Unsupported URL. Only Spotify and YouTube links are supported."
+          message: "Unsupported URL. Please provide a public Spotify, YouTube, or YouTube Music playlist link."
+        });
+      }
+
+      if (tracks.length === 0) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "No tracks found in the provided link. Please ensure the playlist is public."
         });
       }
 
