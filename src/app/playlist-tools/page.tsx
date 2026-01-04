@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { api } from '~/trpc/react';
 
 export default function PlaylistToolsPage() {
@@ -9,6 +9,8 @@ export default function PlaylistToolsPage() {
     const [externalUrl, setExternalUrl] = useState('');
     const [playlistName, setPlaylistName] = useState('My New Playlist');
     const [parsedItems, setParsedItems] = useState<{ track: string; artist: string }[]>([]);
+    const [history, setHistory] = useState<{ track: string; artist: string }[] | null>(null);
+    const [isInputFocused, setIsInputFocused] = useState(false);
     
     const playlistsQuery = api.playlistTools.getPlaylists.useQuery();
     
@@ -21,6 +23,7 @@ export default function PlaylistToolsPage() {
 
     const fetchExternal = api.playlistTools.fetchExternal.useMutation({
         onSuccess: (data) => {
+            setHistory(parsedItems);
             setParsedItems(data.tracks);
             setPlaylistName(data.name);
             setExternalUrl('');
@@ -50,6 +53,7 @@ export default function PlaylistToolsPage() {
                 artist: parts[1] || 'Unknown Artist'
             };
         });
+        setHistory(parsedItems);
         setParsedItems(parsed);
     };
 
@@ -57,9 +61,9 @@ export default function PlaylistToolsPage() {
         const next = [...parsedItems];
         const item = next[index];
         if (item) {
-            // Split on various dashes, pipe, underscore, hyphen
             const parts = item.track.split(/[-–—|_]/).map(p => p.trim());
             if (parts.length >= 2) {
+                setHistory([...parsedItems.map(i => ({ ...i }))]);
                 item.artist = parts[0]!;
                 item.track = parts.slice(1).join(' - ');
                 setParsedItems(next);
@@ -72,25 +76,50 @@ export default function PlaylistToolsPage() {
         const item = next[index];
         if (item) {
             const cleanStr = (s: string) => {
-                // Remove text between parens first
                 let cleaned = s.replace(/\(.*?\)/g, "");
-                // Remove non-alphanumeric and keep spaces
                 cleaned = cleaned.replace(/[^a-zA-Z0-9\s]/g, "");
                 return cleaned.replace(/\s+/g, " ").trim();
             };
+            setHistory([...parsedItems.map(i => ({ ...i }))]);
             item.track = cleanStr(item.track);
             item.artist = cleanStr(item.artist);
             setParsedItems(next);
         }
     };
 
+    const handleRemoveRow = (index: number) => {
+        setHistory([...parsedItems.map(i => ({ ...i }))]);
+        const next = parsedItems.filter((_, i) => i !== index);
+        setParsedItems(next);
+    };
+
     const handleCellChange = (index: number, field: 'track' | 'artist', value: string) => {
         const next = [...parsedItems];
         if (next[index]) {
+            setHistory([...parsedItems.map(i => ({ ...i }))]);
             next[index][field] = value;
             setParsedItems(next);
         }
     };
+
+    const handleUndo = () => {
+        if (history) {
+            const current = [...parsedItems];
+            setParsedItems(history);
+            setHistory(current);
+        }
+    };
+
+    useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if ((e.metaKey || e.ctrlKey) && e.key === 'z') {
+                e.preventDefault();
+                handleUndo();
+            }
+        };
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, [history, parsedItems]);
 
     return (
         <main className="p-8 max-w-7xl mx-auto text-[#f0f6fc]">
@@ -98,6 +127,64 @@ export default function PlaylistToolsPage() {
                 <h1 className="text-4xl font-extrabold text-[#58a6ff] mb-2">Playlist Tools</h1>
                 <p className="text-[#8b949e]">Paste tracklists or fetch from external services.</p>
             </header>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+                {/* Paste Section */}
+                <div 
+                    className="bg-[#161b22] border border-[#30363d] rounded-xl p-6 shadow-sm transition-all duration-500 ease-in-out"
+                    onFocus={() => setIsInputFocused(true)}
+                    onBlur={(e) => {
+                        // Only blur if the new focus isn't inside this container
+                        if (!e.currentTarget.contains(e.relatedTarget as Node)) {
+                            setIsInputFocused(false);
+                        }
+                    }}
+                >
+                    <label className="block text-sm font-medium text-[#8b949e] mb-3 uppercase tracking-wider">
+                        Paste Tracklist (Track - Artist)
+                    </label>
+                    <textarea
+                        className={`w-full bg-[#0d1117] border border-[#30363d] rounded-lg p-4 text-[#c9d1d9] focus:ring-2 focus:ring-[#388bfd] focus:border-transparent outline-none resize-none transition-all duration-500 font-mono text-sm leading-relaxed overflow-hidden ${isInputFocused ? 'h-64' : 'h-12'}`}
+                        placeholder="Song Title - Artist Name"
+                        value={rawText}
+                        onChange={(e) => setRawText(e.target.value)}
+                    />
+                    <div className={`transition-all duration-500 overflow-hidden ${isInputFocused ? 'max-h-20 opacity-100 mt-4' : 'max-h-0 opacity-0'}`}>
+                        <button 
+                            onClick={handleParse}
+                            className="w-full bg-[#238636] hover:bg-[#2eaa42] text-white font-bold py-2.5 px-6 rounded-lg transition-colors border border-transparent shadow-md"
+                        >
+                            Parse Text
+                        </button>
+                    </div>
+                </div>
+
+                {/* Import Section */}
+                <div className="bg-[#161b22] border border-[#30363d] rounded-xl p-6 shadow-sm flex flex-col justify-center">
+                    <label className="block text-sm font-medium text-[#8b949e] mb-3 uppercase tracking-wider">
+                        Import from Link (Spotify/YT)
+                    </label>
+                    <div className="flex gap-2">
+                        <input
+                            type="text"
+                            className="flex-1 bg-[#0d1117] border border-[#30363d] rounded-lg p-3 text-[#c9d1d9] outline-none focus:ring-2 focus:ring-[#388bfd]"
+                            placeholder="Paste Spotify/YouTube playlist URL"
+                            value={externalUrl}
+                            onChange={(e) => setExternalUrl(e.target.value)}
+                        />
+                        <button
+                            onClick={() => fetchExternal.mutate({ url: externalUrl })}
+                            disabled={fetchExternal.isPending || !externalUrl}
+                            className="bg-[#21262d] hover:bg-[#30363d] px-4 rounded-lg text-sm font-bold border border-[#30363d] transition-colors h-12"
+                        >
+                            {fetchExternal.isPending ? '...' : 'Fetch'}
+                        </button>
+                    </div>
+                    {fetchExternal.error && (
+                        <p className="mt-2 text-xs text-[#f85149]">{fetchExternal.error.message}</p>
+                    )}
+                </div>
+            </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
                 {/* Side List */}
@@ -134,134 +221,92 @@ export default function PlaylistToolsPage() {
                     </div>
                 </div>
 
-                {/* Main Workspace */}
+                {/* Preview Section */}
                 <div className="lg:col-span-3">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                        {/* Input Section */}
-                        <div className="space-y-6">
-                            <div className="bg-[#161b22] border border-[#30363d] rounded-xl p-6 shadow-sm">
-                                <label className="block text-sm font-medium text-[#8b949e] mb-3 uppercase tracking-wider">
-                                    Paste Tracklist (Track - Artist)
-                                </label>
-                                <textarea
-                                    className="w-full h-64 bg-[#0d1117] border border-[#30363d] rounded-lg p-4 text-[#c9d1d9] focus:ring-2 focus:ring-[#388bfd] focus:border-transparent outline-none resize-none transition-all font-mono text-sm leading-relaxed"
-                                    placeholder="Song Title - Artist Name&#10;Another Banger - DJ Vibes"
-                                    value={rawText}
-                                    onChange={(e) => setRawText(e.target.value)}
-                                />
-                                <button 
-                                    onClick={handleParse}
-                                    className="mt-4 w-full bg-[#238636] hover:bg-[#2eaa42] text-white font-bold py-3 px-6 rounded-lg transition-colors border border-transparent shadow-md"
-                                >
-                                    Parse Text
-                                </button>
-                            </div>
-
-                        <div className="bg-[#161b22] border border-[#30363d] rounded-xl p-6 shadow-sm">
-                            <label className="block text-sm font-medium text-[#8b949e] mb-3 uppercase tracking-wider">
-                                Import from Link (Spotify/YT)
-                            </label>
-                            <div className="flex gap-2">
-                                <input
-                                    type="text"
-                                    className="flex-1 bg-[#0d1117] border border-[#30363d] rounded-lg p-3 text-[#c9d1d9] outline-none focus:ring-2 focus:ring-[#388bfd]"
-                                    placeholder="Paste Spotify/YouTube playlist URL"
-                                    value={externalUrl}
-                                    onChange={(e) => setExternalUrl(e.target.value)}
-                                />
-                                <button
-                                    onClick={() => fetchExternal.mutate({ url: externalUrl })}
-                                    disabled={fetchExternal.isPending || !externalUrl}
-                                    className="bg-[#21262d] hover:bg-[#30363d] px-4 rounded-lg text-sm font-bold border border-[#30363d] transition-colors"
-                                >
-                                    {fetchExternal.isPending ? '...' : 'Fetch'}
-                                </button>
-                            </div>
-                            {fetchExternal.error && (
-                                <p className="mt-2 text-xs text-[#f85149]">{fetchExternal.error.message}</p>
+                    <div className="bg-[#161b22] border border-[#30363d] rounded-xl p-6 shadow-sm min-h-[400px]">
+                        <div className="flex justify-between items-center mb-6">
+                            <h2 className="text-xl font-bold text-[#c9d1d9]">Playlist Preview</h2>
+                            {parsedItems.length > 0 && (
+                                <div className="flex gap-3">
+                                    <input 
+                                        className="bg-[#0d1117] border border-[#30363d] rounded px-3 py-1 text-sm outline-none w-40"
+                                        value={playlistName}
+                                        onChange={(e) => setPlaylistName(e.target.value)}
+                                        placeholder="Playlist Name"
+                                    />
+                                    <button 
+                                        onClick={() => savePlaylist.mutate({ name: playlistName, items: parsedItems })}
+                                        disabled={savePlaylist.isPending}
+                                        className="bg-[#21262d] hover:bg-[#30363d] text-[#c9d1d9] border border-[#30363d] px-4 py-1 rounded text-sm transition-all"
+                                    >
+                                        {savePlaylist.isPending ? 'Saving...' : 'Save Playlist'}
+                                    </button>
+                                </div>
                             )}
                         </div>
-                    </div>
 
-                        {/* Preview/Editor Section */}
-                        <div className="bg-[#161b22] border border-[#30363d] rounded-xl p-6 shadow-sm min-h-[400px]">
-                            <div className="flex justify-between items-center mb-6">
-                                <h2 className="text-xl font-bold text-[#c9d1d9]">Playlist Preview</h2>
-                                {parsedItems.length > 0 && (
-                                    <div className="flex gap-3">
-                                        <input 
-                                            className="bg-[#0d1117] border border-[#30363d] rounded px-3 py-1 text-sm outline-none w-40"
-                                            value={playlistName}
-                                            onChange={(e) => setPlaylistName(e.target.value)}
-                                            placeholder="Playlist Name"
-                                        />
-                                        <button 
-                                            onClick={() => savePlaylist.mutate({ name: playlistName, items: parsedItems })}
-                                            disabled={savePlaylist.isPending}
-                                            className="bg-[#21262d] hover:bg-[#30363d] text-[#c9d1d9] border border-[#30363d] px-4 py-1 rounded text-sm transition-all"
-                                        >
-                                            {savePlaylist.isPending ? 'Saving...' : 'Save Playlist'}
-                                        </button>
-                                    </div>
-                                )}
+                        {parsedItems.length === 0 ? (
+                            <div className="flex flex-col items-center justify-center min-h-[300px] text-[#8b949e] italic border-2 border-dashed border-[#30363d] rounded-lg">
+                                Parsed tracks will appear here
                             </div>
-
-                            {parsedItems.length === 0 ? (
-                                <div className="flex flex-col items-center justify-center min-h-[300px] text-[#8b949e] italic border-2 border-dashed border-[#30363d] rounded-lg">
-                                    Parsed tracks will appear here
-                                </div>
-                            ) : (
-                                <div className="overflow-x-auto">
-                                    <table className="w-full text-left border-collapse">
-                                        <thead>
-                                            <tr className="border-b border-[#30363d] text-[#8b949e] text-xs font-semibold uppercase tracking-wider">
-                                                <th className="py-3 px-4">Track</th>
-                                                <th className="py-3 px-4">Artist</th>
-                                                <th className="py-3 px-4 text-right">Actions</th>
+                        ) : (
+                            <div className="overflow-x-auto">
+                                <table className="w-full text-left border-collapse">
+                                    <thead>
+                                        <tr className="border-b border-[#30363d] text-[#8b949e] text-xs font-semibold uppercase tracking-wider">
+                                            <th className="py-3 px-4">Track</th>
+                                            <th className="py-3 px-4">Artist</th>
+                                            <th className="py-3 px-4 text-right">Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {parsedItems.map((item, idx) => (
+                                            <tr key={idx} className="border-b border-[#21262d] hover:bg-[#1c2128] transition-colors group">
+                                                <td className="py-1 px-2">
+                                                    <input
+                                                        className="w-full bg-transparent border-none outline-none text-[#c9d1d9] focus:bg-[#0d1117] px-2 py-1 rounded text-sm"
+                                                        value={item.track}
+                                                        onChange={(e) => handleCellChange(idx, 'track', e.target.value)}
+                                                    />
+                                                </td>
+                                                <td className="py-1 px-2">
+                                                    <input
+                                                        className="w-full bg-transparent border-none outline-none text-[#c9d1d9] focus:bg-[#0d1117] px-2 py-1 rounded text-sm"
+                                                        value={item.artist}
+                                                        onChange={(e) => handleCellChange(idx, 'artist', e.target.value)}
+                                                    />
+                                                </td>
+                                                <td className="py-1 px-4 text-right">
+                                                    <div className="flex justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                        <button 
+                                                            onClick={() => handleSplit(idx)}
+                                                            title="Split Track into Artist - Track"
+                                                            className="p-1.5 hover:bg-[#30363d] rounded text-[#8b949e] hover:text-[#58a6ff] transition-colors"
+                                                        >
+                                                            ✂️
+                                                        </button>
+                                                        <button 
+                                                            onClick={() => handleClean(idx)}
+                                                            title="Clean (Alpha-numeric only, remove parens)"
+                                                            className="p-1.5 hover:bg-[#30363d] rounded text-[#8b949e] hover:text-[#58a6ff] transition-colors"
+                                                        >
+                                                            ✨
+                                                        </button>
+                                                        <button 
+                                                            onClick={() => handleRemoveRow(idx)}
+                                                            title="Remove Track"
+                                                            className="p-1.5 hover:bg-[#30363d] rounded text-[#8b949e] hover:text-[#f85149] transition-colors"
+                                                        >
+                                                            🗑️
+                                                        </button>
+                                                    </div>
+                                                </td>
                                             </tr>
-                                        </thead>
-                                        <tbody>
-                                            {parsedItems.map((item, idx) => (
-                                                <tr key={idx} className="border-b border-[#21262d] hover:bg-[#1c2128] transition-colors group">
-                                                    <td className="py-1 px-2">
-                                                        <input
-                                                            className="w-full bg-transparent border-none outline-none text-[#c9d1d9] focus:bg-[#0d1117] px-2 py-1 rounded text-sm"
-                                                            value={item.track}
-                                                            onChange={(e) => handleCellChange(idx, 'track', e.target.value)}
-                                                        />
-                                                    </td>
-                                                    <td className="py-1 px-2">
-                                                        <input
-                                                            className="w-full bg-transparent border-none outline-none text-[#c9d1d9] focus:bg-[#0d1117] px-2 py-1 rounded text-sm"
-                                                            value={item.artist}
-                                                            onChange={(e) => handleCellChange(idx, 'artist', e.target.value)}
-                                                        />
-                                                    </td>
-                                                    <td className="py-1 px-4 text-right">
-                                                        <div className="flex justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                                                            <button 
-                                                                onClick={() => handleSplit(idx)}
-                                                                title="Split Track into Artist - Track"
-                                                                className="p-1.5 hover:bg-[#30363d] rounded text-[#8b949e] hover:text-[#58a6ff] transition-colors"
-                                                            >
-                                                                ✂️
-                                                            </button>
-                                                            <button 
-                                                                onClick={() => handleClean(idx)}
-                                                                title="Clean (Alpha-numeric only, remove parens)"
-                                                                className="p-1.5 hover:bg-[#30363d] rounded text-[#8b949e] hover:text-[#58a6ff] transition-colors"
-                                                            >
-                                                                ✨
-                                                            </button>
-                                                        </div>
-                                                    </td>
-                                                </tr>
-                                            ))}
-                                        </tbody>
-                                    </table>
-                                </div>
-                            )}
-                        </div>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>
