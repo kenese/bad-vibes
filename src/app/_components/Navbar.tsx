@@ -19,10 +19,10 @@ const Navbar = () => {
           Traktor Collection
         </Link>
         <Link 
-          href="/playlist-manager" 
-          className={`nav-link ${pathname.startsWith('/playlist-manager') ? 'active' : ''}`}
+          href="/playlist-tools" 
+          className={`nav-link ${pathname.startsWith('/playlist-tools') ? 'active' : ''}`}
         >
-          Playlist Manager
+          Playlist Tools
         </Link>
       </div>
     </nav>

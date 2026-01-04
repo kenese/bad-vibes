@@ -163,6 +163,21 @@ exports.Prisma.VerificationTokenScalarFieldEnum = {
   expires: 'expires'
 };
 
+exports.Prisma.StandalonePlaylistScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  name: 'name',
+  createdAt: 'createdAt'
+};
+
+exports.Prisma.PlaylistItemScalarFieldEnum = {
+  id: 'id',
+  playlistId: 'playlistId',
+  track: 'track',
+  artist: 'artist',
+  order: 'order'
+};
+
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -179,7 +194,9 @@ exports.Prisma.ModelName = {
   Session: 'Session',
   User: 'User',
   TablePreference: 'TablePreference',
-  VerificationToken: 'VerificationToken'
+  VerificationToken: 'VerificationToken',
+  StandalonePlaylist: 'StandalonePlaylist',
+  PlaylistItem: 'PlaylistItem'
 };
 
 /**

@@ -44,15 +44,16 @@ model Session {
 }
 
 model User {
-    id               String            @id @default(cuid())
-    name             String?
-    email            String?           @unique
-    emailVerified    DateTime?
-    image            String?
-    collectionPath   String?
-    accounts         Account[]
-    sessions         Session[]
-    tablePreferences TablePreference[]
+    id                  String               @id @default(cuid())
+    name                String?
+    email               String?              @unique
+    emailVerified       DateTime?
+    image               String?
+    collectionPath      String?
+    accounts            Account[]
+    sessions            Session[]
+    tablePreferences    TablePreference[]
+    standalonePlaylists StandalonePlaylist[]
 }
 
 model TablePreference {
@@ -71,4 +72,22 @@ model VerificationToken {
     expires    DateTime
 
     @@unique([identifier, token])
+}
+
+model StandalonePlaylist {
+    id        String         @id @default(cuid())
+    userId    String
+    user      User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+    name      String
+    items     PlaylistItem[]
+    createdAt DateTime       @default(now())
+}
+
+model PlaylistItem {
+    id         String             @id @default(cuid())
+    playlistId String
+    playlist   StandalonePlaylist @relation(fields: [playlistId], references: [id], onDelete: Cascade)
+    track      String
+    artist     String
+    order      Int
 }

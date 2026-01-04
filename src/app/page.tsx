@@ -45,11 +45,11 @@ export default async function Home() {
                 </Link>
                 <Link
                   className="flex max-w-xs flex-col gap-4 rounded-2xl bg-[#161b22] border border-[#30363d] p-6 hover:bg-[#1c2128] hover:border-[#388bfd] transition-all"
-                  href="/playlist-manager"
+                  href="/playlist-tools"
                 >
-                  <h3 className="text-2xl font-bold text-[#58a6ff]">Playlist Manager →</h3>
+                  <h3 className="text-2xl font-bold text-[#58a6ff]">Playlist Tools →</h3>
                   <div className="text-sm text-[#8b949e]">
-                    Advanced batch tools for mass playlist organization and housekeeping.
+                    Create standalone tracklists via text parsing or Spotify/YouTube links.
                   </div>
                 </Link>
               </div>

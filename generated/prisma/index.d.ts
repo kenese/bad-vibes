@@ -38,6 +38,16 @@ export type TablePreference = $Result.DefaultSelection<Prisma.$TablePreferencePa
  * 
  */
 export type VerificationToken = $Result.DefaultSelection<Prisma.$VerificationTokenPayload>
+/**
+ * Model StandalonePlaylist
+ * 
+ */
+export type StandalonePlaylist = $Result.DefaultSelection<Prisma.$StandalonePlaylistPayload>
+/**
+ * Model PlaylistItem
+ * 
+ */
+export type PlaylistItem = $Result.DefaultSelection<Prisma.$PlaylistItemPayload>
 
 /**
  * ##  Prisma Client ʲˢ
@@ -206,6 +216,26 @@ export class PrismaClient<
     * ```
     */
   get verificationToken(): Prisma.VerificationTokenDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.standalonePlaylist`: Exposes CRUD operations for the **StandalonePlaylist** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more StandalonePlaylists
+    * const standalonePlaylists = await prisma.standalonePlaylist.findMany()
+    * ```
+    */
+  get standalonePlaylist(): Prisma.StandalonePlaylistDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.playlistItem`: Exposes CRUD operations for the **PlaylistItem** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more PlaylistItems
+    * const playlistItems = await prisma.playlistItem.findMany()
+    * ```
+    */
+  get playlistItem(): Prisma.PlaylistItemDelegate<ExtArgs, ClientOptions>;
 }
 
 export namespace Prisma {
@@ -651,7 +681,9 @@ export namespace Prisma {
     Session: 'Session',
     User: 'User',
     TablePreference: 'TablePreference',
-    VerificationToken: 'VerificationToken'
+    VerificationToken: 'VerificationToken',
+    StandalonePlaylist: 'StandalonePlaylist',
+    PlaylistItem: 'PlaylistItem'
   };
 
   export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -670,7 +702,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "account" | "session" | "user" | "tablePreference" | "verificationToken"
+      modelProps: "account" | "session" | "user" | "tablePreference" | "verificationToken" | "standalonePlaylist" | "playlistItem"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -1044,6 +1076,154 @@ export namespace Prisma {
           }
         }
       }
+      StandalonePlaylist: {
+        payload: Prisma.$StandalonePlaylistPayload<ExtArgs>
+        fields: Prisma.StandalonePlaylistFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.StandalonePlaylistFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$StandalonePlaylistPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.StandalonePlaylistFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$StandalonePlaylistPayload>
+          }
+          findFirst: {
+            args: Prisma.StandalonePlaylistFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$StandalonePlaylistPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.StandalonePlaylistFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$StandalonePlaylistPayload>
+          }
+          findMany: {
+            args: Prisma.StandalonePlaylistFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$StandalonePlaylistPayload>[]
+          }
+          create: {
+            args: Prisma.StandalonePlaylistCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$StandalonePlaylistPayload>
+          }
+          createMany: {
+            args: Prisma.StandalonePlaylistCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.StandalonePlaylistCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$StandalonePlaylistPayload>[]
+          }
+          delete: {
+            args: Prisma.StandalonePlaylistDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$StandalonePlaylistPayload>
+          }
+          update: {
+            args: Prisma.StandalonePlaylistUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$StandalonePlaylistPayload>
+          }
+          deleteMany: {
+            args: Prisma.StandalonePlaylistDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.StandalonePlaylistUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.StandalonePlaylistUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$StandalonePlaylistPayload>[]
+          }
+          upsert: {
+            args: Prisma.StandalonePlaylistUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$StandalonePlaylistPayload>
+          }
+          aggregate: {
+            args: Prisma.StandalonePlaylistAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateStandalonePlaylist>
+          }
+          groupBy: {
+            args: Prisma.StandalonePlaylistGroupByArgs<ExtArgs>
+            result: $Utils.Optional<StandalonePlaylistGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.StandalonePlaylistCountArgs<ExtArgs>
+            result: $Utils.Optional<StandalonePlaylistCountAggregateOutputType> | number
+          }
+        }
+      }
+      PlaylistItem: {
+        payload: Prisma.$PlaylistItemPayload<ExtArgs>
+        fields: Prisma.PlaylistItemFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.PlaylistItemFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PlaylistItemPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.PlaylistItemFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PlaylistItemPayload>
+          }
+          findFirst: {
+            args: Prisma.PlaylistItemFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PlaylistItemPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.PlaylistItemFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PlaylistItemPayload>
+          }
+          findMany: {
+            args: Prisma.PlaylistItemFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PlaylistItemPayload>[]
+          }
+          create: {
+            args: Prisma.PlaylistItemCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PlaylistItemPayload>
+          }
+          createMany: {
+            args: Prisma.PlaylistItemCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.PlaylistItemCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PlaylistItemPayload>[]
+          }
+          delete: {
+            args: Prisma.PlaylistItemDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PlaylistItemPayload>
+          }
+          update: {
+            args: Prisma.PlaylistItemUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PlaylistItemPayload>
+          }
+          deleteMany: {
+            args: Prisma.PlaylistItemDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.PlaylistItemUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.PlaylistItemUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PlaylistItemPayload>[]
+          }
+          upsert: {
+            args: Prisma.PlaylistItemUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PlaylistItemPayload>
+          }
+          aggregate: {
+            args: Prisma.PlaylistItemAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregatePlaylistItem>
+          }
+          groupBy: {
+            args: Prisma.PlaylistItemGroupByArgs<ExtArgs>
+            result: $Utils.Optional<PlaylistItemGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.PlaylistItemCountArgs<ExtArgs>
+            result: $Utils.Optional<PlaylistItemCountAggregateOutputType> | number
+          }
+        }
+      }
     }
   } & {
     other: {
@@ -1145,6 +1325,8 @@ export namespace Prisma {
     user?: UserOmit
     tablePreference?: TablePreferenceOmit
     verificationToken?: VerificationTokenOmit
+    standalonePlaylist?: StandalonePlaylistOmit
+    playlistItem?: PlaylistItemOmit
   }
 
   /* Types for Logging */
@@ -1228,12 +1410,14 @@ export namespace Prisma {
     accounts: number
     sessions: number
     tablePreferences: number
+    standalonePlaylists: number
   }
 
   export type UserCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     accounts?: boolean | UserCountOutputTypeCountAccountsArgs
     sessions?: boolean | UserCountOutputTypeCountSessionsArgs
     tablePreferences?: boolean | UserCountOutputTypeCountTablePreferencesArgs
+    standalonePlaylists?: boolean | UserCountOutputTypeCountStandalonePlaylistsArgs
   }
 
   // Custom InputTypes
@@ -1266,6 +1450,44 @@ export namespace Prisma {
    */
   export type UserCountOutputTypeCountTablePreferencesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: TablePreferenceWhereInput
+  }
+
+  /**
+   * UserCountOutputType without action
+   */
+  export type UserCountOutputTypeCountStandalonePlaylistsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: StandalonePlaylistWhereInput
+  }
+
+
+  /**
+   * Count Type StandalonePlaylistCountOutputType
+   */
+
+  export type StandalonePlaylistCountOutputType = {
+    items: number
+  }
+
+  export type StandalonePlaylistCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    items?: boolean | StandalonePlaylistCountOutputTypeCountItemsArgs
+  }
+
+  // Custom InputTypes
+  /**
+   * StandalonePlaylistCountOutputType without action
+   */
+  export type StandalonePlaylistCountOutputTypeDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the StandalonePlaylistCountOutputType
+     */
+    select?: StandalonePlaylistCountOutputTypeSelect<ExtArgs> | null
+  }
+
+  /**
+   * StandalonePlaylistCountOutputType without action
+   */
+  export type StandalonePlaylistCountOutputTypeCountItemsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: PlaylistItemWhereInput
   }
 
 
@@ -3689,6 +3911,7 @@ export namespace Prisma {
     accounts?: boolean | User$accountsArgs<ExtArgs>
     sessions?: boolean | User$sessionsArgs<ExtArgs>
     tablePreferences?: boolean | User$tablePreferencesArgs<ExtArgs>
+    standalonePlaylists?: boolean | User$standalonePlaylistsArgs<ExtArgs>
     _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["user"]>
 
@@ -3724,6 +3947,7 @@ export namespace Prisma {
     accounts?: boolean | User$accountsArgs<ExtArgs>
     sessions?: boolean | User$sessionsArgs<ExtArgs>
     tablePreferences?: boolean | User$tablePreferencesArgs<ExtArgs>
+    standalonePlaylists?: boolean | User$standalonePlaylistsArgs<ExtArgs>
     _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type UserIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {}
@@ -3735,6 +3959,7 @@ export namespace Prisma {
       accounts: Prisma.$AccountPayload<ExtArgs>[]
       sessions: Prisma.$SessionPayload<ExtArgs>[]
       tablePreferences: Prisma.$TablePreferencePayload<ExtArgs>[]
+      standalonePlaylists: Prisma.$StandalonePlaylistPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -4140,6 +4365,7 @@ export namespace Prisma {
     accounts<T extends User$accountsArgs<ExtArgs> = {}>(args?: Subset<T, User$accountsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AccountPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     sessions<T extends User$sessionsArgs<ExtArgs> = {}>(args?: Subset<T, User$sessionsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SessionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     tablePreferences<T extends User$tablePreferencesArgs<ExtArgs> = {}>(args?: Subset<T, User$tablePreferencesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$TablePreferencePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    standalonePlaylists<T extends User$standalonePlaylistsArgs<ExtArgs> = {}>(args?: Subset<T, User$standalonePlaylistsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$StandalonePlaylistPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -4630,6 +4856,30 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: TablePreferenceScalarFieldEnum | TablePreferenceScalarFieldEnum[]
+  }
+
+  /**
+   * User.standalonePlaylists
+   */
+  export type User$standalonePlaylistsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the StandalonePlaylist
+     */
+    select?: StandalonePlaylistSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the StandalonePlaylist
+     */
+    omit?: StandalonePlaylistOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: StandalonePlaylistInclude<ExtArgs> | null
+    where?: StandalonePlaylistWhereInput
+    orderBy?: StandalonePlaylistOrderByWithRelationInput | StandalonePlaylistOrderByWithRelationInput[]
+    cursor?: StandalonePlaylistWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: StandalonePlaylistScalarFieldEnum | StandalonePlaylistScalarFieldEnum[]
   }
 
   /**
@@ -6662,6 +6912,2169 @@ export namespace Prisma {
 
 
   /**
+   * Model StandalonePlaylist
+   */
+
+  export type AggregateStandalonePlaylist = {
+    _count: StandalonePlaylistCountAggregateOutputType | null
+    _min: StandalonePlaylistMinAggregateOutputType | null
+    _max: StandalonePlaylistMaxAggregateOutputType | null
+  }
+
+  export type StandalonePlaylistMinAggregateOutputType = {
+    id: string | null
+    userId: string | null
+    name: string | null
+    createdAt: Date | null
+  }
+
+  export type StandalonePlaylistMaxAggregateOutputType = {
+    id: string | null
+    userId: string | null
+    name: string | null
+    createdAt: Date | null
+  }
+
+  export type StandalonePlaylistCountAggregateOutputType = {
+    id: number
+    userId: number
+    name: number
+    createdAt: number
+    _all: number
+  }
+
+
+  export type StandalonePlaylistMinAggregateInputType = {
+    id?: true
+    userId?: true
+    name?: true
+    createdAt?: true
+  }
+
+  export type StandalonePlaylistMaxAggregateInputType = {
+    id?: true
+    userId?: true
+    name?: true
+    createdAt?: true
+  }
+
+  export type StandalonePlaylistCountAggregateInputType = {
+    id?: true
+    userId?: true
+    name?: true
+    createdAt?: true
+    _all?: true
+  }
+
+  export type StandalonePlaylistAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which StandalonePlaylist to aggregate.
+     */
+    where?: StandalonePlaylistWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of StandalonePlaylists to fetch.
+     */
+    orderBy?: StandalonePlaylistOrderByWithRelationInput | StandalonePlaylistOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: StandalonePlaylistWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` StandalonePlaylists from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` StandalonePlaylists.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned StandalonePlaylists
+    **/
+    _count?: true | StandalonePlaylistCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: StandalonePlaylistMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: StandalonePlaylistMaxAggregateInputType
+  }
+
+  export type GetStandalonePlaylistAggregateType<T extends StandalonePlaylistAggregateArgs> = {
+        [P in keyof T & keyof AggregateStandalonePlaylist]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateStandalonePlaylist[P]>
+      : GetScalarType<T[P], AggregateStandalonePlaylist[P]>
+  }
+
+
+
+
+  export type StandalonePlaylistGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: StandalonePlaylistWhereInput
+    orderBy?: StandalonePlaylistOrderByWithAggregationInput | StandalonePlaylistOrderByWithAggregationInput[]
+    by: StandalonePlaylistScalarFieldEnum[] | StandalonePlaylistScalarFieldEnum
+    having?: StandalonePlaylistScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: StandalonePlaylistCountAggregateInputType | true
+    _min?: StandalonePlaylistMinAggregateInputType
+    _max?: StandalonePlaylistMaxAggregateInputType
+  }
+
+  export type StandalonePlaylistGroupByOutputType = {
+    id: string
+    userId: string
+    name: string
+    createdAt: Date
+    _count: StandalonePlaylistCountAggregateOutputType | null
+    _min: StandalonePlaylistMinAggregateOutputType | null
+    _max: StandalonePlaylistMaxAggregateOutputType | null
+  }
+
+  type GetStandalonePlaylistGroupByPayload<T extends StandalonePlaylistGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<StandalonePlaylistGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof StandalonePlaylistGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], StandalonePlaylistGroupByOutputType[P]>
+            : GetScalarType<T[P], StandalonePlaylistGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type StandalonePlaylistSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    userId?: boolean
+    name?: boolean
+    createdAt?: boolean
+    user?: boolean | UserDefaultArgs<ExtArgs>
+    items?: boolean | StandalonePlaylist$itemsArgs<ExtArgs>
+    _count?: boolean | StandalonePlaylistCountOutputTypeDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["standalonePlaylist"]>
+
+  export type StandalonePlaylistSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    userId?: boolean
+    name?: boolean
+    createdAt?: boolean
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["standalonePlaylist"]>
+
+  export type StandalonePlaylistSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    userId?: boolean
+    name?: boolean
+    createdAt?: boolean
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["standalonePlaylist"]>
+
+  export type StandalonePlaylistSelectScalar = {
+    id?: boolean
+    userId?: boolean
+    name?: boolean
+    createdAt?: boolean
+  }
+
+  export type StandalonePlaylistOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "name" | "createdAt", ExtArgs["result"]["standalonePlaylist"]>
+  export type StandalonePlaylistInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    user?: boolean | UserDefaultArgs<ExtArgs>
+    items?: boolean | StandalonePlaylist$itemsArgs<ExtArgs>
+    _count?: boolean | StandalonePlaylistCountOutputTypeDefaultArgs<ExtArgs>
+  }
+  export type StandalonePlaylistIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }
+  export type StandalonePlaylistIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }
+
+  export type $StandalonePlaylistPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "StandalonePlaylist"
+    objects: {
+      user: Prisma.$UserPayload<ExtArgs>
+      items: Prisma.$PlaylistItemPayload<ExtArgs>[]
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      userId: string
+      name: string
+      createdAt: Date
+    }, ExtArgs["result"]["standalonePlaylist"]>
+    composites: {}
+  }
+
+  type StandalonePlaylistGetPayload<S extends boolean | null | undefined | StandalonePlaylistDefaultArgs> = $Result.GetResult<Prisma.$StandalonePlaylistPayload, S>
+
+  type StandalonePlaylistCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<StandalonePlaylistFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: StandalonePlaylistCountAggregateInputType | true
+    }
+
+  export interface StandalonePlaylistDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['StandalonePlaylist'], meta: { name: 'StandalonePlaylist' } }
+    /**
+     * Find zero or one StandalonePlaylist that matches the filter.
+     * @param {StandalonePlaylistFindUniqueArgs} args - Arguments to find a StandalonePlaylist
+     * @example
+     * // Get one StandalonePlaylist
+     * const standalonePlaylist = await prisma.standalonePlaylist.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends StandalonePlaylistFindUniqueArgs>(args: SelectSubset<T, StandalonePlaylistFindUniqueArgs<ExtArgs>>): Prisma__StandalonePlaylistClient<$Result.GetResult<Prisma.$StandalonePlaylistPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one StandalonePlaylist that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {StandalonePlaylistFindUniqueOrThrowArgs} args - Arguments to find a StandalonePlaylist
+     * @example
+     * // Get one StandalonePlaylist
+     * const standalonePlaylist = await prisma.standalonePlaylist.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends StandalonePlaylistFindUniqueOrThrowArgs>(args: SelectSubset<T, StandalonePlaylistFindUniqueOrThrowArgs<ExtArgs>>): Prisma__StandalonePlaylistClient<$Result.GetResult<Prisma.$StandalonePlaylistPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first StandalonePlaylist that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {StandalonePlaylistFindFirstArgs} args - Arguments to find a StandalonePlaylist
+     * @example
+     * // Get one StandalonePlaylist
+     * const standalonePlaylist = await prisma.standalonePlaylist.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends StandalonePlaylistFindFirstArgs>(args?: SelectSubset<T, StandalonePlaylistFindFirstArgs<ExtArgs>>): Prisma__StandalonePlaylistClient<$Result.GetResult<Prisma.$StandalonePlaylistPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first StandalonePlaylist that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {StandalonePlaylistFindFirstOrThrowArgs} args - Arguments to find a StandalonePlaylist
+     * @example
+     * // Get one StandalonePlaylist
+     * const standalonePlaylist = await prisma.standalonePlaylist.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends StandalonePlaylistFindFirstOrThrowArgs>(args?: SelectSubset<T, StandalonePlaylistFindFirstOrThrowArgs<ExtArgs>>): Prisma__StandalonePlaylistClient<$Result.GetResult<Prisma.$StandalonePlaylistPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more StandalonePlaylists that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {StandalonePlaylistFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all StandalonePlaylists
+     * const standalonePlaylists = await prisma.standalonePlaylist.findMany()
+     * 
+     * // Get first 10 StandalonePlaylists
+     * const standalonePlaylists = await prisma.standalonePlaylist.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const standalonePlaylistWithIdOnly = await prisma.standalonePlaylist.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends StandalonePlaylistFindManyArgs>(args?: SelectSubset<T, StandalonePlaylistFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$StandalonePlaylistPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a StandalonePlaylist.
+     * @param {StandalonePlaylistCreateArgs} args - Arguments to create a StandalonePlaylist.
+     * @example
+     * // Create one StandalonePlaylist
+     * const StandalonePlaylist = await prisma.standalonePlaylist.create({
+     *   data: {
+     *     // ... data to create a StandalonePlaylist
+     *   }
+     * })
+     * 
+     */
+    create<T extends StandalonePlaylistCreateArgs>(args: SelectSubset<T, StandalonePlaylistCreateArgs<ExtArgs>>): Prisma__StandalonePlaylistClient<$Result.GetResult<Prisma.$StandalonePlaylistPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many StandalonePlaylists.
+     * @param {StandalonePlaylistCreateManyArgs} args - Arguments to create many StandalonePlaylists.
+     * @example
+     * // Create many StandalonePlaylists
+     * const standalonePlaylist = await prisma.standalonePlaylist.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends StandalonePlaylistCreateManyArgs>(args?: SelectSubset<T, StandalonePlaylistCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many StandalonePlaylists and returns the data saved in the database.
+     * @param {StandalonePlaylistCreateManyAndReturnArgs} args - Arguments to create many StandalonePlaylists.
+     * @example
+     * // Create many StandalonePlaylists
+     * const standalonePlaylist = await prisma.standalonePlaylist.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many StandalonePlaylists and only return the `id`
+     * const standalonePlaylistWithIdOnly = await prisma.standalonePlaylist.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends StandalonePlaylistCreateManyAndReturnArgs>(args?: SelectSubset<T, StandalonePlaylistCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$StandalonePlaylistPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a StandalonePlaylist.
+     * @param {StandalonePlaylistDeleteArgs} args - Arguments to delete one StandalonePlaylist.
+     * @example
+     * // Delete one StandalonePlaylist
+     * const StandalonePlaylist = await prisma.standalonePlaylist.delete({
+     *   where: {
+     *     // ... filter to delete one StandalonePlaylist
+     *   }
+     * })
+     * 
+     */
+    delete<T extends StandalonePlaylistDeleteArgs>(args: SelectSubset<T, StandalonePlaylistDeleteArgs<ExtArgs>>): Prisma__StandalonePlaylistClient<$Result.GetResult<Prisma.$StandalonePlaylistPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one StandalonePlaylist.
+     * @param {StandalonePlaylistUpdateArgs} args - Arguments to update one StandalonePlaylist.
+     * @example
+     * // Update one StandalonePlaylist
+     * const standalonePlaylist = await prisma.standalonePlaylist.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends StandalonePlaylistUpdateArgs>(args: SelectSubset<T, StandalonePlaylistUpdateArgs<ExtArgs>>): Prisma__StandalonePlaylistClient<$Result.GetResult<Prisma.$StandalonePlaylistPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more StandalonePlaylists.
+     * @param {StandalonePlaylistDeleteManyArgs} args - Arguments to filter StandalonePlaylists to delete.
+     * @example
+     * // Delete a few StandalonePlaylists
+     * const { count } = await prisma.standalonePlaylist.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends StandalonePlaylistDeleteManyArgs>(args?: SelectSubset<T, StandalonePlaylistDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more StandalonePlaylists.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {StandalonePlaylistUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many StandalonePlaylists
+     * const standalonePlaylist = await prisma.standalonePlaylist.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends StandalonePlaylistUpdateManyArgs>(args: SelectSubset<T, StandalonePlaylistUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more StandalonePlaylists and returns the data updated in the database.
+     * @param {StandalonePlaylistUpdateManyAndReturnArgs} args - Arguments to update many StandalonePlaylists.
+     * @example
+     * // Update many StandalonePlaylists
+     * const standalonePlaylist = await prisma.standalonePlaylist.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more StandalonePlaylists and only return the `id`
+     * const standalonePlaylistWithIdOnly = await prisma.standalonePlaylist.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends StandalonePlaylistUpdateManyAndReturnArgs>(args: SelectSubset<T, StandalonePlaylistUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$StandalonePlaylistPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one StandalonePlaylist.
+     * @param {StandalonePlaylistUpsertArgs} args - Arguments to update or create a StandalonePlaylist.
+     * @example
+     * // Update or create a StandalonePlaylist
+     * const standalonePlaylist = await prisma.standalonePlaylist.upsert({
+     *   create: {
+     *     // ... data to create a StandalonePlaylist
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the StandalonePlaylist we want to update
+     *   }
+     * })
+     */
+    upsert<T extends StandalonePlaylistUpsertArgs>(args: SelectSubset<T, StandalonePlaylistUpsertArgs<ExtArgs>>): Prisma__StandalonePlaylistClient<$Result.GetResult<Prisma.$StandalonePlaylistPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of StandalonePlaylists.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {StandalonePlaylistCountArgs} args - Arguments to filter StandalonePlaylists to count.
+     * @example
+     * // Count the number of StandalonePlaylists
+     * const count = await prisma.standalonePlaylist.count({
+     *   where: {
+     *     // ... the filter for the StandalonePlaylists we want to count
+     *   }
+     * })
+    **/
+    count<T extends StandalonePlaylistCountArgs>(
+      args?: Subset<T, StandalonePlaylistCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], StandalonePlaylistCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a StandalonePlaylist.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {StandalonePlaylistAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends StandalonePlaylistAggregateArgs>(args: Subset<T, StandalonePlaylistAggregateArgs>): Prisma.PrismaPromise<GetStandalonePlaylistAggregateType<T>>
+
+    /**
+     * Group by StandalonePlaylist.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {StandalonePlaylistGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends StandalonePlaylistGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: StandalonePlaylistGroupByArgs['orderBy'] }
+        : { orderBy?: StandalonePlaylistGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, StandalonePlaylistGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetStandalonePlaylistGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the StandalonePlaylist model
+   */
+  readonly fields: StandalonePlaylistFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for StandalonePlaylist.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__StandalonePlaylistClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    user<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    items<T extends StandalonePlaylist$itemsArgs<ExtArgs> = {}>(args?: Subset<T, StandalonePlaylist$itemsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PlaylistItemPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the StandalonePlaylist model
+   */
+  interface StandalonePlaylistFieldRefs {
+    readonly id: FieldRef<"StandalonePlaylist", 'String'>
+    readonly userId: FieldRef<"StandalonePlaylist", 'String'>
+    readonly name: FieldRef<"StandalonePlaylist", 'String'>
+    readonly createdAt: FieldRef<"StandalonePlaylist", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * StandalonePlaylist findUnique
+   */
+  export type StandalonePlaylistFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the StandalonePlaylist
+     */
+    select?: StandalonePlaylistSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the StandalonePlaylist
+     */
+    omit?: StandalonePlaylistOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: StandalonePlaylistInclude<ExtArgs> | null
+    /**
+     * Filter, which StandalonePlaylist to fetch.
+     */
+    where: StandalonePlaylistWhereUniqueInput
+  }
+
+  /**
+   * StandalonePlaylist findUniqueOrThrow
+   */
+  export type StandalonePlaylistFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the StandalonePlaylist
+     */
+    select?: StandalonePlaylistSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the StandalonePlaylist
+     */
+    omit?: StandalonePlaylistOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: StandalonePlaylistInclude<ExtArgs> | null
+    /**
+     * Filter, which StandalonePlaylist to fetch.
+     */
+    where: StandalonePlaylistWhereUniqueInput
+  }
+
+  /**
+   * StandalonePlaylist findFirst
+   */
+  export type StandalonePlaylistFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the StandalonePlaylist
+     */
+    select?: StandalonePlaylistSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the StandalonePlaylist
+     */
+    omit?: StandalonePlaylistOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: StandalonePlaylistInclude<ExtArgs> | null
+    /**
+     * Filter, which StandalonePlaylist to fetch.
+     */
+    where?: StandalonePlaylistWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of StandalonePlaylists to fetch.
+     */
+    orderBy?: StandalonePlaylistOrderByWithRelationInput | StandalonePlaylistOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for StandalonePlaylists.
+     */
+    cursor?: StandalonePlaylistWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` StandalonePlaylists from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` StandalonePlaylists.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of StandalonePlaylists.
+     */
+    distinct?: StandalonePlaylistScalarFieldEnum | StandalonePlaylistScalarFieldEnum[]
+  }
+
+  /**
+   * StandalonePlaylist findFirstOrThrow
+   */
+  export type StandalonePlaylistFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the StandalonePlaylist
+     */
+    select?: StandalonePlaylistSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the StandalonePlaylist
+     */
+    omit?: StandalonePlaylistOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: StandalonePlaylistInclude<ExtArgs> | null
+    /**
+     * Filter, which StandalonePlaylist to fetch.
+     */
+    where?: StandalonePlaylistWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of StandalonePlaylists to fetch.
+     */
+    orderBy?: StandalonePlaylistOrderByWithRelationInput | StandalonePlaylistOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for StandalonePlaylists.
+     */
+    cursor?: StandalonePlaylistWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` StandalonePlaylists from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` StandalonePlaylists.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of StandalonePlaylists.
+     */
+    distinct?: StandalonePlaylistScalarFieldEnum | StandalonePlaylistScalarFieldEnum[]
+  }
+
+  /**
+   * StandalonePlaylist findMany
+   */
+  export type StandalonePlaylistFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the StandalonePlaylist
+     */
+    select?: StandalonePlaylistSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the StandalonePlaylist
+     */
+    omit?: StandalonePlaylistOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: StandalonePlaylistInclude<ExtArgs> | null
+    /**
+     * Filter, which StandalonePlaylists to fetch.
+     */
+    where?: StandalonePlaylistWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of StandalonePlaylists to fetch.
+     */
+    orderBy?: StandalonePlaylistOrderByWithRelationInput | StandalonePlaylistOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing StandalonePlaylists.
+     */
+    cursor?: StandalonePlaylistWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` StandalonePlaylists from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` StandalonePlaylists.
+     */
+    skip?: number
+    distinct?: StandalonePlaylistScalarFieldEnum | StandalonePlaylistScalarFieldEnum[]
+  }
+
+  /**
+   * StandalonePlaylist create
+   */
+  export type StandalonePlaylistCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the StandalonePlaylist
+     */
+    select?: StandalonePlaylistSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the StandalonePlaylist
+     */
+    omit?: StandalonePlaylistOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: StandalonePlaylistInclude<ExtArgs> | null
+    /**
+     * The data needed to create a StandalonePlaylist.
+     */
+    data: XOR<StandalonePlaylistCreateInput, StandalonePlaylistUncheckedCreateInput>
+  }
+
+  /**
+   * StandalonePlaylist createMany
+   */
+  export type StandalonePlaylistCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many StandalonePlaylists.
+     */
+    data: StandalonePlaylistCreateManyInput | StandalonePlaylistCreateManyInput[]
+  }
+
+  /**
+   * StandalonePlaylist createManyAndReturn
+   */
+  export type StandalonePlaylistCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the StandalonePlaylist
+     */
+    select?: StandalonePlaylistSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the StandalonePlaylist
+     */
+    omit?: StandalonePlaylistOmit<ExtArgs> | null
+    /**
+     * The data used to create many StandalonePlaylists.
+     */
+    data: StandalonePlaylistCreateManyInput | StandalonePlaylistCreateManyInput[]
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: StandalonePlaylistIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * StandalonePlaylist update
+   */
+  export type StandalonePlaylistUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the StandalonePlaylist
+     */
+    select?: StandalonePlaylistSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the StandalonePlaylist
+     */
+    omit?: StandalonePlaylistOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: StandalonePlaylistInclude<ExtArgs> | null
+    /**
+     * The data needed to update a StandalonePlaylist.
+     */
+    data: XOR<StandalonePlaylistUpdateInput, StandalonePlaylistUncheckedUpdateInput>
+    /**
+     * Choose, which StandalonePlaylist to update.
+     */
+    where: StandalonePlaylistWhereUniqueInput
+  }
+
+  /**
+   * StandalonePlaylist updateMany
+   */
+  export type StandalonePlaylistUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update StandalonePlaylists.
+     */
+    data: XOR<StandalonePlaylistUpdateManyMutationInput, StandalonePlaylistUncheckedUpdateManyInput>
+    /**
+     * Filter which StandalonePlaylists to update
+     */
+    where?: StandalonePlaylistWhereInput
+    /**
+     * Limit how many StandalonePlaylists to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * StandalonePlaylist updateManyAndReturn
+   */
+  export type StandalonePlaylistUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the StandalonePlaylist
+     */
+    select?: StandalonePlaylistSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the StandalonePlaylist
+     */
+    omit?: StandalonePlaylistOmit<ExtArgs> | null
+    /**
+     * The data used to update StandalonePlaylists.
+     */
+    data: XOR<StandalonePlaylistUpdateManyMutationInput, StandalonePlaylistUncheckedUpdateManyInput>
+    /**
+     * Filter which StandalonePlaylists to update
+     */
+    where?: StandalonePlaylistWhereInput
+    /**
+     * Limit how many StandalonePlaylists to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: StandalonePlaylistIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * StandalonePlaylist upsert
+   */
+  export type StandalonePlaylistUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the StandalonePlaylist
+     */
+    select?: StandalonePlaylistSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the StandalonePlaylist
+     */
+    omit?: StandalonePlaylistOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: StandalonePlaylistInclude<ExtArgs> | null
+    /**
+     * The filter to search for the StandalonePlaylist to update in case it exists.
+     */
+    where: StandalonePlaylistWhereUniqueInput
+    /**
+     * In case the StandalonePlaylist found by the `where` argument doesn't exist, create a new StandalonePlaylist with this data.
+     */
+    create: XOR<StandalonePlaylistCreateInput, StandalonePlaylistUncheckedCreateInput>
+    /**
+     * In case the StandalonePlaylist was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<StandalonePlaylistUpdateInput, StandalonePlaylistUncheckedUpdateInput>
+  }
+
+  /**
+   * StandalonePlaylist delete
+   */
+  export type StandalonePlaylistDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the StandalonePlaylist
+     */
+    select?: StandalonePlaylistSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the StandalonePlaylist
+     */
+    omit?: StandalonePlaylistOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: StandalonePlaylistInclude<ExtArgs> | null
+    /**
+     * Filter which StandalonePlaylist to delete.
+     */
+    where: StandalonePlaylistWhereUniqueInput
+  }
+
+  /**
+   * StandalonePlaylist deleteMany
+   */
+  export type StandalonePlaylistDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which StandalonePlaylists to delete
+     */
+    where?: StandalonePlaylistWhereInput
+    /**
+     * Limit how many StandalonePlaylists to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * StandalonePlaylist.items
+   */
+  export type StandalonePlaylist$itemsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PlaylistItem
+     */
+    select?: PlaylistItemSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PlaylistItem
+     */
+    omit?: PlaylistItemOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PlaylistItemInclude<ExtArgs> | null
+    where?: PlaylistItemWhereInput
+    orderBy?: PlaylistItemOrderByWithRelationInput | PlaylistItemOrderByWithRelationInput[]
+    cursor?: PlaylistItemWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: PlaylistItemScalarFieldEnum | PlaylistItemScalarFieldEnum[]
+  }
+
+  /**
+   * StandalonePlaylist without action
+   */
+  export type StandalonePlaylistDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the StandalonePlaylist
+     */
+    select?: StandalonePlaylistSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the StandalonePlaylist
+     */
+    omit?: StandalonePlaylistOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: StandalonePlaylistInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model PlaylistItem
+   */
+
+  export type AggregatePlaylistItem = {
+    _count: PlaylistItemCountAggregateOutputType | null
+    _avg: PlaylistItemAvgAggregateOutputType | null
+    _sum: PlaylistItemSumAggregateOutputType | null
+    _min: PlaylistItemMinAggregateOutputType | null
+    _max: PlaylistItemMaxAggregateOutputType | null
+  }
+
+  export type PlaylistItemAvgAggregateOutputType = {
+    order: number | null
+  }
+
+  export type PlaylistItemSumAggregateOutputType = {
+    order: number | null
+  }
+
+  export type PlaylistItemMinAggregateOutputType = {
+    id: string | null
+    playlistId: string | null
+    track: string | null
+    artist: string | null
+    order: number | null
+  }
+
+  export type PlaylistItemMaxAggregateOutputType = {
+    id: string | null
+    playlistId: string | null
+    track: string | null
+    artist: string | null
+    order: number | null
+  }
+
+  export type PlaylistItemCountAggregateOutputType = {
+    id: number
+    playlistId: number
+    track: number
+    artist: number
+    order: number
+    _all: number
+  }
+
+
+  export type PlaylistItemAvgAggregateInputType = {
+    order?: true
+  }
+
+  export type PlaylistItemSumAggregateInputType = {
+    order?: true
+  }
+
+  export type PlaylistItemMinAggregateInputType = {
+    id?: true
+    playlistId?: true
+    track?: true
+    artist?: true
+    order?: true
+  }
+
+  export type PlaylistItemMaxAggregateInputType = {
+    id?: true
+    playlistId?: true
+    track?: true
+    artist?: true
+    order?: true
+  }
+
+  export type PlaylistItemCountAggregateInputType = {
+    id?: true
+    playlistId?: true
+    track?: true
+    artist?: true
+    order?: true
+    _all?: true
+  }
+
+  export type PlaylistItemAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which PlaylistItem to aggregate.
+     */
+    where?: PlaylistItemWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of PlaylistItems to fetch.
+     */
+    orderBy?: PlaylistItemOrderByWithRelationInput | PlaylistItemOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: PlaylistItemWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` PlaylistItems from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` PlaylistItems.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned PlaylistItems
+    **/
+    _count?: true | PlaylistItemCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: PlaylistItemAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: PlaylistItemSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: PlaylistItemMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: PlaylistItemMaxAggregateInputType
+  }
+
+  export type GetPlaylistItemAggregateType<T extends PlaylistItemAggregateArgs> = {
+        [P in keyof T & keyof AggregatePlaylistItem]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregatePlaylistItem[P]>
+      : GetScalarType<T[P], AggregatePlaylistItem[P]>
+  }
+
+
+
+
+  export type PlaylistItemGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: PlaylistItemWhereInput
+    orderBy?: PlaylistItemOrderByWithAggregationInput | PlaylistItemOrderByWithAggregationInput[]
+    by: PlaylistItemScalarFieldEnum[] | PlaylistItemScalarFieldEnum
+    having?: PlaylistItemScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: PlaylistItemCountAggregateInputType | true
+    _avg?: PlaylistItemAvgAggregateInputType
+    _sum?: PlaylistItemSumAggregateInputType
+    _min?: PlaylistItemMinAggregateInputType
+    _max?: PlaylistItemMaxAggregateInputType
+  }
+
+  export type PlaylistItemGroupByOutputType = {
+    id: string
+    playlistId: string
+    track: string
+    artist: string
+    order: number
+    _count: PlaylistItemCountAggregateOutputType | null
+    _avg: PlaylistItemAvgAggregateOutputType | null
+    _sum: PlaylistItemSumAggregateOutputType | null
+    _min: PlaylistItemMinAggregateOutputType | null
+    _max: PlaylistItemMaxAggregateOutputType | null
+  }
+
+  type GetPlaylistItemGroupByPayload<T extends PlaylistItemGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<PlaylistItemGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof PlaylistItemGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], PlaylistItemGroupByOutputType[P]>
+            : GetScalarType<T[P], PlaylistItemGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type PlaylistItemSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    playlistId?: boolean
+    track?: boolean
+    artist?: boolean
+    order?: boolean
+    playlist?: boolean | StandalonePlaylistDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["playlistItem"]>
+
+  export type PlaylistItemSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    playlistId?: boolean
+    track?: boolean
+    artist?: boolean
+    order?: boolean
+    playlist?: boolean | StandalonePlaylistDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["playlistItem"]>
+
+  export type PlaylistItemSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    playlistId?: boolean
+    track?: boolean
+    artist?: boolean
+    order?: boolean
+    playlist?: boolean | StandalonePlaylistDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["playlistItem"]>
+
+  export type PlaylistItemSelectScalar = {
+    id?: boolean
+    playlistId?: boolean
+    track?: boolean
+    artist?: boolean
+    order?: boolean
+  }
+
+  export type PlaylistItemOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "playlistId" | "track" | "artist" | "order", ExtArgs["result"]["playlistItem"]>
+  export type PlaylistItemInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    playlist?: boolean | StandalonePlaylistDefaultArgs<ExtArgs>
+  }
+  export type PlaylistItemIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    playlist?: boolean | StandalonePlaylistDefaultArgs<ExtArgs>
+  }
+  export type PlaylistItemIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    playlist?: boolean | StandalonePlaylistDefaultArgs<ExtArgs>
+  }
+
+  export type $PlaylistItemPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "PlaylistItem"
+    objects: {
+      playlist: Prisma.$StandalonePlaylistPayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      playlistId: string
+      track: string
+      artist: string
+      order: number
+    }, ExtArgs["result"]["playlistItem"]>
+    composites: {}
+  }
+
+  type PlaylistItemGetPayload<S extends boolean | null | undefined | PlaylistItemDefaultArgs> = $Result.GetResult<Prisma.$PlaylistItemPayload, S>
+
+  type PlaylistItemCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<PlaylistItemFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: PlaylistItemCountAggregateInputType | true
+    }
+
+  export interface PlaylistItemDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['PlaylistItem'], meta: { name: 'PlaylistItem' } }
+    /**
+     * Find zero or one PlaylistItem that matches the filter.
+     * @param {PlaylistItemFindUniqueArgs} args - Arguments to find a PlaylistItem
+     * @example
+     * // Get one PlaylistItem
+     * const playlistItem = await prisma.playlistItem.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends PlaylistItemFindUniqueArgs>(args: SelectSubset<T, PlaylistItemFindUniqueArgs<ExtArgs>>): Prisma__PlaylistItemClient<$Result.GetResult<Prisma.$PlaylistItemPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one PlaylistItem that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {PlaylistItemFindUniqueOrThrowArgs} args - Arguments to find a PlaylistItem
+     * @example
+     * // Get one PlaylistItem
+     * const playlistItem = await prisma.playlistItem.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends PlaylistItemFindUniqueOrThrowArgs>(args: SelectSubset<T, PlaylistItemFindUniqueOrThrowArgs<ExtArgs>>): Prisma__PlaylistItemClient<$Result.GetResult<Prisma.$PlaylistItemPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first PlaylistItem that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PlaylistItemFindFirstArgs} args - Arguments to find a PlaylistItem
+     * @example
+     * // Get one PlaylistItem
+     * const playlistItem = await prisma.playlistItem.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends PlaylistItemFindFirstArgs>(args?: SelectSubset<T, PlaylistItemFindFirstArgs<ExtArgs>>): Prisma__PlaylistItemClient<$Result.GetResult<Prisma.$PlaylistItemPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first PlaylistItem that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PlaylistItemFindFirstOrThrowArgs} args - Arguments to find a PlaylistItem
+     * @example
+     * // Get one PlaylistItem
+     * const playlistItem = await prisma.playlistItem.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends PlaylistItemFindFirstOrThrowArgs>(args?: SelectSubset<T, PlaylistItemFindFirstOrThrowArgs<ExtArgs>>): Prisma__PlaylistItemClient<$Result.GetResult<Prisma.$PlaylistItemPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more PlaylistItems that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PlaylistItemFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all PlaylistItems
+     * const playlistItems = await prisma.playlistItem.findMany()
+     * 
+     * // Get first 10 PlaylistItems
+     * const playlistItems = await prisma.playlistItem.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const playlistItemWithIdOnly = await prisma.playlistItem.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends PlaylistItemFindManyArgs>(args?: SelectSubset<T, PlaylistItemFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PlaylistItemPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a PlaylistItem.
+     * @param {PlaylistItemCreateArgs} args - Arguments to create a PlaylistItem.
+     * @example
+     * // Create one PlaylistItem
+     * const PlaylistItem = await prisma.playlistItem.create({
+     *   data: {
+     *     // ... data to create a PlaylistItem
+     *   }
+     * })
+     * 
+     */
+    create<T extends PlaylistItemCreateArgs>(args: SelectSubset<T, PlaylistItemCreateArgs<ExtArgs>>): Prisma__PlaylistItemClient<$Result.GetResult<Prisma.$PlaylistItemPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many PlaylistItems.
+     * @param {PlaylistItemCreateManyArgs} args - Arguments to create many PlaylistItems.
+     * @example
+     * // Create many PlaylistItems
+     * const playlistItem = await prisma.playlistItem.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends PlaylistItemCreateManyArgs>(args?: SelectSubset<T, PlaylistItemCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many PlaylistItems and returns the data saved in the database.
+     * @param {PlaylistItemCreateManyAndReturnArgs} args - Arguments to create many PlaylistItems.
+     * @example
+     * // Create many PlaylistItems
+     * const playlistItem = await prisma.playlistItem.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many PlaylistItems and only return the `id`
+     * const playlistItemWithIdOnly = await prisma.playlistItem.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends PlaylistItemCreateManyAndReturnArgs>(args?: SelectSubset<T, PlaylistItemCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PlaylistItemPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a PlaylistItem.
+     * @param {PlaylistItemDeleteArgs} args - Arguments to delete one PlaylistItem.
+     * @example
+     * // Delete one PlaylistItem
+     * const PlaylistItem = await prisma.playlistItem.delete({
+     *   where: {
+     *     // ... filter to delete one PlaylistItem
+     *   }
+     * })
+     * 
+     */
+    delete<T extends PlaylistItemDeleteArgs>(args: SelectSubset<T, PlaylistItemDeleteArgs<ExtArgs>>): Prisma__PlaylistItemClient<$Result.GetResult<Prisma.$PlaylistItemPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one PlaylistItem.
+     * @param {PlaylistItemUpdateArgs} args - Arguments to update one PlaylistItem.
+     * @example
+     * // Update one PlaylistItem
+     * const playlistItem = await prisma.playlistItem.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends PlaylistItemUpdateArgs>(args: SelectSubset<T, PlaylistItemUpdateArgs<ExtArgs>>): Prisma__PlaylistItemClient<$Result.GetResult<Prisma.$PlaylistItemPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more PlaylistItems.
+     * @param {PlaylistItemDeleteManyArgs} args - Arguments to filter PlaylistItems to delete.
+     * @example
+     * // Delete a few PlaylistItems
+     * const { count } = await prisma.playlistItem.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends PlaylistItemDeleteManyArgs>(args?: SelectSubset<T, PlaylistItemDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more PlaylistItems.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PlaylistItemUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many PlaylistItems
+     * const playlistItem = await prisma.playlistItem.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends PlaylistItemUpdateManyArgs>(args: SelectSubset<T, PlaylistItemUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more PlaylistItems and returns the data updated in the database.
+     * @param {PlaylistItemUpdateManyAndReturnArgs} args - Arguments to update many PlaylistItems.
+     * @example
+     * // Update many PlaylistItems
+     * const playlistItem = await prisma.playlistItem.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more PlaylistItems and only return the `id`
+     * const playlistItemWithIdOnly = await prisma.playlistItem.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends PlaylistItemUpdateManyAndReturnArgs>(args: SelectSubset<T, PlaylistItemUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PlaylistItemPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one PlaylistItem.
+     * @param {PlaylistItemUpsertArgs} args - Arguments to update or create a PlaylistItem.
+     * @example
+     * // Update or create a PlaylistItem
+     * const playlistItem = await prisma.playlistItem.upsert({
+     *   create: {
+     *     // ... data to create a PlaylistItem
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the PlaylistItem we want to update
+     *   }
+     * })
+     */
+    upsert<T extends PlaylistItemUpsertArgs>(args: SelectSubset<T, PlaylistItemUpsertArgs<ExtArgs>>): Prisma__PlaylistItemClient<$Result.GetResult<Prisma.$PlaylistItemPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of PlaylistItems.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PlaylistItemCountArgs} args - Arguments to filter PlaylistItems to count.
+     * @example
+     * // Count the number of PlaylistItems
+     * const count = await prisma.playlistItem.count({
+     *   where: {
+     *     // ... the filter for the PlaylistItems we want to count
+     *   }
+     * })
+    **/
+    count<T extends PlaylistItemCountArgs>(
+      args?: Subset<T, PlaylistItemCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], PlaylistItemCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a PlaylistItem.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PlaylistItemAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends PlaylistItemAggregateArgs>(args: Subset<T, PlaylistItemAggregateArgs>): Prisma.PrismaPromise<GetPlaylistItemAggregateType<T>>
+
+    /**
+     * Group by PlaylistItem.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PlaylistItemGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends PlaylistItemGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: PlaylistItemGroupByArgs['orderBy'] }
+        : { orderBy?: PlaylistItemGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, PlaylistItemGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetPlaylistItemGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the PlaylistItem model
+   */
+  readonly fields: PlaylistItemFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for PlaylistItem.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__PlaylistItemClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    playlist<T extends StandalonePlaylistDefaultArgs<ExtArgs> = {}>(args?: Subset<T, StandalonePlaylistDefaultArgs<ExtArgs>>): Prisma__StandalonePlaylistClient<$Result.GetResult<Prisma.$StandalonePlaylistPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the PlaylistItem model
+   */
+  interface PlaylistItemFieldRefs {
+    readonly id: FieldRef<"PlaylistItem", 'String'>
+    readonly playlistId: FieldRef<"PlaylistItem", 'String'>
+    readonly track: FieldRef<"PlaylistItem", 'String'>
+    readonly artist: FieldRef<"PlaylistItem", 'String'>
+    readonly order: FieldRef<"PlaylistItem", 'Int'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * PlaylistItem findUnique
+   */
+  export type PlaylistItemFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PlaylistItem
+     */
+    select?: PlaylistItemSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PlaylistItem
+     */
+    omit?: PlaylistItemOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PlaylistItemInclude<ExtArgs> | null
+    /**
+     * Filter, which PlaylistItem to fetch.
+     */
+    where: PlaylistItemWhereUniqueInput
+  }
+
+  /**
+   * PlaylistItem findUniqueOrThrow
+   */
+  export type PlaylistItemFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PlaylistItem
+     */
+    select?: PlaylistItemSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PlaylistItem
+     */
+    omit?: PlaylistItemOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PlaylistItemInclude<ExtArgs> | null
+    /**
+     * Filter, which PlaylistItem to fetch.
+     */
+    where: PlaylistItemWhereUniqueInput
+  }
+
+  /**
+   * PlaylistItem findFirst
+   */
+  export type PlaylistItemFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PlaylistItem
+     */
+    select?: PlaylistItemSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PlaylistItem
+     */
+    omit?: PlaylistItemOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PlaylistItemInclude<ExtArgs> | null
+    /**
+     * Filter, which PlaylistItem to fetch.
+     */
+    where?: PlaylistItemWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of PlaylistItems to fetch.
+     */
+    orderBy?: PlaylistItemOrderByWithRelationInput | PlaylistItemOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for PlaylistItems.
+     */
+    cursor?: PlaylistItemWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` PlaylistItems from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` PlaylistItems.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of PlaylistItems.
+     */
+    distinct?: PlaylistItemScalarFieldEnum | PlaylistItemScalarFieldEnum[]
+  }
+
+  /**
+   * PlaylistItem findFirstOrThrow
+   */
+  export type PlaylistItemFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PlaylistItem
+     */
+    select?: PlaylistItemSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PlaylistItem
+     */
+    omit?: PlaylistItemOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PlaylistItemInclude<ExtArgs> | null
+    /**
+     * Filter, which PlaylistItem to fetch.
+     */
+    where?: PlaylistItemWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of PlaylistItems to fetch.
+     */
+    orderBy?: PlaylistItemOrderByWithRelationInput | PlaylistItemOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for PlaylistItems.
+     */
+    cursor?: PlaylistItemWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` PlaylistItems from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` PlaylistItems.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of PlaylistItems.
+     */
+    distinct?: PlaylistItemScalarFieldEnum | PlaylistItemScalarFieldEnum[]
+  }
+
+  /**
+   * PlaylistItem findMany
+   */
+  export type PlaylistItemFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PlaylistItem
+     */
+    select?: PlaylistItemSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PlaylistItem
+     */
+    omit?: PlaylistItemOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PlaylistItemInclude<ExtArgs> | null
+    /**
+     * Filter, which PlaylistItems to fetch.
+     */
+    where?: PlaylistItemWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of PlaylistItems to fetch.
+     */
+    orderBy?: PlaylistItemOrderByWithRelationInput | PlaylistItemOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing PlaylistItems.
+     */
+    cursor?: PlaylistItemWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` PlaylistItems from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` PlaylistItems.
+     */
+    skip?: number
+    distinct?: PlaylistItemScalarFieldEnum | PlaylistItemScalarFieldEnum[]
+  }
+
+  /**
+   * PlaylistItem create
+   */
+  export type PlaylistItemCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PlaylistItem
+     */
+    select?: PlaylistItemSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PlaylistItem
+     */
+    omit?: PlaylistItemOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PlaylistItemInclude<ExtArgs> | null
+    /**
+     * The data needed to create a PlaylistItem.
+     */
+    data: XOR<PlaylistItemCreateInput, PlaylistItemUncheckedCreateInput>
+  }
+
+  /**
+   * PlaylistItem createMany
+   */
+  export type PlaylistItemCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many PlaylistItems.
+     */
+    data: PlaylistItemCreateManyInput | PlaylistItemCreateManyInput[]
+  }
+
+  /**
+   * PlaylistItem createManyAndReturn
+   */
+  export type PlaylistItemCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PlaylistItem
+     */
+    select?: PlaylistItemSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the PlaylistItem
+     */
+    omit?: PlaylistItemOmit<ExtArgs> | null
+    /**
+     * The data used to create many PlaylistItems.
+     */
+    data: PlaylistItemCreateManyInput | PlaylistItemCreateManyInput[]
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PlaylistItemIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * PlaylistItem update
+   */
+  export type PlaylistItemUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PlaylistItem
+     */
+    select?: PlaylistItemSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PlaylistItem
+     */
+    omit?: PlaylistItemOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PlaylistItemInclude<ExtArgs> | null
+    /**
+     * The data needed to update a PlaylistItem.
+     */
+    data: XOR<PlaylistItemUpdateInput, PlaylistItemUncheckedUpdateInput>
+    /**
+     * Choose, which PlaylistItem to update.
+     */
+    where: PlaylistItemWhereUniqueInput
+  }
+
+  /**
+   * PlaylistItem updateMany
+   */
+  export type PlaylistItemUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update PlaylistItems.
+     */
+    data: XOR<PlaylistItemUpdateManyMutationInput, PlaylistItemUncheckedUpdateManyInput>
+    /**
+     * Filter which PlaylistItems to update
+     */
+    where?: PlaylistItemWhereInput
+    /**
+     * Limit how many PlaylistItems to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * PlaylistItem updateManyAndReturn
+   */
+  export type PlaylistItemUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PlaylistItem
+     */
+    select?: PlaylistItemSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the PlaylistItem
+     */
+    omit?: PlaylistItemOmit<ExtArgs> | null
+    /**
+     * The data used to update PlaylistItems.
+     */
+    data: XOR<PlaylistItemUpdateManyMutationInput, PlaylistItemUncheckedUpdateManyInput>
+    /**
+     * Filter which PlaylistItems to update
+     */
+    where?: PlaylistItemWhereInput
+    /**
+     * Limit how many PlaylistItems to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PlaylistItemIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * PlaylistItem upsert
+   */
+  export type PlaylistItemUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PlaylistItem
+     */
+    select?: PlaylistItemSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PlaylistItem
+     */
+    omit?: PlaylistItemOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PlaylistItemInclude<ExtArgs> | null
+    /**
+     * The filter to search for the PlaylistItem to update in case it exists.
+     */
+    where: PlaylistItemWhereUniqueInput
+    /**
+     * In case the PlaylistItem found by the `where` argument doesn't exist, create a new PlaylistItem with this data.
+     */
+    create: XOR<PlaylistItemCreateInput, PlaylistItemUncheckedCreateInput>
+    /**
+     * In case the PlaylistItem was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<PlaylistItemUpdateInput, PlaylistItemUncheckedUpdateInput>
+  }
+
+  /**
+   * PlaylistItem delete
+   */
+  export type PlaylistItemDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PlaylistItem
+     */
+    select?: PlaylistItemSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PlaylistItem
+     */
+    omit?: PlaylistItemOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PlaylistItemInclude<ExtArgs> | null
+    /**
+     * Filter which PlaylistItem to delete.
+     */
+    where: PlaylistItemWhereUniqueInput
+  }
+
+  /**
+   * PlaylistItem deleteMany
+   */
+  export type PlaylistItemDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which PlaylistItems to delete
+     */
+    where?: PlaylistItemWhereInput
+    /**
+     * Limit how many PlaylistItems to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * PlaylistItem without action
+   */
+  export type PlaylistItemDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PlaylistItem
+     */
+    select?: PlaylistItemSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PlaylistItem
+     */
+    omit?: PlaylistItemOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PlaylistItemInclude<ExtArgs> | null
+  }
+
+
+  /**
    * Enums
    */
 
@@ -6730,6 +9143,27 @@ export namespace Prisma {
   };
 
   export type VerificationTokenScalarFieldEnum = (typeof VerificationTokenScalarFieldEnum)[keyof typeof VerificationTokenScalarFieldEnum]
+
+
+  export const StandalonePlaylistScalarFieldEnum: {
+    id: 'id',
+    userId: 'userId',
+    name: 'name',
+    createdAt: 'createdAt'
+  };
+
+  export type StandalonePlaylistScalarFieldEnum = (typeof StandalonePlaylistScalarFieldEnum)[keyof typeof StandalonePlaylistScalarFieldEnum]
+
+
+  export const PlaylistItemScalarFieldEnum: {
+    id: 'id',
+    playlistId: 'playlistId',
+    track: 'track',
+    artist: 'artist',
+    order: 'order'
+  };
+
+  export type PlaylistItemScalarFieldEnum = (typeof PlaylistItemScalarFieldEnum)[keyof typeof PlaylistItemScalarFieldEnum]
 
 
   export const SortOrder: {
@@ -6945,6 +9379,7 @@ export namespace Prisma {
     accounts?: AccountListRelationFilter
     sessions?: SessionListRelationFilter
     tablePreferences?: TablePreferenceListRelationFilter
+    standalonePlaylists?: StandalonePlaylistListRelationFilter
   }
 
   export type UserOrderByWithRelationInput = {
@@ -6957,6 +9392,7 @@ export namespace Prisma {
     accounts?: AccountOrderByRelationAggregateInput
     sessions?: SessionOrderByRelationAggregateInput
     tablePreferences?: TablePreferenceOrderByRelationAggregateInput
+    standalonePlaylists?: StandalonePlaylistOrderByRelationAggregateInput
   }
 
   export type UserWhereUniqueInput = Prisma.AtLeast<{
@@ -6972,6 +9408,7 @@ export namespace Prisma {
     accounts?: AccountListRelationFilter
     sessions?: SessionListRelationFilter
     tablePreferences?: TablePreferenceListRelationFilter
+    standalonePlaylists?: StandalonePlaylistListRelationFilter
   }, "id" | "email">
 
   export type UserOrderByWithAggregationInput = {
@@ -7090,6 +9527,116 @@ export namespace Prisma {
     identifier?: StringWithAggregatesFilter<"VerificationToken"> | string
     token?: StringWithAggregatesFilter<"VerificationToken"> | string
     expires?: DateTimeWithAggregatesFilter<"VerificationToken"> | Date | string
+  }
+
+  export type StandalonePlaylistWhereInput = {
+    AND?: StandalonePlaylistWhereInput | StandalonePlaylistWhereInput[]
+    OR?: StandalonePlaylistWhereInput[]
+    NOT?: StandalonePlaylistWhereInput | StandalonePlaylistWhereInput[]
+    id?: StringFilter<"StandalonePlaylist"> | string
+    userId?: StringFilter<"StandalonePlaylist"> | string
+    name?: StringFilter<"StandalonePlaylist"> | string
+    createdAt?: DateTimeFilter<"StandalonePlaylist"> | Date | string
+    user?: XOR<UserScalarRelationFilter, UserWhereInput>
+    items?: PlaylistItemListRelationFilter
+  }
+
+  export type StandalonePlaylistOrderByWithRelationInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    name?: SortOrder
+    createdAt?: SortOrder
+    user?: UserOrderByWithRelationInput
+    items?: PlaylistItemOrderByRelationAggregateInput
+  }
+
+  export type StandalonePlaylistWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    AND?: StandalonePlaylistWhereInput | StandalonePlaylistWhereInput[]
+    OR?: StandalonePlaylistWhereInput[]
+    NOT?: StandalonePlaylistWhereInput | StandalonePlaylistWhereInput[]
+    userId?: StringFilter<"StandalonePlaylist"> | string
+    name?: StringFilter<"StandalonePlaylist"> | string
+    createdAt?: DateTimeFilter<"StandalonePlaylist"> | Date | string
+    user?: XOR<UserScalarRelationFilter, UserWhereInput>
+    items?: PlaylistItemListRelationFilter
+  }, "id">
+
+  export type StandalonePlaylistOrderByWithAggregationInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    name?: SortOrder
+    createdAt?: SortOrder
+    _count?: StandalonePlaylistCountOrderByAggregateInput
+    _max?: StandalonePlaylistMaxOrderByAggregateInput
+    _min?: StandalonePlaylistMinOrderByAggregateInput
+  }
+
+  export type StandalonePlaylistScalarWhereWithAggregatesInput = {
+    AND?: StandalonePlaylistScalarWhereWithAggregatesInput | StandalonePlaylistScalarWhereWithAggregatesInput[]
+    OR?: StandalonePlaylistScalarWhereWithAggregatesInput[]
+    NOT?: StandalonePlaylistScalarWhereWithAggregatesInput | StandalonePlaylistScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"StandalonePlaylist"> | string
+    userId?: StringWithAggregatesFilter<"StandalonePlaylist"> | string
+    name?: StringWithAggregatesFilter<"StandalonePlaylist"> | string
+    createdAt?: DateTimeWithAggregatesFilter<"StandalonePlaylist"> | Date | string
+  }
+
+  export type PlaylistItemWhereInput = {
+    AND?: PlaylistItemWhereInput | PlaylistItemWhereInput[]
+    OR?: PlaylistItemWhereInput[]
+    NOT?: PlaylistItemWhereInput | PlaylistItemWhereInput[]
+    id?: StringFilter<"PlaylistItem"> | string
+    playlistId?: StringFilter<"PlaylistItem"> | string
+    track?: StringFilter<"PlaylistItem"> | string
+    artist?: StringFilter<"PlaylistItem"> | string
+    order?: IntFilter<"PlaylistItem"> | number
+    playlist?: XOR<StandalonePlaylistScalarRelationFilter, StandalonePlaylistWhereInput>
+  }
+
+  export type PlaylistItemOrderByWithRelationInput = {
+    id?: SortOrder
+    playlistId?: SortOrder
+    track?: SortOrder
+    artist?: SortOrder
+    order?: SortOrder
+    playlist?: StandalonePlaylistOrderByWithRelationInput
+  }
+
+  export type PlaylistItemWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    AND?: PlaylistItemWhereInput | PlaylistItemWhereInput[]
+    OR?: PlaylistItemWhereInput[]
+    NOT?: PlaylistItemWhereInput | PlaylistItemWhereInput[]
+    playlistId?: StringFilter<"PlaylistItem"> | string
+    track?: StringFilter<"PlaylistItem"> | string
+    artist?: StringFilter<"PlaylistItem"> | string
+    order?: IntFilter<"PlaylistItem"> | number
+    playlist?: XOR<StandalonePlaylistScalarRelationFilter, StandalonePlaylistWhereInput>
+  }, "id">
+
+  export type PlaylistItemOrderByWithAggregationInput = {
+    id?: SortOrder
+    playlistId?: SortOrder
+    track?: SortOrder
+    artist?: SortOrder
+    order?: SortOrder
+    _count?: PlaylistItemCountOrderByAggregateInput
+    _avg?: PlaylistItemAvgOrderByAggregateInput
+    _max?: PlaylistItemMaxOrderByAggregateInput
+    _min?: PlaylistItemMinOrderByAggregateInput
+    _sum?: PlaylistItemSumOrderByAggregateInput
+  }
+
+  export type PlaylistItemScalarWhereWithAggregatesInput = {
+    AND?: PlaylistItemScalarWhereWithAggregatesInput | PlaylistItemScalarWhereWithAggregatesInput[]
+    OR?: PlaylistItemScalarWhereWithAggregatesInput[]
+    NOT?: PlaylistItemScalarWhereWithAggregatesInput | PlaylistItemScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"PlaylistItem"> | string
+    playlistId?: StringWithAggregatesFilter<"PlaylistItem"> | string
+    track?: StringWithAggregatesFilter<"PlaylistItem"> | string
+    artist?: StringWithAggregatesFilter<"PlaylistItem"> | string
+    order?: IntWithAggregatesFilter<"PlaylistItem"> | number
   }
 
   export type AccountCreateInput = {
@@ -7261,6 +9808,7 @@ export namespace Prisma {
     accounts?: AccountCreateNestedManyWithoutUserInput
     sessions?: SessionCreateNestedManyWithoutUserInput
     tablePreferences?: TablePreferenceCreateNestedManyWithoutUserInput
+    standalonePlaylists?: StandalonePlaylistCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateInput = {
@@ -7273,6 +9821,7 @@ export namespace Prisma {
     accounts?: AccountUncheckedCreateNestedManyWithoutUserInput
     sessions?: SessionUncheckedCreateNestedManyWithoutUserInput
     tablePreferences?: TablePreferenceUncheckedCreateNestedManyWithoutUserInput
+    standalonePlaylists?: StandalonePlaylistUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserUpdateInput = {
@@ -7285,6 +9834,7 @@ export namespace Prisma {
     accounts?: AccountUpdateManyWithoutUserNestedInput
     sessions?: SessionUpdateManyWithoutUserNestedInput
     tablePreferences?: TablePreferenceUpdateManyWithoutUserNestedInput
+    standalonePlaylists?: StandalonePlaylistUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateInput = {
@@ -7297,6 +9847,7 @@ export namespace Prisma {
     accounts?: AccountUncheckedUpdateManyWithoutUserNestedInput
     sessions?: SessionUncheckedUpdateManyWithoutUserNestedInput
     tablePreferences?: TablePreferenceUncheckedUpdateManyWithoutUserNestedInput
+    standalonePlaylists?: StandalonePlaylistUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type UserCreateManyInput = {
@@ -7414,6 +9965,113 @@ export namespace Prisma {
     identifier?: StringFieldUpdateOperationsInput | string
     token?: StringFieldUpdateOperationsInput | string
     expires?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type StandalonePlaylistCreateInput = {
+    id?: string
+    name: string
+    createdAt?: Date | string
+    user: UserCreateNestedOneWithoutStandalonePlaylistsInput
+    items?: PlaylistItemCreateNestedManyWithoutPlaylistInput
+  }
+
+  export type StandalonePlaylistUncheckedCreateInput = {
+    id?: string
+    userId: string
+    name: string
+    createdAt?: Date | string
+    items?: PlaylistItemUncheckedCreateNestedManyWithoutPlaylistInput
+  }
+
+  export type StandalonePlaylistUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    user?: UserUpdateOneRequiredWithoutStandalonePlaylistsNestedInput
+    items?: PlaylistItemUpdateManyWithoutPlaylistNestedInput
+  }
+
+  export type StandalonePlaylistUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    items?: PlaylistItemUncheckedUpdateManyWithoutPlaylistNestedInput
+  }
+
+  export type StandalonePlaylistCreateManyInput = {
+    id?: string
+    userId: string
+    name: string
+    createdAt?: Date | string
+  }
+
+  export type StandalonePlaylistUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type StandalonePlaylistUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type PlaylistItemCreateInput = {
+    id?: string
+    track: string
+    artist: string
+    order: number
+    playlist: StandalonePlaylistCreateNestedOneWithoutItemsInput
+  }
+
+  export type PlaylistItemUncheckedCreateInput = {
+    id?: string
+    playlistId: string
+    track: string
+    artist: string
+    order: number
+  }
+
+  export type PlaylistItemUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    track?: StringFieldUpdateOperationsInput | string
+    artist?: StringFieldUpdateOperationsInput | string
+    order?: IntFieldUpdateOperationsInput | number
+    playlist?: StandalonePlaylistUpdateOneRequiredWithoutItemsNestedInput
+  }
+
+  export type PlaylistItemUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    playlistId?: StringFieldUpdateOperationsInput | string
+    track?: StringFieldUpdateOperationsInput | string
+    artist?: StringFieldUpdateOperationsInput | string
+    order?: IntFieldUpdateOperationsInput | number
+  }
+
+  export type PlaylistItemCreateManyInput = {
+    id?: string
+    playlistId: string
+    track: string
+    artist: string
+    order: number
+  }
+
+  export type PlaylistItemUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    track?: StringFieldUpdateOperationsInput | string
+    artist?: StringFieldUpdateOperationsInput | string
+    order?: IntFieldUpdateOperationsInput | number
+  }
+
+  export type PlaylistItemUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    playlistId?: StringFieldUpdateOperationsInput | string
+    track?: StringFieldUpdateOperationsInput | string
+    artist?: StringFieldUpdateOperationsInput | string
+    order?: IntFieldUpdateOperationsInput | number
   }
 
   export type StringFilter<$PrismaModel = never> = {
@@ -7653,6 +10311,12 @@ export namespace Prisma {
     none?: TablePreferenceWhereInput
   }
 
+  export type StandalonePlaylistListRelationFilter = {
+    every?: StandalonePlaylistWhereInput
+    some?: StandalonePlaylistWhereInput
+    none?: StandalonePlaylistWhereInput
+  }
+
   export type AccountOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
@@ -7662,6 +10326,10 @@ export namespace Prisma {
   }
 
   export type TablePreferenceOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type StandalonePlaylistOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
@@ -7755,6 +10423,101 @@ export namespace Prisma {
     expires?: SortOrder
   }
 
+  export type PlaylistItemListRelationFilter = {
+    every?: PlaylistItemWhereInput
+    some?: PlaylistItemWhereInput
+    none?: PlaylistItemWhereInput
+  }
+
+  export type PlaylistItemOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type StandalonePlaylistCountOrderByAggregateInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    name?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type StandalonePlaylistMaxOrderByAggregateInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    name?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type StandalonePlaylistMinOrderByAggregateInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    name?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type IntFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel>
+    in?: number[]
+    notIn?: number[]
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntFilter<$PrismaModel> | number
+  }
+
+  export type StandalonePlaylistScalarRelationFilter = {
+    is?: StandalonePlaylistWhereInput
+    isNot?: StandalonePlaylistWhereInput
+  }
+
+  export type PlaylistItemCountOrderByAggregateInput = {
+    id?: SortOrder
+    playlistId?: SortOrder
+    track?: SortOrder
+    artist?: SortOrder
+    order?: SortOrder
+  }
+
+  export type PlaylistItemAvgOrderByAggregateInput = {
+    order?: SortOrder
+  }
+
+  export type PlaylistItemMaxOrderByAggregateInput = {
+    id?: SortOrder
+    playlistId?: SortOrder
+    track?: SortOrder
+    artist?: SortOrder
+    order?: SortOrder
+  }
+
+  export type PlaylistItemMinOrderByAggregateInput = {
+    id?: SortOrder
+    playlistId?: SortOrder
+    track?: SortOrder
+    artist?: SortOrder
+    order?: SortOrder
+  }
+
+  export type PlaylistItemSumOrderByAggregateInput = {
+    order?: SortOrder
+  }
+
+  export type IntWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel>
+    in?: number[]
+    notIn?: number[]
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntWithAggregatesFilter<$PrismaModel> | number
+    _count?: NestedIntFilter<$PrismaModel>
+    _avg?: NestedFloatFilter<$PrismaModel>
+    _sum?: NestedIntFilter<$PrismaModel>
+    _min?: NestedIntFilter<$PrismaModel>
+    _max?: NestedIntFilter<$PrismaModel>
+  }
+
   export type UserCreateNestedOneWithoutAccountsInput = {
     create?: XOR<UserCreateWithoutAccountsInput, UserUncheckedCreateWithoutAccountsInput>
     connectOrCreate?: UserCreateOrConnectWithoutAccountsInput
@@ -7824,6 +10587,13 @@ export namespace Prisma {
     connect?: TablePreferenceWhereUniqueInput | TablePreferenceWhereUniqueInput[]
   }
 
+  export type StandalonePlaylistCreateNestedManyWithoutUserInput = {
+    create?: XOR<StandalonePlaylistCreateWithoutUserInput, StandalonePlaylistUncheckedCreateWithoutUserInput> | StandalonePlaylistCreateWithoutUserInput[] | StandalonePlaylistUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: StandalonePlaylistCreateOrConnectWithoutUserInput | StandalonePlaylistCreateOrConnectWithoutUserInput[]
+    createMany?: StandalonePlaylistCreateManyUserInputEnvelope
+    connect?: StandalonePlaylistWhereUniqueInput | StandalonePlaylistWhereUniqueInput[]
+  }
+
   export type AccountUncheckedCreateNestedManyWithoutUserInput = {
     create?: XOR<AccountCreateWithoutUserInput, AccountUncheckedCreateWithoutUserInput> | AccountCreateWithoutUserInput[] | AccountUncheckedCreateWithoutUserInput[]
     connectOrCreate?: AccountCreateOrConnectWithoutUserInput | AccountCreateOrConnectWithoutUserInput[]
@@ -7843,6 +10613,13 @@ export namespace Prisma {
     connectOrCreate?: TablePreferenceCreateOrConnectWithoutUserInput | TablePreferenceCreateOrConnectWithoutUserInput[]
     createMany?: TablePreferenceCreateManyUserInputEnvelope
     connect?: TablePreferenceWhereUniqueInput | TablePreferenceWhereUniqueInput[]
+  }
+
+  export type StandalonePlaylistUncheckedCreateNestedManyWithoutUserInput = {
+    create?: XOR<StandalonePlaylistCreateWithoutUserInput, StandalonePlaylistUncheckedCreateWithoutUserInput> | StandalonePlaylistCreateWithoutUserInput[] | StandalonePlaylistUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: StandalonePlaylistCreateOrConnectWithoutUserInput | StandalonePlaylistCreateOrConnectWithoutUserInput[]
+    createMany?: StandalonePlaylistCreateManyUserInputEnvelope
+    connect?: StandalonePlaylistWhereUniqueInput | StandalonePlaylistWhereUniqueInput[]
   }
 
   export type NullableDateTimeFieldUpdateOperationsInput = {
@@ -7891,6 +10668,20 @@ export namespace Prisma {
     deleteMany?: TablePreferenceScalarWhereInput | TablePreferenceScalarWhereInput[]
   }
 
+  export type StandalonePlaylistUpdateManyWithoutUserNestedInput = {
+    create?: XOR<StandalonePlaylistCreateWithoutUserInput, StandalonePlaylistUncheckedCreateWithoutUserInput> | StandalonePlaylistCreateWithoutUserInput[] | StandalonePlaylistUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: StandalonePlaylistCreateOrConnectWithoutUserInput | StandalonePlaylistCreateOrConnectWithoutUserInput[]
+    upsert?: StandalonePlaylistUpsertWithWhereUniqueWithoutUserInput | StandalonePlaylistUpsertWithWhereUniqueWithoutUserInput[]
+    createMany?: StandalonePlaylistCreateManyUserInputEnvelope
+    set?: StandalonePlaylistWhereUniqueInput | StandalonePlaylistWhereUniqueInput[]
+    disconnect?: StandalonePlaylistWhereUniqueInput | StandalonePlaylistWhereUniqueInput[]
+    delete?: StandalonePlaylistWhereUniqueInput | StandalonePlaylistWhereUniqueInput[]
+    connect?: StandalonePlaylistWhereUniqueInput | StandalonePlaylistWhereUniqueInput[]
+    update?: StandalonePlaylistUpdateWithWhereUniqueWithoutUserInput | StandalonePlaylistUpdateWithWhereUniqueWithoutUserInput[]
+    updateMany?: StandalonePlaylistUpdateManyWithWhereWithoutUserInput | StandalonePlaylistUpdateManyWithWhereWithoutUserInput[]
+    deleteMany?: StandalonePlaylistScalarWhereInput | StandalonePlaylistScalarWhereInput[]
+  }
+
   export type AccountUncheckedUpdateManyWithoutUserNestedInput = {
     create?: XOR<AccountCreateWithoutUserInput, AccountUncheckedCreateWithoutUserInput> | AccountCreateWithoutUserInput[] | AccountUncheckedCreateWithoutUserInput[]
     connectOrCreate?: AccountCreateOrConnectWithoutUserInput | AccountCreateOrConnectWithoutUserInput[]
@@ -7933,6 +10724,20 @@ export namespace Prisma {
     deleteMany?: TablePreferenceScalarWhereInput | TablePreferenceScalarWhereInput[]
   }
 
+  export type StandalonePlaylistUncheckedUpdateManyWithoutUserNestedInput = {
+    create?: XOR<StandalonePlaylistCreateWithoutUserInput, StandalonePlaylistUncheckedCreateWithoutUserInput> | StandalonePlaylistCreateWithoutUserInput[] | StandalonePlaylistUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: StandalonePlaylistCreateOrConnectWithoutUserInput | StandalonePlaylistCreateOrConnectWithoutUserInput[]
+    upsert?: StandalonePlaylistUpsertWithWhereUniqueWithoutUserInput | StandalonePlaylistUpsertWithWhereUniqueWithoutUserInput[]
+    createMany?: StandalonePlaylistCreateManyUserInputEnvelope
+    set?: StandalonePlaylistWhereUniqueInput | StandalonePlaylistWhereUniqueInput[]
+    disconnect?: StandalonePlaylistWhereUniqueInput | StandalonePlaylistWhereUniqueInput[]
+    delete?: StandalonePlaylistWhereUniqueInput | StandalonePlaylistWhereUniqueInput[]
+    connect?: StandalonePlaylistWhereUniqueInput | StandalonePlaylistWhereUniqueInput[]
+    update?: StandalonePlaylistUpdateWithWhereUniqueWithoutUserInput | StandalonePlaylistUpdateWithWhereUniqueWithoutUserInput[]
+    updateMany?: StandalonePlaylistUpdateManyWithWhereWithoutUserInput | StandalonePlaylistUpdateManyWithWhereWithoutUserInput[]
+    deleteMany?: StandalonePlaylistScalarWhereInput | StandalonePlaylistScalarWhereInput[]
+  }
+
   export type UserCreateNestedOneWithoutTablePreferencesInput = {
     create?: XOR<UserCreateWithoutTablePreferencesInput, UserUncheckedCreateWithoutTablePreferencesInput>
     connectOrCreate?: UserCreateOrConnectWithoutTablePreferencesInput
@@ -7945,6 +10750,84 @@ export namespace Prisma {
     upsert?: UserUpsertWithoutTablePreferencesInput
     connect?: UserWhereUniqueInput
     update?: XOR<XOR<UserUpdateToOneWithWhereWithoutTablePreferencesInput, UserUpdateWithoutTablePreferencesInput>, UserUncheckedUpdateWithoutTablePreferencesInput>
+  }
+
+  export type UserCreateNestedOneWithoutStandalonePlaylistsInput = {
+    create?: XOR<UserCreateWithoutStandalonePlaylistsInput, UserUncheckedCreateWithoutStandalonePlaylistsInput>
+    connectOrCreate?: UserCreateOrConnectWithoutStandalonePlaylistsInput
+    connect?: UserWhereUniqueInput
+  }
+
+  export type PlaylistItemCreateNestedManyWithoutPlaylistInput = {
+    create?: XOR<PlaylistItemCreateWithoutPlaylistInput, PlaylistItemUncheckedCreateWithoutPlaylistInput> | PlaylistItemCreateWithoutPlaylistInput[] | PlaylistItemUncheckedCreateWithoutPlaylistInput[]
+    connectOrCreate?: PlaylistItemCreateOrConnectWithoutPlaylistInput | PlaylistItemCreateOrConnectWithoutPlaylistInput[]
+    createMany?: PlaylistItemCreateManyPlaylistInputEnvelope
+    connect?: PlaylistItemWhereUniqueInput | PlaylistItemWhereUniqueInput[]
+  }
+
+  export type PlaylistItemUncheckedCreateNestedManyWithoutPlaylistInput = {
+    create?: XOR<PlaylistItemCreateWithoutPlaylistInput, PlaylistItemUncheckedCreateWithoutPlaylistInput> | PlaylistItemCreateWithoutPlaylistInput[] | PlaylistItemUncheckedCreateWithoutPlaylistInput[]
+    connectOrCreate?: PlaylistItemCreateOrConnectWithoutPlaylistInput | PlaylistItemCreateOrConnectWithoutPlaylistInput[]
+    createMany?: PlaylistItemCreateManyPlaylistInputEnvelope
+    connect?: PlaylistItemWhereUniqueInput | PlaylistItemWhereUniqueInput[]
+  }
+
+  export type UserUpdateOneRequiredWithoutStandalonePlaylistsNestedInput = {
+    create?: XOR<UserCreateWithoutStandalonePlaylistsInput, UserUncheckedCreateWithoutStandalonePlaylistsInput>
+    connectOrCreate?: UserCreateOrConnectWithoutStandalonePlaylistsInput
+    upsert?: UserUpsertWithoutStandalonePlaylistsInput
+    connect?: UserWhereUniqueInput
+    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutStandalonePlaylistsInput, UserUpdateWithoutStandalonePlaylistsInput>, UserUncheckedUpdateWithoutStandalonePlaylistsInput>
+  }
+
+  export type PlaylistItemUpdateManyWithoutPlaylistNestedInput = {
+    create?: XOR<PlaylistItemCreateWithoutPlaylistInput, PlaylistItemUncheckedCreateWithoutPlaylistInput> | PlaylistItemCreateWithoutPlaylistInput[] | PlaylistItemUncheckedCreateWithoutPlaylistInput[]
+    connectOrCreate?: PlaylistItemCreateOrConnectWithoutPlaylistInput | PlaylistItemCreateOrConnectWithoutPlaylistInput[]
+    upsert?: PlaylistItemUpsertWithWhereUniqueWithoutPlaylistInput | PlaylistItemUpsertWithWhereUniqueWithoutPlaylistInput[]
+    createMany?: PlaylistItemCreateManyPlaylistInputEnvelope
+    set?: PlaylistItemWhereUniqueInput | PlaylistItemWhereUniqueInput[]
+    disconnect?: PlaylistItemWhereUniqueInput | PlaylistItemWhereUniqueInput[]
+    delete?: PlaylistItemWhereUniqueInput | PlaylistItemWhereUniqueInput[]
+    connect?: PlaylistItemWhereUniqueInput | PlaylistItemWhereUniqueInput[]
+    update?: PlaylistItemUpdateWithWhereUniqueWithoutPlaylistInput | PlaylistItemUpdateWithWhereUniqueWithoutPlaylistInput[]
+    updateMany?: PlaylistItemUpdateManyWithWhereWithoutPlaylistInput | PlaylistItemUpdateManyWithWhereWithoutPlaylistInput[]
+    deleteMany?: PlaylistItemScalarWhereInput | PlaylistItemScalarWhereInput[]
+  }
+
+  export type PlaylistItemUncheckedUpdateManyWithoutPlaylistNestedInput = {
+    create?: XOR<PlaylistItemCreateWithoutPlaylistInput, PlaylistItemUncheckedCreateWithoutPlaylistInput> | PlaylistItemCreateWithoutPlaylistInput[] | PlaylistItemUncheckedCreateWithoutPlaylistInput[]
+    connectOrCreate?: PlaylistItemCreateOrConnectWithoutPlaylistInput | PlaylistItemCreateOrConnectWithoutPlaylistInput[]
+    upsert?: PlaylistItemUpsertWithWhereUniqueWithoutPlaylistInput | PlaylistItemUpsertWithWhereUniqueWithoutPlaylistInput[]
+    createMany?: PlaylistItemCreateManyPlaylistInputEnvelope
+    set?: PlaylistItemWhereUniqueInput | PlaylistItemWhereUniqueInput[]
+    disconnect?: PlaylistItemWhereUniqueInput | PlaylistItemWhereUniqueInput[]
+    delete?: PlaylistItemWhereUniqueInput | PlaylistItemWhereUniqueInput[]
+    connect?: PlaylistItemWhereUniqueInput | PlaylistItemWhereUniqueInput[]
+    update?: PlaylistItemUpdateWithWhereUniqueWithoutPlaylistInput | PlaylistItemUpdateWithWhereUniqueWithoutPlaylistInput[]
+    updateMany?: PlaylistItemUpdateManyWithWhereWithoutPlaylistInput | PlaylistItemUpdateManyWithWhereWithoutPlaylistInput[]
+    deleteMany?: PlaylistItemScalarWhereInput | PlaylistItemScalarWhereInput[]
+  }
+
+  export type StandalonePlaylistCreateNestedOneWithoutItemsInput = {
+    create?: XOR<StandalonePlaylistCreateWithoutItemsInput, StandalonePlaylistUncheckedCreateWithoutItemsInput>
+    connectOrCreate?: StandalonePlaylistCreateOrConnectWithoutItemsInput
+    connect?: StandalonePlaylistWhereUniqueInput
+  }
+
+  export type IntFieldUpdateOperationsInput = {
+    set?: number
+    increment?: number
+    decrement?: number
+    multiply?: number
+    divide?: number
+  }
+
+  export type StandalonePlaylistUpdateOneRequiredWithoutItemsNestedInput = {
+    create?: XOR<StandalonePlaylistCreateWithoutItemsInput, StandalonePlaylistUncheckedCreateWithoutItemsInput>
+    connectOrCreate?: StandalonePlaylistCreateOrConnectWithoutItemsInput
+    upsert?: StandalonePlaylistUpsertWithoutItemsInput
+    connect?: StandalonePlaylistWhereUniqueInput
+    update?: XOR<XOR<StandalonePlaylistUpdateToOneWithWhereWithoutItemsInput, StandalonePlaylistUpdateWithoutItemsInput>, StandalonePlaylistUncheckedUpdateWithoutItemsInput>
   }
 
   export type NestedStringFilter<$PrismaModel = never> = {
@@ -8108,6 +10991,33 @@ export namespace Prisma {
     _max?: NestedDateTimeNullableFilter<$PrismaModel>
   }
 
+  export type NestedIntWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel>
+    in?: number[]
+    notIn?: number[]
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntWithAggregatesFilter<$PrismaModel> | number
+    _count?: NestedIntFilter<$PrismaModel>
+    _avg?: NestedFloatFilter<$PrismaModel>
+    _sum?: NestedIntFilter<$PrismaModel>
+    _min?: NestedIntFilter<$PrismaModel>
+    _max?: NestedIntFilter<$PrismaModel>
+  }
+
+  export type NestedFloatFilter<$PrismaModel = never> = {
+    equals?: number | FloatFieldRefInput<$PrismaModel>
+    in?: number[]
+    notIn?: number[]
+    lt?: number | FloatFieldRefInput<$PrismaModel>
+    lte?: number | FloatFieldRefInput<$PrismaModel>
+    gt?: number | FloatFieldRefInput<$PrismaModel>
+    gte?: number | FloatFieldRefInput<$PrismaModel>
+    not?: NestedFloatFilter<$PrismaModel> | number
+  }
+
   export type UserCreateWithoutAccountsInput = {
     id?: string
     name?: string | null
@@ -8117,6 +11027,7 @@ export namespace Prisma {
     collectionPath?: string | null
     sessions?: SessionCreateNestedManyWithoutUserInput
     tablePreferences?: TablePreferenceCreateNestedManyWithoutUserInput
+    standalonePlaylists?: StandalonePlaylistCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutAccountsInput = {
@@ -8128,6 +11039,7 @@ export namespace Prisma {
     collectionPath?: string | null
     sessions?: SessionUncheckedCreateNestedManyWithoutUserInput
     tablePreferences?: TablePreferenceUncheckedCreateNestedManyWithoutUserInput
+    standalonePlaylists?: StandalonePlaylistUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutAccountsInput = {
@@ -8155,6 +11067,7 @@ export namespace Prisma {
     collectionPath?: NullableStringFieldUpdateOperationsInput | string | null
     sessions?: SessionUpdateManyWithoutUserNestedInput
     tablePreferences?: TablePreferenceUpdateManyWithoutUserNestedInput
+    standalonePlaylists?: StandalonePlaylistUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutAccountsInput = {
@@ -8166,6 +11079,7 @@ export namespace Prisma {
     collectionPath?: NullableStringFieldUpdateOperationsInput | string | null
     sessions?: SessionUncheckedUpdateManyWithoutUserNestedInput
     tablePreferences?: TablePreferenceUncheckedUpdateManyWithoutUserNestedInput
+    standalonePlaylists?: StandalonePlaylistUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type UserCreateWithoutSessionsInput = {
@@ -8177,6 +11091,7 @@ export namespace Prisma {
     collectionPath?: string | null
     accounts?: AccountCreateNestedManyWithoutUserInput
     tablePreferences?: TablePreferenceCreateNestedManyWithoutUserInput
+    standalonePlaylists?: StandalonePlaylistCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutSessionsInput = {
@@ -8188,6 +11103,7 @@ export namespace Prisma {
     collectionPath?: string | null
     accounts?: AccountUncheckedCreateNestedManyWithoutUserInput
     tablePreferences?: TablePreferenceUncheckedCreateNestedManyWithoutUserInput
+    standalonePlaylists?: StandalonePlaylistUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutSessionsInput = {
@@ -8215,6 +11131,7 @@ export namespace Prisma {
     collectionPath?: NullableStringFieldUpdateOperationsInput | string | null
     accounts?: AccountUpdateManyWithoutUserNestedInput
     tablePreferences?: TablePreferenceUpdateManyWithoutUserNestedInput
+    standalonePlaylists?: StandalonePlaylistUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutSessionsInput = {
@@ -8226,6 +11143,7 @@ export namespace Prisma {
     collectionPath?: NullableStringFieldUpdateOperationsInput | string | null
     accounts?: AccountUncheckedUpdateManyWithoutUserNestedInput
     tablePreferences?: TablePreferenceUncheckedUpdateManyWithoutUserNestedInput
+    standalonePlaylists?: StandalonePlaylistUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type AccountCreateWithoutUserInput = {
@@ -8307,6 +11225,29 @@ export namespace Prisma {
 
   export type TablePreferenceCreateManyUserInputEnvelope = {
     data: TablePreferenceCreateManyUserInput | TablePreferenceCreateManyUserInput[]
+  }
+
+  export type StandalonePlaylistCreateWithoutUserInput = {
+    id?: string
+    name: string
+    createdAt?: Date | string
+    items?: PlaylistItemCreateNestedManyWithoutPlaylistInput
+  }
+
+  export type StandalonePlaylistUncheckedCreateWithoutUserInput = {
+    id?: string
+    name: string
+    createdAt?: Date | string
+    items?: PlaylistItemUncheckedCreateNestedManyWithoutPlaylistInput
+  }
+
+  export type StandalonePlaylistCreateOrConnectWithoutUserInput = {
+    where: StandalonePlaylistWhereUniqueInput
+    create: XOR<StandalonePlaylistCreateWithoutUserInput, StandalonePlaylistUncheckedCreateWithoutUserInput>
+  }
+
+  export type StandalonePlaylistCreateManyUserInputEnvelope = {
+    data: StandalonePlaylistCreateManyUserInput | StandalonePlaylistCreateManyUserInput[]
   }
 
   export type AccountUpsertWithWhereUniqueWithoutUserInput = {
@@ -8396,6 +11337,32 @@ export namespace Prisma {
     config?: StringFilter<"TablePreference"> | string
   }
 
+  export type StandalonePlaylistUpsertWithWhereUniqueWithoutUserInput = {
+    where: StandalonePlaylistWhereUniqueInput
+    update: XOR<StandalonePlaylistUpdateWithoutUserInput, StandalonePlaylistUncheckedUpdateWithoutUserInput>
+    create: XOR<StandalonePlaylistCreateWithoutUserInput, StandalonePlaylistUncheckedCreateWithoutUserInput>
+  }
+
+  export type StandalonePlaylistUpdateWithWhereUniqueWithoutUserInput = {
+    where: StandalonePlaylistWhereUniqueInput
+    data: XOR<StandalonePlaylistUpdateWithoutUserInput, StandalonePlaylistUncheckedUpdateWithoutUserInput>
+  }
+
+  export type StandalonePlaylistUpdateManyWithWhereWithoutUserInput = {
+    where: StandalonePlaylistScalarWhereInput
+    data: XOR<StandalonePlaylistUpdateManyMutationInput, StandalonePlaylistUncheckedUpdateManyWithoutUserInput>
+  }
+
+  export type StandalonePlaylistScalarWhereInput = {
+    AND?: StandalonePlaylistScalarWhereInput | StandalonePlaylistScalarWhereInput[]
+    OR?: StandalonePlaylistScalarWhereInput[]
+    NOT?: StandalonePlaylistScalarWhereInput | StandalonePlaylistScalarWhereInput[]
+    id?: StringFilter<"StandalonePlaylist"> | string
+    userId?: StringFilter<"StandalonePlaylist"> | string
+    name?: StringFilter<"StandalonePlaylist"> | string
+    createdAt?: DateTimeFilter<"StandalonePlaylist"> | Date | string
+  }
+
   export type UserCreateWithoutTablePreferencesInput = {
     id?: string
     name?: string | null
@@ -8405,6 +11372,7 @@ export namespace Prisma {
     collectionPath?: string | null
     accounts?: AccountCreateNestedManyWithoutUserInput
     sessions?: SessionCreateNestedManyWithoutUserInput
+    standalonePlaylists?: StandalonePlaylistCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutTablePreferencesInput = {
@@ -8416,6 +11384,7 @@ export namespace Prisma {
     collectionPath?: string | null
     accounts?: AccountUncheckedCreateNestedManyWithoutUserInput
     sessions?: SessionUncheckedCreateNestedManyWithoutUserInput
+    standalonePlaylists?: StandalonePlaylistUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutTablePreferencesInput = {
@@ -8443,6 +11412,7 @@ export namespace Prisma {
     collectionPath?: NullableStringFieldUpdateOperationsInput | string | null
     accounts?: AccountUpdateManyWithoutUserNestedInput
     sessions?: SessionUpdateManyWithoutUserNestedInput
+    standalonePlaylists?: StandalonePlaylistUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutTablePreferencesInput = {
@@ -8454,6 +11424,165 @@ export namespace Prisma {
     collectionPath?: NullableStringFieldUpdateOperationsInput | string | null
     accounts?: AccountUncheckedUpdateManyWithoutUserNestedInput
     sessions?: SessionUncheckedUpdateManyWithoutUserNestedInput
+    standalonePlaylists?: StandalonePlaylistUncheckedUpdateManyWithoutUserNestedInput
+  }
+
+  export type UserCreateWithoutStandalonePlaylistsInput = {
+    id?: string
+    name?: string | null
+    email?: string | null
+    emailVerified?: Date | string | null
+    image?: string | null
+    collectionPath?: string | null
+    accounts?: AccountCreateNestedManyWithoutUserInput
+    sessions?: SessionCreateNestedManyWithoutUserInput
+    tablePreferences?: TablePreferenceCreateNestedManyWithoutUserInput
+  }
+
+  export type UserUncheckedCreateWithoutStandalonePlaylistsInput = {
+    id?: string
+    name?: string | null
+    email?: string | null
+    emailVerified?: Date | string | null
+    image?: string | null
+    collectionPath?: string | null
+    accounts?: AccountUncheckedCreateNestedManyWithoutUserInput
+    sessions?: SessionUncheckedCreateNestedManyWithoutUserInput
+    tablePreferences?: TablePreferenceUncheckedCreateNestedManyWithoutUserInput
+  }
+
+  export type UserCreateOrConnectWithoutStandalonePlaylistsInput = {
+    where: UserWhereUniqueInput
+    create: XOR<UserCreateWithoutStandalonePlaylistsInput, UserUncheckedCreateWithoutStandalonePlaylistsInput>
+  }
+
+  export type PlaylistItemCreateWithoutPlaylistInput = {
+    id?: string
+    track: string
+    artist: string
+    order: number
+  }
+
+  export type PlaylistItemUncheckedCreateWithoutPlaylistInput = {
+    id?: string
+    track: string
+    artist: string
+    order: number
+  }
+
+  export type PlaylistItemCreateOrConnectWithoutPlaylistInput = {
+    where: PlaylistItemWhereUniqueInput
+    create: XOR<PlaylistItemCreateWithoutPlaylistInput, PlaylistItemUncheckedCreateWithoutPlaylistInput>
+  }
+
+  export type PlaylistItemCreateManyPlaylistInputEnvelope = {
+    data: PlaylistItemCreateManyPlaylistInput | PlaylistItemCreateManyPlaylistInput[]
+  }
+
+  export type UserUpsertWithoutStandalonePlaylistsInput = {
+    update: XOR<UserUpdateWithoutStandalonePlaylistsInput, UserUncheckedUpdateWithoutStandalonePlaylistsInput>
+    create: XOR<UserCreateWithoutStandalonePlaylistsInput, UserUncheckedCreateWithoutStandalonePlaylistsInput>
+    where?: UserWhereInput
+  }
+
+  export type UserUpdateToOneWithWhereWithoutStandalonePlaylistsInput = {
+    where?: UserWhereInput
+    data: XOR<UserUpdateWithoutStandalonePlaylistsInput, UserUncheckedUpdateWithoutStandalonePlaylistsInput>
+  }
+
+  export type UserUpdateWithoutStandalonePlaylistsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: NullableStringFieldUpdateOperationsInput | string | null
+    emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    image?: NullableStringFieldUpdateOperationsInput | string | null
+    collectionPath?: NullableStringFieldUpdateOperationsInput | string | null
+    accounts?: AccountUpdateManyWithoutUserNestedInput
+    sessions?: SessionUpdateManyWithoutUserNestedInput
+    tablePreferences?: TablePreferenceUpdateManyWithoutUserNestedInput
+  }
+
+  export type UserUncheckedUpdateWithoutStandalonePlaylistsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: NullableStringFieldUpdateOperationsInput | string | null
+    emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    image?: NullableStringFieldUpdateOperationsInput | string | null
+    collectionPath?: NullableStringFieldUpdateOperationsInput | string | null
+    accounts?: AccountUncheckedUpdateManyWithoutUserNestedInput
+    sessions?: SessionUncheckedUpdateManyWithoutUserNestedInput
+    tablePreferences?: TablePreferenceUncheckedUpdateManyWithoutUserNestedInput
+  }
+
+  export type PlaylistItemUpsertWithWhereUniqueWithoutPlaylistInput = {
+    where: PlaylistItemWhereUniqueInput
+    update: XOR<PlaylistItemUpdateWithoutPlaylistInput, PlaylistItemUncheckedUpdateWithoutPlaylistInput>
+    create: XOR<PlaylistItemCreateWithoutPlaylistInput, PlaylistItemUncheckedCreateWithoutPlaylistInput>
+  }
+
+  export type PlaylistItemUpdateWithWhereUniqueWithoutPlaylistInput = {
+    where: PlaylistItemWhereUniqueInput
+    data: XOR<PlaylistItemUpdateWithoutPlaylistInput, PlaylistItemUncheckedUpdateWithoutPlaylistInput>
+  }
+
+  export type PlaylistItemUpdateManyWithWhereWithoutPlaylistInput = {
+    where: PlaylistItemScalarWhereInput
+    data: XOR<PlaylistItemUpdateManyMutationInput, PlaylistItemUncheckedUpdateManyWithoutPlaylistInput>
+  }
+
+  export type PlaylistItemScalarWhereInput = {
+    AND?: PlaylistItemScalarWhereInput | PlaylistItemScalarWhereInput[]
+    OR?: PlaylistItemScalarWhereInput[]
+    NOT?: PlaylistItemScalarWhereInput | PlaylistItemScalarWhereInput[]
+    id?: StringFilter<"PlaylistItem"> | string
+    playlistId?: StringFilter<"PlaylistItem"> | string
+    track?: StringFilter<"PlaylistItem"> | string
+    artist?: StringFilter<"PlaylistItem"> | string
+    order?: IntFilter<"PlaylistItem"> | number
+  }
+
+  export type StandalonePlaylistCreateWithoutItemsInput = {
+    id?: string
+    name: string
+    createdAt?: Date | string
+    user: UserCreateNestedOneWithoutStandalonePlaylistsInput
+  }
+
+  export type StandalonePlaylistUncheckedCreateWithoutItemsInput = {
+    id?: string
+    userId: string
+    name: string
+    createdAt?: Date | string
+  }
+
+  export type StandalonePlaylistCreateOrConnectWithoutItemsInput = {
+    where: StandalonePlaylistWhereUniqueInput
+    create: XOR<StandalonePlaylistCreateWithoutItemsInput, StandalonePlaylistUncheckedCreateWithoutItemsInput>
+  }
+
+  export type StandalonePlaylistUpsertWithoutItemsInput = {
+    update: XOR<StandalonePlaylistUpdateWithoutItemsInput, StandalonePlaylistUncheckedUpdateWithoutItemsInput>
+    create: XOR<StandalonePlaylistCreateWithoutItemsInput, StandalonePlaylistUncheckedCreateWithoutItemsInput>
+    where?: StandalonePlaylistWhereInput
+  }
+
+  export type StandalonePlaylistUpdateToOneWithWhereWithoutItemsInput = {
+    where?: StandalonePlaylistWhereInput
+    data: XOR<StandalonePlaylistUpdateWithoutItemsInput, StandalonePlaylistUncheckedUpdateWithoutItemsInput>
+  }
+
+  export type StandalonePlaylistUpdateWithoutItemsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    user?: UserUpdateOneRequiredWithoutStandalonePlaylistsNestedInput
+  }
+
+  export type StandalonePlaylistUncheckedUpdateWithoutItemsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type AccountCreateManyUserInput = {
@@ -8481,6 +11610,12 @@ export namespace Prisma {
     id?: string
     tableName: string
     config: string
+  }
+
+  export type StandalonePlaylistCreateManyUserInput = {
+    id?: string
+    name: string
+    createdAt?: Date | string
   }
 
   export type AccountUpdateWithoutUserInput = {
@@ -8562,6 +11697,54 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     tableName?: StringFieldUpdateOperationsInput | string
     config?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type StandalonePlaylistUpdateWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    items?: PlaylistItemUpdateManyWithoutPlaylistNestedInput
+  }
+
+  export type StandalonePlaylistUncheckedUpdateWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    items?: PlaylistItemUncheckedUpdateManyWithoutPlaylistNestedInput
+  }
+
+  export type StandalonePlaylistUncheckedUpdateManyWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type PlaylistItemCreateManyPlaylistInput = {
+    id?: string
+    track: string
+    artist: string
+    order: number
+  }
+
+  export type PlaylistItemUpdateWithoutPlaylistInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    track?: StringFieldUpdateOperationsInput | string
+    artist?: StringFieldUpdateOperationsInput | string
+    order?: IntFieldUpdateOperationsInput | number
+  }
+
+  export type PlaylistItemUncheckedUpdateWithoutPlaylistInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    track?: StringFieldUpdateOperationsInput | string
+    artist?: StringFieldUpdateOperationsInput | string
+    order?: IntFieldUpdateOperationsInput | number
+  }
+
+  export type PlaylistItemUncheckedUpdateManyWithoutPlaylistInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    track?: StringFieldUpdateOperationsInput | string
+    artist?: StringFieldUpdateOperationsInput | string
+    order?: IntFieldUpdateOperationsInput | number
   }
 
 
