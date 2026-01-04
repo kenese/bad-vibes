@@ -21,7 +21,8 @@ export default function PlaylistToolsPage() {
 
     const fetchExternal = api.playlistTools.fetchExternal.useMutation({
         onSuccess: (data) => {
-            setParsedItems(data);
+            setParsedItems(data.tracks);
+            setPlaylistName(data.name);
             setExternalUrl('');
         }
     });
@@ -50,6 +51,37 @@ export default function PlaylistToolsPage() {
             };
         });
         setParsedItems(parsed);
+    };
+
+    const handleSplit = (index: number) => {
+        const next = [...parsedItems];
+        const item = next[index];
+        if (item) {
+            // Split on various dashes, pipe, underscore, hyphen
+            const parts = item.track.split(/[-–—|_]/).map(p => p.trim());
+            if (parts.length >= 2) {
+                item.artist = parts[0]!;
+                item.track = parts.slice(1).join(' - ');
+                setParsedItems(next);
+            }
+        }
+    };
+
+    const handleClean = (index: number) => {
+        const next = [...parsedItems];
+        const item = next[index];
+        if (item) {
+            const cleanStr = (s: string) => {
+                // Remove text between parens first
+                let cleaned = s.replace(/\(.*?\)/g, "");
+                // Remove non-alphanumeric and keep spaces
+                cleaned = cleaned.replace(/[^a-zA-Z0-9\s]/g, "");
+                return cleaned.replace(/\s+/g, " ").trim();
+            };
+            item.track = cleanStr(item.track);
+            item.artist = cleanStr(item.artist);
+            setParsedItems(next);
+        }
     };
 
     const handleCellChange = (index: number, field: 'track' | 'artist', value: string) => {
@@ -185,6 +217,7 @@ export default function PlaylistToolsPage() {
                                             <tr className="border-b border-[#30363d] text-[#8b949e] text-xs font-semibold uppercase tracking-wider">
                                                 <th className="py-3 px-4">Track</th>
                                                 <th className="py-3 px-4">Artist</th>
+                                                <th className="py-3 px-4 text-right">Actions</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -203,6 +236,24 @@ export default function PlaylistToolsPage() {
                                                             value={item.artist}
                                                             onChange={(e) => handleCellChange(idx, 'artist', e.target.value)}
                                                         />
+                                                    </td>
+                                                    <td className="py-1 px-4 text-right">
+                                                        <div className="flex justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                            <button 
+                                                                onClick={() => handleSplit(idx)}
+                                                                title="Split Track into Artist - Track"
+                                                                className="p-1.5 hover:bg-[#30363d] rounded text-[#8b949e] hover:text-[#58a6ff] transition-colors"
+                                                            >
+                                                                ✂️
+                                                            </button>
+                                                            <button 
+                                                                onClick={() => handleClean(idx)}
+                                                                title="Clean (Alpha-numeric only, remove parens)"
+                                                                className="p-1.5 hover:bg-[#30363d] rounded text-[#8b949e] hover:text-[#58a6ff] transition-colors"
+                                                            >
+                                                                ✨
+                                                            </button>
+                                                        </div>
                                                     </td>
                                                 </tr>
                                             ))}

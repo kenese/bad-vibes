@@ -44,8 +44,10 @@ export const playlistToolsRouter = createTRPCRouter({
       }
       const tracks: { track: string; artist: string }[] = [];
 
+      let playlistName = "My New Playlist";
+
       if (input.url.includes("spotify.com")) {
-        // ... (Spotify logic remains mostly same, just ensuring robustness)
+        // Use the embed URL for easier parsing
         const embedUrl = input.url.includes("/embed/") 
           ? input.url 
           : input.url.replace("open.spotify.com/", "open.spotify.com/embed/");
@@ -66,15 +68,19 @@ export const playlistToolsRouter = createTRPCRouter({
             try {
               const jsonStr = embedHtml.slice(contentStart, contentEnd);
               const data = JSON.parse(jsonStr);
-              const items = data.props?.pageProps?.state?.data?.entity?.trackList;
+              const entity = data.props?.pageProps?.state?.data?.entity;
               
-              if (items && Array.isArray(items)) {
-                items.forEach((item: any) => {
-                  tracks.push({
-                    track: item.title || "Unknown Track",
-                    artist: item.subtitle || "Unknown Artist"
+              if (entity) {
+                playlistName = entity.name || playlistName;
+                const items = entity.trackList;
+                if (items && Array.isArray(items)) {
+                  items.forEach((item: any) => {
+                    tracks.push({
+                      track: item.title || "Unknown Track",
+                      artist: item.subtitle || "Unknown Artist"
+                    });
                   });
-                });
+                }
               }
             } catch (e) {
               console.error("Spotify JSON parse error:", e);
@@ -94,40 +100,75 @@ export const playlistToolsRouter = createTRPCRouter({
           }
         }
       } else if (input.url.includes("music.youtube.com")) {
-        // YouTube Music uses hydration blocks initialData.push(...)
+        const titleMatch = html.match(/<title>([^<]+)<\/title>/i);
+        if (titleMatch?.[1]) {
+            playlistName = titleMatch[1].replace(" - YouTube Music", "").trim();
+        }
+
+        // Try hydration blocks first
         const blocks = html.split('initialData.push(');
-        const correctBlock = blocks.find(b => b.includes('musicPlaylistShelfRenderer'));
+        let correctBlock = blocks.find(b => b.includes('musicPlaylistShelfRenderer'));
         
+        let jsonData: any = null;
+
         if (correctBlock) {
+          console.log("[fetchExternal] Found initialData block with musicPlaylistShelfRenderer");
           const dataMatch = correctBlock.match(/data:\s*'([^']+)'/);
           if (dataMatch?.[1]) {
-            const encodedData = dataMatch[1];
-            const decodedData = encodedData.replace(/\\x([0-9a-fA-F]{2})/g, (_, hex) => 
-               String.fromCharCode(parseInt(hex, 16))
-            );
-            
             try {
-              const data = JSON.parse(decodedData);
-              const shelf = data.contents?.twoColumnBrowseResultsRenderer?.secondaryContents?.sectionListRenderer?.contents?.[0]?.musicPlaylistShelfRenderer;
-              const items = shelf?.contents || [];
-              
-              items.forEach((item: any) => {
-                const r = item.musicResponsiveListItemRenderer;
-                if (r) {
-                  const title = r.flexColumns?.[0]?.musicResponsiveListItemFlexColumnRenderer?.text?.runs?.[0]?.text;
-                  const artist = r.flexColumns?.[1]?.musicResponsiveListItemFlexColumnRenderer?.text?.runs?.[0]?.text;
-                  if (title) {
-                    tracks.push({
-                      track: title,
-                      artist: artist || "Unknown Artist"
-                    });
-                  }
-                }
-              });
+              const decodedData = dataMatch[1].replace(/\\x([0-9a-fA-F]{2})/g, (_, hex) => 
+                 String.fromCharCode(parseInt(hex, 16))
+              );
+              jsonData = JSON.parse(decodedData);
             } catch (e) {
-              console.error("YouTube Music parse error:", e);
+              console.error("[fetchExternal] YTM JSON parse error (block):", e);
             }
           }
+        }
+
+        // Fallback to ytInitialData if hydration blocks didn't work
+        if (!jsonData) {
+          const ytDataStart = html.indexOf("ytInitialData = ");
+          if (ytDataStart !== -1) {
+             const start = ytDataStart + "ytInitialData = ".length;
+             const end = html.indexOf(";</script>", start);
+             if (end > start) {
+                try {
+                  jsonData = JSON.parse(html.slice(start, end));
+                  console.log("[fetchExternal] Found YTM data via ytInitialData fallback");
+                } catch (e) {
+                  console.error("[fetchExternal] YTM JSON parse error (fallback):", e);
+                }
+             }
+          }
+        }
+        
+        if (jsonData) {
+          // The structure can be content or secondaryContents
+          const shelf = 
+            jsonData.contents?.twoColumnBrowseResultsRenderer?.secondaryContents?.sectionListRenderer?.contents?.[0]?.musicPlaylistShelfRenderer ||
+            jsonData.contents?.singleColumnBrowseResultsRenderer?.tabs?.[0]?.tabRenderer?.content?.sectionListRenderer?.contents?.[0]?.musicPlaylistShelfRenderer;
+          
+          const items = shelf?.contents || [];
+          console.log(`[fetchExternal] YTM tracks found: ${items.length}`);
+          
+          items.forEach((item: any) => {
+            const r = item.musicResponsiveListItemRenderer;
+            if (r) {
+              const title = r.flexColumns?.[0]?.musicResponsiveListItemFlexColumnRenderer?.text?.runs?.[0]?.text;
+              const artist = r.flexColumns?.[1]?.musicResponsiveListItemFlexColumnRenderer?.text?.runs?.[0]?.text;
+              if (title) {
+                tracks.push({
+                  track: title,
+                  artist: artist || "Unknown Artist"
+                });
+              }
+            }
+          });
+        }
+
+        if (tracks.length === 0) {
+           console.warn(`[fetchExternal] YTM Extraction failed. HTML Length: ${html.length}, Start snippet: ${html.slice(0, 500)}`);
         }
       } else if (input.url.includes("youtube.com") || input.url.includes("youtu.be")) {
         const start = html.indexOf("ytInitialData = ") + "ytInitialData = ".length;
@@ -137,6 +178,9 @@ export const playlistToolsRouter = createTRPCRouter({
           try {
             const jsonStr = html.slice(start, end);
             const data = JSON.parse(jsonStr);
+            
+            playlistName = data.metadata?.playlistMetadataRenderer?.title || playlistName;
+
             const contents = data.contents?.twoColumnBrowseResultsRenderer?.tabs?.[0]?.tabRenderer?.content?.sectionListRenderer?.contents?.[0]?.itemSectionRenderer?.contents?.[0]?.playlistVideoListRenderer?.contents;
             
             if (contents && Array.isArray(contents)) {
@@ -147,7 +191,6 @@ export const playlistToolsRouter = createTRPCRouter({
                 const fullTitle = v.title?.runs?.[0]?.text || "";
                 const channel = v.shortBylineText?.runs?.[0]?.text || "";
                 
-                // Try to split title if it contains artist
                 const splitters = [" - ", " – ", " — ", " | "];
                 let track = fullTitle;
                 let artist = channel;
@@ -182,7 +225,7 @@ export const playlistToolsRouter = createTRPCRouter({
         });
       }
 
-      return tracks;
+      return { name: playlistName, tracks };
     }),
 
   savePlaylist: protectedProcedure
