@@ -14,13 +14,19 @@ type SidebarNode = NonNullable<
   inferRouterOutputs<AppRouter>['collection']['sidebar']['tree']
 >;
 
-const CollectionView = () => {
+const CollectionView = ({ initialActivePath }: { initialActivePath?: string }) => {
   const utils = api.useUtils();
   const hasCollectionQuery = api.collection.hasCollection.useQuery();
+  const stateQuery = api.preferences.getTableConfig.useQuery(
+    { tableName: 'collection_view' },
+    { staleTime: Infinity }
+  );
   const sidebarQuery = api.collection.sidebar.useQuery(undefined, {
     enabled: !!hasCollectionQuery.data
   });
-  const [activePath, setActivePath] = useState<string | null>(null);
+
+  const [activePath, setActivePath] = useState<string | null>(initialActivePath ?? null);
+
   const [selectedPaths, setSelectedPaths] = useState<string[]>([]);
   const [companionName, setCompanionName] = useState('');
   const [folderName, setFolderName] = useState('');
@@ -103,18 +109,17 @@ const CollectionView = () => {
     }
   });
 
-  const stateQuery = api.preferences.getTableConfig.useQuery(
-    { tableName: 'collection_view' },
-    { staleTime: Infinity }
-  );
   const setStateMutation = api.preferences.setTableConfig.useMutation();
 
+  // Sync activePath if it's still null and queries finish on client
   useEffect(() => {
-    if (stateQuery.data?.lastOpenedPath && !activePath && sidebarQuery.data?.tree) {
-      setActivePath(stateQuery.data.lastOpenedPath as string);
-    } else if (!activePath && sidebarQuery.data?.tree && stateQuery.isSuccess) {
-      const firstPlaylist = findFirstPlaylist(sidebarQuery.data.tree);
-      setActivePath(firstPlaylist?.path ?? sidebarQuery.data.tree.path);
+    if (!activePath && sidebarQuery.data?.tree && stateQuery.isSuccess) {
+      if (stateQuery.data?.lastOpenedPath) {
+        setActivePath(stateQuery.data.lastOpenedPath as string);
+      } else {
+        const firstPlaylist = findFirstPlaylist(sidebarQuery.data.tree);
+        setActivePath(firstPlaylist?.path ?? sidebarQuery.data.tree.path);
+      }
     }
   }, [stateQuery.data, stateQuery.isSuccess, sidebarQuery.data, activePath]);
 
@@ -190,7 +195,7 @@ const CollectionView = () => {
     );
   };
 
-  if (hasCollectionQuery.isLoading) return <div className="p-8 text-center text-[#8b949e]">Loading your collection status...</div>;
+  if (hasCollectionQuery.isLoading && !hasCollectionQuery.data) return <div className="p-8 text-center text-[#8b949e]">Loading your collection status...</div>;
 
   if (!hasCollectionQuery.data) {
     return <UploadPrompt onUploadSuccess={() => void utils.collection.hasCollection.invalidate()} />;
@@ -335,10 +340,10 @@ const CollectionView = () => {
 
         <div className="table-section">
           <h2>{playlistQuery.data?.playlistName ?? 'Select a playlist'}</h2>
-          <PlaylistTable
+          {playlistQuery.data?.playlistName && (<PlaylistTable
             isLoading={playlistQuery.isLoading}
             tracks={playlistQuery.data?.tracks ?? []}
-          />
+          />)}
         </div>
       </section>
     </div>
@@ -347,16 +352,16 @@ const CollectionView = () => {
 
 export default CollectionView;
 
-const findFirstPlaylist = (node: SidebarNode): SidebarNode | null => {
+function findFirstPlaylist(node: SidebarNode): SidebarNode | null {
   if (node.type === 'PLAYLIST') return node;
   for (const child of node.children ?? []) {
     const discovered = findFirstPlaylist(child);
     if (discovered) return discovered;
   }
   return null;
-};
+}
 
-const flattenFolders = (node: SidebarNode): FlattenedFolder[] => {
+function flattenFolders(node: SidebarNode): FlattenedFolder[] {
   const rows: FlattenedFolder[] = [];
   const walk = (current: SidebarNode) => {
     if (current.type === 'FOLDER') {
@@ -369,4 +374,4 @@ const flattenFolders = (node: SidebarNode): FlattenedFolder[] => {
   };
   walk(node);
   return rows;
-};
+}

@@ -26,7 +26,6 @@ const PlaylistTable = ({
   isLoading: boolean;
 }) => {
   const [sort, setSort] = useState<SortState>({ key: 'title', direction: 'asc' });
-  const [columnWidths, setColumnWidths] = useState<Record<string, number>>({});
   const resizingRef = useRef<{ key: string; startX: number; startWidth: number } | null>(
     null
   );
@@ -35,11 +34,16 @@ const PlaylistTable = ({
     { tableName: TABLE_NAME },
     { staleTime: Infinity }
   );
+  
+  const [columnWidths, setColumnWidths] = useState<Record<string, number>>(
+    (configQuery.data as Record<string, number>) ?? {}
+  );
+
   const setConfigMutation = api.preferences.setTableConfig.useMutation();
 
   useEffect(() => {
     if (configQuery.data) {
-      setColumnWidths(configQuery.data);
+      setColumnWidths(configQuery.data as Record<string, number>);
     }
   }, [configQuery.data]);
 
@@ -116,8 +120,8 @@ const PlaylistTable = ({
     return columns.reduce((sum, col) => sum + (columnWidths[col.key] ?? col.minWidth), 0);
   }, [columnWidths]);
 
-  if (isLoading) return <p>Loading tracks…</p>;
-  if (!tracks.length) return <p>No tracks in this playlist.</p>;
+  if (isLoading && !tracks.length) return <p>Loading tracks…</p>;
+  if (!isLoading && !tracks.length) return <p>No tracks in this playlist.</p>;
 
   return (
     <table className="tracks-table" style={{ width: totalTableWidth }}>
