@@ -1,6 +1,4 @@
 import { CollectionService } from "./collectionService";
-import path from "path";
-import fs from "fs";
 
 class CollectionManager {
   private instances = new Map<string, { service: CollectionService; lastAccess: number }>();
@@ -19,7 +17,7 @@ class CollectionManager {
       return existing.service;
     }
 
-    const service = new CollectionService(filePath);
+    const service = new CollectionService(userId, filePath);
     this.instances.set(userId, { service, lastAccess: Date.now() });
 
     if (this.instances.size > this.MAX_INSTANCES) {
@@ -33,12 +31,8 @@ class CollectionManager {
     this.instances.delete(userId);
   }
 
-  getStoragePath(userId: string): string {
-    const storageDir = path.join(process.cwd(), "storage", "collections", userId);
-    if (!fs.existsSync(storageDir)) {
-      fs.mkdirSync(storageDir, { recursive: true });
-    }
-    return path.join(storageDir, "collection.nml");
+  getBlobPathname(userId: string): string {
+    return `collections/${userId}/collection.nml`;
   }
 
   private evictOldest() {

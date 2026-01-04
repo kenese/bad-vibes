@@ -1,7 +1,6 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { auth } from "~/server/auth";
 import { db } from "~/server/db";
-import fs from "fs";
 
 export async function GET(_req: NextRequest) {
   const session = await auth();
@@ -14,13 +13,16 @@ export async function GET(_req: NextRequest) {
     select: { collectionPath: true }
   });
 
-  if (!user?.collectionPath || !fs.existsSync(user.collectionPath)) {
+  if (!user?.collectionPath) {
     return new NextResponse("Collection not found", { status: 404 });
   }
 
-  const fileStream = fs.createReadStream(user.collectionPath);
-  // @ts-expect-error - ReadableStream to BodyInit
-  return new NextResponse(fileStream, {
+  const response = await fetch(user.collectionPath);
+  if (!response.ok) {
+    return new NextResponse("Failed to fetch collection from storage", { status: 500 });
+  }
+
+  return new NextResponse(response.body, {
     headers: {
       "Content-Type": "application/xml",
       "Content-Disposition": 'attachment; filename="collection.nml"',

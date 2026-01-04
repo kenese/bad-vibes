@@ -38,6 +38,18 @@ export const collectionRouter = createTRPCRouter({
     return !!user?.collectionPath;
   }),
 
+  registerCollection: protectedProcedure
+    .input(z.object({ url: z.string().url() }))
+    .mutation(async ({ ctx, input }) => {
+      await ctx.db.user.update({
+        where: { id: ctx.session.user.id },
+        data: { collectionPath: input.url }
+      });
+      // Clear any existing service instance for this user to ensure fresh reload
+      collectionManager.invalidate(ctx.session.user.id);
+      return { success: true };
+    }),
+
   sidebar: protectedProcedure.query(async ({ ctx }) => {
     const service = await getServiceForUser(ctx);
     return service.getSidebar();

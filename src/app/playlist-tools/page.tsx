@@ -44,6 +44,7 @@ export default function PlaylistToolsPage() {
     });
 
     const handleParse = () => {
+        debugger
         const lines = rawText.split('\n').filter(l => l.trim());
         const parsed = lines.map(line => {
             const clean = line.replace(/[^a-zA-Z0-9\s-]/g, "");

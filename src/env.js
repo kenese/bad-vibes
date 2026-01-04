@@ -16,6 +16,7 @@ export const env = createEnv({
     DATABASE_URL: z.string().url(),
     STORAGE_DATABASE_URL: z.string().url(),
     STORAGE_PRISMA_DATABASE_URL: z.string(), // prisma+postgres protocol might not be recognized as a valid URL by some versions of zod if it's strict on protocol
+    BLOB_READ_WRITE_TOKEN: z.string().optional(),
     NODE_ENV: z
       .enum(["development", "test", "production"])
       .default("development"),
@@ -42,6 +43,7 @@ export const env = createEnv({
     DATABASE_URL: process.env.DATABASE_URL,
     STORAGE_DATABASE_URL: process.env.STORAGE_DATABASE_URL,
     STORAGE_PRISMA_DATABASE_URL: process.env.STORAGE_PRISMA_DATABASE_URL,
+    BLOB_READ_WRITE_TOKEN: process.env.BLOB_READ_WRITE_TOKEN,
     NODE_ENV: process.env.NODE_ENV,
     COLLECTION_FILE: process.env.COLLECTION_FILE,
   },

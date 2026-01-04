@@ -1,6 +1,8 @@
 'use client';
 
 import { useState } from 'react';
+import { upload } from '@vercel/blob/client';
+import { api } from '~/trpc/react';
 
 const UploadPrompt = ({ onUploadSuccess }: { onUploadSuccess: () => void }) => {
   const [file, setFile] = useState<File | null>(null);
@@ -14,6 +16,16 @@ const UploadPrompt = ({ onUploadSuccess }: { onUploadSuccess: () => void }) => {
     }
   };
 
+  const registerCollection = api.collection.registerCollection.useMutation({
+    onSuccess: () => {
+      onUploadSuccess();
+    },
+    onError: () => {
+      setError('Failed to register collection. Please try again.');
+      setIsUploading(false);
+    }
+  });
+
   const handleUpload = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!file) return;
@@ -21,23 +33,17 @@ const UploadPrompt = ({ onUploadSuccess }: { onUploadSuccess: () => void }) => {
     setIsUploading(true);
     setError(null);
 
-    const formData = new FormData();
-    formData.append('file', file);
-
     try {
-      const response = await fetch('/api/collection/upload', {
-        method: 'POST',
-        body: formData,
+      const newBlob = await upload(file.name, file, {
+        access: 'public',
+        handleUploadUrl: '/api/collection/upload/vercel-blob',
       });
 
-      if (!response.ok) {
-        throw new Error('Upload failed');
-      }
-
-      onUploadSuccess();
-    } catch {
+      console.log('Blob uploaded:', newBlob.url);
+      registerCollection.mutate({ url: newBlob.url });
+    } catch (err) {
+      console.error('Upload error:', err);
       setError('Failed to upload collection. Please try again.');
-    } finally {
       setIsUploading(false);
     }
   };

@@ -1,6 +1,7 @@
 import { randomUUID } from 'node:crypto';
-import fs from 'node:fs/promises';
+import { put } from '@vercel/blob';
 import { XMLBuilder, XMLParser } from 'fast-xml-parser';
+import { db } from '../db';
 
 export type SidebarTreeNode = {
   name: string;
@@ -125,7 +126,8 @@ const toArray = <T>(maybe: T | T[] | undefined): T[] => {
 };
 
 export class CollectionService {
-  private readonly collectionPath: string;
+  private collectionPath: string;
+  private readonly userId: string;
   private document: NmlDocument | null = null;
   private trackIndex = new Map<string, TrackEntry>();
   private pathIndex = new Map<string, NodeReference>();
@@ -135,7 +137,8 @@ export class CollectionService {
   private idCounter = 0;
   private loadingPromise: Promise<void> | null = null;
 
-  constructor(filePath: string) {
+  constructor(userId: string, filePath: string) {
+    this.userId = userId;
     this.collectionPath = filePath;
   }
 
@@ -329,7 +332,40 @@ export class CollectionService {
   }
 
   private async readDocument() {
-    const xml = await fs.readFile(this.collectionPath, 'utf8');
+    let xml: string;
+
+    try {
+      if (this.collectionPath.startsWith('http')) {
+        const response = await fetch(this.collectionPath);
+        if (!response.ok) {
+          // Handle missing remote file (404, etc.)
+          console.warn(`Collection file missing at ${this.collectionPath}. Clearing stale path.`);
+          await db.user.update({
+            where: { id: this.userId },
+            data: { collectionPath: null }
+          });
+          // Return early - page will load with no collection
+          return;
+        }
+        xml = await response.text();
+      } else {
+        // Local file path - use Node.js fs
+        const fs = await import('node:fs/promises');
+        xml = await fs.readFile(this.collectionPath, 'utf-8');
+      }
+    } catch (error) {
+      if ((error as NodeJS.ErrnoException)?.code === 'ENOENT') {
+        console.warn(`Collection file missing at ${this.collectionPath}. Clearing stale path.`);
+        await db.user.update({
+          where: { id: this.userId },
+          data: { collectionPath: null }
+        });
+        // Return early - page will load with no collection
+        return;
+      }
+      throw error;
+    }
+
     this.document = parser.parse(xml) as NmlDocument;
     this.refreshTrackIndex();
     this.invalidateTree();
@@ -586,7 +622,23 @@ export class CollectionService {
     const output = xmlBody.startsWith('<?xml')
       ? xmlBody
       : `<?xml version="1.0" encoding="UTF-8"?>\n${xmlBody}`;
-    await fs.writeFile(this.collectionPath, output, 'utf8');
+
+    // Store in Vercel Blob
+    const { url } = await put(`collections/${this.userId}/collection.nml`, output, {
+      access: 'public',
+      contentType: 'text/xml',
+      addRandomSuffix: true // Avoid caching issues
+    });
+
+    // Update the database with the new URL
+    await db.user.update({
+      where: { id: this.userId },
+      data: { collectionPath: url }
+    });
+
+    // Update local reference to the new URL
+    this.collectionPath = url;
+    
     this.invalidateTree();
   }
 }
