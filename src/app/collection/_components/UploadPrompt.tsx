@@ -16,6 +16,25 @@ const UploadPrompt = ({ onUploadSuccess }: { onUploadSuccess: () => void }) => {
     }
   };
 
+  const deleteCollection = api.collection.deleteCollection.useMutation({
+    onSuccess: () => {
+      // Refresh to clear any stale state
+      window.location.reload();
+    },
+    onError: (err) => {
+      console.error('Failed to delete collection:', err);
+      // Even if it fails, try to clear UI state
+      setError(null);
+    }
+  });
+
+  const handleDeleteCollection = (e: React.MouseEvent) => {
+    e.preventDefault();
+    if (!confirm('Are you sure you want to reset your collection data?')) return;
+    deleteCollection.mutate();
+    setError(null);
+  };
+
   const registerCollection = api.collection.registerCollection.useMutation({
     onSuccess: () => {
       onUploadSuccess();
@@ -84,13 +103,26 @@ const UploadPrompt = ({ onUploadSuccess }: { onUploadSuccess: () => void }) => {
 
           {error && <p className="text-red-400 text-sm mt-2">{error}</p>}
 
-          <button
-            type="submit"
-            disabled={!file || isUploading}
-            className="w-full py-3 px-4 bg-[#238636] hover:bg-[#2eaa42] disabled:bg-[#238636]/50 disabled:cursor-not-allowed text-white font-semibold rounded-lg transition-colors shadow-lg"
-          >
-            {isUploading ? 'Uploading Collection...' : 'Get Started'}
-          </button>
+          <div className="flex gap-2">
+            <button
+              type="submit"
+              disabled={!file || isUploading}
+              className="flex-1 py-3 px-4 bg-[#238636] hover:bg-[#2eaa42] disabled:bg-[#238636]/50 disabled:cursor-not-allowed text-white font-semibold rounded-lg transition-colors shadow-lg"
+            >
+              {isUploading ? 'Uploading Collection...' : 'Get Started'}
+            </button>
+            {error && (
+              <button
+                type="button"
+                onClick={handleDeleteCollection}
+                disabled={deleteCollection.isPending}
+                className="px-4 bg-red-900/50 hover:bg-red-900 text-red-100 border border-red-800 rounded-lg transition-colors"
+                title="Delete/Reset Collection"
+              >
+                🗑️
+              </button>
+            )}
+          </div>
         </form>
 
         <p className="text-xs text-[#484f58] mt-6 italic">
