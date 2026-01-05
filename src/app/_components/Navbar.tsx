@@ -24,6 +24,12 @@ const Navbar = () => {
         >
           Playlist Tools
         </Link>
+        <Link 
+          href="/soulseek" 
+          className={`nav-link ${pathname.startsWith('/soulseek') ? 'active' : ''}`}
+        >
+          Soulseek
+        </Link>
       </div>
     </nav>
   );

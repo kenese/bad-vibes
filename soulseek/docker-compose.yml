@@ -10,6 +10,7 @@ services:
       - SLSKD_DND=false # Set to true if you don't want download notifications
       - PUID=501 # 501 is the standard User ID for the first user on macOS
       - PGID=20 # 20 is the standard Group ID for "staff" on macOS
+      - ASPNETCORE_ENVIRONMENT=Development
       - TZ=America/New_York # Change to your Timezone
     volumes:
       # Where the app stores its database/settings

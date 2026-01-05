@@ -1,10 +1,17 @@
 soulseek:
   username: knse
   password: P@rrot123sou
+feature:
+  swagger: true
 web:
   authentication:
     username: knse
     password: P@rrot123sou
+    api_keys:
+      bad-vibes:
+        key: "tVm5pksWCakKHKEJh3E98AdDJsQbHXCRkdRRt2YKavE="
+        role: administrator
+        cidr: 0.0.0.0/0
 # debug: false
 # headless: false
 # remote_configuration: false

@@ -22,6 +22,10 @@ export const env = createEnv({
       .default("development"),
     COLLECTION_FILE: z.string().optional(),
     ALLOWED_USER_EMAIL: z.string().email().optional(), // Optional for now, but used for lockdown
+    SLSKD_URL: z.string().url(),
+    SLSKD_API_KEY: z.string(),
+    AI_API_URL: z.string().url().optional(),
+    AI_API_KEY: z.string().optional(),
   },
 
   /**
@@ -48,6 +52,10 @@ export const env = createEnv({
     NODE_ENV: process.env.NODE_ENV,
     COLLECTION_FILE: process.env.COLLECTION_FILE,
     ALLOWED_USER_EMAIL: process.env.ALLOWED_USER_EMAIL,
+    SLSKD_URL: process.env.SLSKD_URL,
+    SLSKD_API_KEY: process.env.SLSKD_API_KEY,
+    AI_API_URL: process.env.AI_API_URL,
+    AI_API_KEY: process.env.AI_API_KEY,
   },
   /**
    * Run `build` or `dev` with `SKIP_ENV_VALIDATION` to skip env validation. This is especially
