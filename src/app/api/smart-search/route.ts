@@ -1,6 +1,6 @@
 import { type NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
-import { cleanSearchQuery } from '~/lib/search-janitor';
+import { cleanSearchQuery } from '~/lib/search-clean';
 import { AiExpansionService } from '~/services/ai-service';
 
 // Environment variables
@@ -10,12 +10,10 @@ const SLSKD_API_KEY = process.env.SLSKD_API_KEY;
 // Validation Schema
 const searchSchema = z.object({
   query: z.string().min(1, "Query is required"),
+  action: z.enum(['preview', 'execute']).optional().default('preview'),
 });
 
-interface SlskdSearchPayload {
-  id: string; // We'll generate a UUID for tracking
-  searchText: string;
-}
+
 
 // Helper: Call Slskd
 async function triggerSlskdSearch(query: string, source: string): Promise<boolean> {
@@ -35,24 +33,12 @@ async function triggerSlskdSearch(query: string, source: string): Promise<boolea
         'X-API-KEY': SLSKD_API_KEY
       },
       body: JSON.stringify({
-        id: searchId,
         searchText: query
-      } as SlskdSearchPayload)
+      })
     });
 
     if (!res.ok) {
         console.error(`[SmartSearch] Slskd Error ${res.status}: ${res.statusText}`);
-        console.error(`Request:`, `${SLSKD_URL}/api/v0/searches`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-API-Key': SLSKD_API_KEY
-      },
-      body: JSON.stringify({
-        id: searchId,
-        searchText: query
-      } as SlskdSearchPayload)
-    }, );
         return false;
     }
     return true;
@@ -61,6 +47,8 @@ async function triggerSlskdSearch(query: string, source: string): Promise<boolea
     return false;
   }
 }
+
+
 
 export async function POST(req: NextRequest) {
   try {
@@ -71,55 +59,49 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: result.error.flatten() }, { status: 400 });
     }
 
-    const originalQuery = result.data.query;
-    const searchTasks: Promise<boolean>[] = [];
-    const triggeredQueries: string[] = [];
+    const { query, action } = result.data;
 
-    // 1. Trigger Original Search
-    searchTasks.push(triggerSlskdSearch(originalQuery, 'original').then(success => {
-        if (success) triggeredQueries.push(originalQuery);
-        return success;
-    }));
-
-    // 2. Janitor Search
-    const cleanedQuery = cleanSearchQuery(originalQuery);
-    if (cleanedQuery !== originalQuery && cleanedQuery.length > 0) {
-      searchTasks.push(triggerSlskdSearch(cleanedQuery, 'janitor').then(success => {
-        if (success) triggeredQueries.push(cleanedQuery);
-        return success;
-      }));
+    // EXECUTE MODE: Trigger Slskd immediately
+    if (action === 'execute') {
+      const success = await triggerSlskdSearch(query, 'manual_execute');
+      if (success) {
+        return NextResponse.json({ success: true, message: 'Search triggered' });
+      } else {
+        return NextResponse.json({ error: 'Failed to trigger search' }, { status: 502 });
+      }
     }
 
-    // 3. AI Expansion (Background)
-    // We don't await this for the response, but we trigger it. 
-    // Wait, Vercel/Serverless functions might kill the process if we don't await. 
-    // To be safe in Next.js App Router (which supports streaming/background work better but still risky on serverless), 
-    // we SHOULD mostly await or use `waitUntil` (Next.js 15 / Vercel spec). 
-    // Ideally we race or just await it effectively since prompt is fast-ish.
-    // The requirement said "parallel/background". 
-    // We'll fire it and await `allSettled` to report back what happened, 
-    // OR we trigger it and return early? If we return early, λ dies.
-    // We will await it, but strictly bounded by the 2s timeout in AiService.
+    // PREVIEW MODE: Generate variations only
+    const results: { q: string, type: 'Original' | 'Cleaned' | 'AI' }[] = [];
 
-    // const aiPromise = AiExpansionService.expandQuery(originalQuery).then(async (variations) => {
-    //     if (variations.length > 0) {
-    //         console.log(`[SmartSearch] AI suggested: ${variations.join(', ')}`);
-    //         const subTasks = variations.map(v => triggerSlskdSearch(v, 'ai'));
-    //         await Promise.all(subTasks);
-    //         triggeredQueries.push(...variations);
-    //     }
-    // });
-    
-    // // We'll add AI task to our main wait list to ensure it runs before response sends
-    // // (preserving the "serverless" execution model)
-    // searchTasks.push(aiPromise.then(() => true));
+    // 1. Original
+    results.push({ q: query, type: 'Original' });
 
-    await Promise.allSettled(searchTasks);
+    // 2. Cleaned
+    const cleanedQuery = cleanSearchQuery(query);
+    if (cleanedQuery !== query && cleanedQuery.length > 0) {
+      results.push({ q: cleanedQuery, type: 'Cleaned' });
+    }
+
+    // 3. AI Expansion (Awaited for Preview)
+    try {
+        const aiVariations = await AiExpansionService.expandQuery(query);
+        if (aiVariations && aiVariations.length > 0) {
+            aiVariations.forEach(v => {
+                // Deduplicate
+                if (v !== query && v !== cleanedQuery) {
+                    results.push({ q: v, type: 'AI' });
+                }
+            });
+        }
+    } catch (e) {
+        console.warn('[SmartSearch] AI expansion failed safely:', e);
+        // Continue without AI results
+    }
 
     return NextResponse.json({ 
         success: true, 
-        triggered: triggeredQueries,
-        cleaned: cleanedQuery !== originalQuery ? cleanedQuery : null 
+        results
     });
 
   } catch (error) {
