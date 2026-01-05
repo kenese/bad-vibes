@@ -214,6 +214,14 @@ export default function PlaylistToolsPage() {
                                 >
                                     🗑️
                                 </button>
+                                <a
+                                    href={`/soulseek?playlistId=${pl.id}`}
+                                    onClick={(e) => e.stopPropagation()}
+                                    title="Search on Soulseek"
+                                    className="opacity-0 group-hover:opacity-100 p-1 text-[#58a6ff] hover:bg-[#30363d] rounded transition-all ml-1"
+                                >
+                                    🔍
+                                </a>
                             </div>
                         ))}
                         {playlistsQuery.data?.length === 0 && (

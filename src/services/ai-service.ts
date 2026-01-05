@@ -1,5 +1,3 @@
-import { env } from "~/env";
-
 interface AiExpansionResponse {
   variations: string[];
 }
@@ -39,11 +37,11 @@ export class AiExpansionService {
     // or OpenAI if key is present. For this robust implementation, we'll implement a generic fetch 
     // that fits OpenAI-compatible APIs (like Ollama, LocalAI, vLLM).
 
-    const apiUrl = process.env.AI_API_URL || 'http://localhost:11434/v1/chat/completions';
-    const apiKey = process.env.AI_API_KEY || 'ollama'; // Ollama often doesn't need a key vs OpenAI
+    const apiUrl = process.env.AI_API_URL ?? 'http://localhost:11434/v1/chat/completions';
+    const apiKey = process.env.AI_API_KEY ?? 'ollama'; // Ollama often doesn't need a key vs OpenAI
 
     const body = {
-      model: process.env.AI_MODEL || 'llama3', // Default to a common open model
+      model: process.env.AI_MODEL ?? 'llama3', // Default to a common open model
       messages: [
         { role: 'system', content: this.SYSTEM_PROMPT },
         { role: 'user', content: query }

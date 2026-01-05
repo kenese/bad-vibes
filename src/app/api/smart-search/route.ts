@@ -52,7 +52,7 @@ async function triggerSlskdSearch(query: string, source: string): Promise<boolea
 
 export async function POST(req: NextRequest) {
   try {
-    const body = await req.json();
+    const body = await req.json() as unknown;
     const result = searchSchema.safeParse(body);
 
     if (!result.success) {
