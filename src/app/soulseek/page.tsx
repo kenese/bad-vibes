@@ -1,12 +1,12 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { useSmartSearch } from '~/hooks/useSmartSearch';
 import { api } from '~/trpc/react';
 import { cleanSearchQuery } from '~/lib/search-clean';
 
-export default function SoulseekPage() {
+function SoulseekContent() {
   const searchParams = useSearchParams();
   const playlistId = searchParams.get('playlistId');
   
@@ -272,5 +272,13 @@ export default function SoulseekPage() {
         </div>
       )}
     </div>
+  );
+}
+
+export default function SoulseekPage() {
+  return (
+    <Suspense fallback={<div className="text-white p-8">Loading...</div>}>
+      <SoulseekContent />
+    </Suspense>
   );
 }
