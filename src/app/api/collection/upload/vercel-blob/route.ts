@@ -11,8 +11,6 @@ export async function POST(request: Request): Promise<NextResponse> {
       body,
       request,
       onBeforeGenerateToken: async (_pathname) => {
-       
-        debugger;
         const session = await auth();
         if (!session?.user) {
           throw new Error('Unauthorized');
@@ -20,6 +18,7 @@ export async function POST(request: Request): Promise<NextResponse> {
 
         return {
           allowedContentTypes: ['text/xml', 'application/xml', 'application/vnd.enliven', 'application/octet-stream'],
+          allowOverwrite: true,
           tokenPayload: JSON.stringify({
             userId: session.user.id,
           }),

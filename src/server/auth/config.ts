@@ -1,5 +1,6 @@
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import { type DefaultSession, type NextAuthConfig } from "next-auth";
+import { env } from "~/env";
 import DiscordProvider from "next-auth/providers/discord";
 
 import { db } from "~/server/db";
@@ -45,6 +46,12 @@ export const authConfig = {
   ],
   adapter: PrismaAdapter(db),
   callbacks: {
+    signIn: ({ user }) => {
+      if (env.ALLOWED_USER_EMAIL && user.email !== env.ALLOWED_USER_EMAIL) {
+        return false;
+      }
+      return true;
+    },
     session: ({ session, user }) => ({
       ...session,
       user: {

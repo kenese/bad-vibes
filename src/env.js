@@ -21,6 +21,7 @@ export const env = createEnv({
       .enum(["development", "test", "production"])
       .default("development"),
     COLLECTION_FILE: z.string().optional(),
+    ALLOWED_USER_EMAIL: z.string().email().optional(), // Optional for now, but used for lockdown
   },
 
   /**
@@ -46,6 +47,7 @@ export const env = createEnv({
     BLOB_READ_WRITE_TOKEN: process.env.BLOB_READ_WRITE_TOKEN,
     NODE_ENV: process.env.NODE_ENV,
     COLLECTION_FILE: process.env.COLLECTION_FILE,
+    ALLOWED_USER_EMAIL: process.env.ALLOWED_USER_EMAIL,
   },
   /**
    * Run `build` or `dev` with `SKIP_ENV_VALIDATION` to skip env validation. This is especially

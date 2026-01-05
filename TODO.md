@@ -18,12 +18,14 @@
 
 ## Soulseek Clone Route
 
-- [ ] Set up server
-- [ ] Set up tunnel
-- [ ] Use existing ui to download songs
+- [x] Set up server
+- [x] Set up tunnel
+- [x] Use existing ui to download songs
 - [ ] Create bespoke features to download whole playlist of songs
 
 ## Shazam Route (or just make playlist tools take a shazam url?)
 
 - [ ] Create Shazam scraper
 - [ ] Create shazam auto playlist from audio (youtube music track)
+
+- [x] Lock down soulseek and bad-vibes routes to only my email

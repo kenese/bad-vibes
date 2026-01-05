@@ -6,11 +6,12 @@ import type { AppRouter } from '~/server/api/root';
 import type { inferRouterOutputs } from '@trpc/server';
 
 type TrackRow = inferRouterOutputs<AppRouter>['collection']['playlistTracks']['tracks'][number];
-type SortKey = keyof Pick<TrackRow, 'title' | 'artist' | 'album' | 'bpm' | 'rating'>;
+type SortKey = keyof Pick<TrackRow, 'title' | 'artist' | 'album' | 'bpm' | 'rating'> | 'originalIndex';
 type SortState = { key: SortKey; direction: 'asc' | 'desc' };
 
 const TABLE_NAME = 'playlist_tracks';
 const columns: { key: SortKey; label: string; minWidth: number }[] = [
+  { key: 'originalIndex', label: '#', minWidth: 50 },
   { key: 'title', label: 'Title', minWidth: 200 },
   { key: 'artist', label: 'Artist', minWidth: 150 },
   { key: 'album', label: 'Release', minWidth: 150 },
@@ -25,7 +26,7 @@ const PlaylistTable = ({
   tracks: TrackRow[];
   isLoading: boolean;
 }) => {
-  const [sort, setSort] = useState<SortState>({ key: 'title', direction: 'asc' });
+  const [sort, setSort] = useState<SortState>({ key: 'originalIndex', direction: 'asc' });
   const resizingRef = useRef<{ key: string; startX: number; startWidth: number } | null>(
     null
   );
@@ -48,10 +49,16 @@ const PlaylistTable = ({
   }, [configQuery.data]);
 
   const sortedTracks = useMemo(() => {
-    const list = [...tracks];
+    const list = tracks.map((t, i) => ({ ...t, originalIndex: i + 1 }));
     list.sort((a, b) => {
-      const left = a[sort.key] ?? '';
-      const right = b[sort.key] ?? '';
+      if (sort.key === 'originalIndex') {
+        return sort.direction === 'asc' 
+          ? a.originalIndex - b.originalIndex 
+          : b.originalIndex - a.originalIndex;
+      }
+
+      const left = a[sort.key as keyof TrackRow] ?? '';
+      const right = b[sort.key as keyof TrackRow] ?? '';
       if (left === right) return 0;
       if (typeof left === 'number' && typeof right === 'number') {
         return sort.direction === 'asc' ? left - right : right - left;
@@ -159,6 +166,7 @@ const PlaylistTable = ({
       <tbody>
         {sortedTracks.map((track) => (
           <tr key={track.key}>
+            <td className="text-center text-[#8b949e]">{track.originalIndex}</td>
             <td>{track.title}</td>
             <td>{track.artist ?? '—'}</td>
             <td>{track.album ?? '—'}</td>

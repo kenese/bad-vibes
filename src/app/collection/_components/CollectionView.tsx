@@ -72,7 +72,7 @@ const CollectionView = ({ initialActivePath }: { initialActivePath?: string }) =
 
   const playlistQuery = api.collection.playlistTracks.useQuery(
     { path: activePath ?? '' },
-    { enabled: Boolean(activePath) }
+    { enabled: Boolean(activePath) && activeNode?.type === 'PLAYLIST' }
   );
 
   const folderOptions = useMemo<FlattenedFolder[]>(() => {
@@ -212,6 +212,13 @@ const CollectionView = ({ initialActivePath }: { initialActivePath?: string }) =
     );
   };
 
+  // Calculate loading state based on relevant queries only
+  const isLoading = 
+    hasCollectionQuery.isFetching || 
+    sidebarQuery.isFetching || 
+    playlistQuery.isFetching ||
+    stateQuery.isFetching;
+
   if (hasCollectionQuery.isLoading && !hasCollectionQuery.data) return <div className="p-8 text-center text-[#8b949e]">Loading your collection status...</div>;
 
   if (!hasCollectionQuery.data) {
@@ -221,13 +228,19 @@ const CollectionView = ({ initialActivePath }: { initialActivePath?: string }) =
   return (
     <div
       className={`app-shell ${isResizing ? 'resizing' : ''}`}
-      style={{ gridTemplateColumns: `${sidebarWidth}px 6px 1fr` }}
+      style={{ '--sidebar-width': `${sidebarWidth}px` } as React.CSSProperties}
     >
       <aside className="sidebar-panel">
         <header>
           <div className="flex-stack">
             <h1>Traktor Collection</h1>
             <div className="flex items-center gap-2">
+              {isLoading && (
+                <div 
+                  className="animate-spin h-5 w-5 border-2 border-[#8b949e] border-t-[#f0f6fc] rounded-full mr-2" 
+                  title="Loading..."
+                />
+              )}
               <a 
                 href="/api/collection/download" 
                 className="download-link"
