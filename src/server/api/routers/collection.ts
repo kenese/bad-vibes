@@ -3,6 +3,8 @@ import { z } from 'zod';
 import { createTRPCRouter, protectedProcedure } from '~/server/api/trpc';
 import { collectionManager } from '~/server/services/collectionManager';
 import { type db } from '~/server/db';
+import { del } from '@vercel/blob';
+
 
 interface TRPCContext {
   db: typeof db;
@@ -36,6 +38,32 @@ export const collectionRouter = createTRPCRouter({
       select: { collectionPath: true }
     });
     return !!user?.collectionPath;
+  }),
+
+  deleteCollection: protectedProcedure.mutation(async ({ ctx }) => {
+    const user = await ctx.db.user.findUnique({
+      where: { id: ctx.session.user.id },
+      select: { collectionPath: true }
+    });
+
+    if (user?.collectionPath) {
+      console.log('Attempting to delete blob at:', user.collectionPath);
+      try {
+        await del(user.collectionPath);
+        console.log('Blob deletion successful');
+      } catch (error) {
+        console.error('Failed to delete blob:', error);
+      }
+
+      await ctx.db.user.update({
+        where: { id: ctx.session.user.id },
+        data: { collectionPath: null }
+      });
+      collectionManager.invalidate(ctx.session.user.id);
+    } else {
+      console.log('No collection path found to delete');
+    }
+    return { success: true };
   }),
 
   registerCollection: protectedProcedure

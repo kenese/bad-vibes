@@ -109,6 +109,17 @@ const CollectionView = ({ initialActivePath }: { initialActivePath?: string }) =
     }
   });
 
+  const deleteCollection = api.collection.deleteCollection.useMutation({
+    onSuccess: () => {
+      void utils.collection.hasCollection.invalidate();
+    }
+  });
+
+  const handleDeleteCollection = () => {
+    if (!confirm('Are you sure you want to delete your entire collection? This cannot be undone.')) return;
+    deleteCollection.mutate();
+  };
+
   const setStateMutation = api.preferences.setTableConfig.useMutation();
   const lastSavedPathRef = useRef<string | null>(initialActivePath ?? null);
 
@@ -216,13 +227,23 @@ const CollectionView = ({ initialActivePath }: { initialActivePath?: string }) =
         <header>
           <div className="flex-stack">
             <h1>Traktor Collection</h1>
-            <a 
-              href="/api/collection/download" 
-              className="download-link"
-              title="Download collection.nml"
-            >
-              📥
-            </a>
+            <div className="flex items-center gap-2">
+              <a 
+                href="/api/collection/download" 
+                className="download-link"
+                title="Download collection.nml"
+              >
+                ↓
+              </a>
+              <button
+                onClick={handleDeleteCollection}
+                disabled={deleteCollection.isPending}
+                className="text-[#f85149] hover:bg-[#30363d] p-2 rounded transition-colors"
+                title="Delete Collection"
+              >
+                🗑️
+              </button>
+            </div>
           </div>
           <p className="meta">
             {sidebarQuery.isLoading

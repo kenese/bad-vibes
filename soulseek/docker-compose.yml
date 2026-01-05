@@ -1,0 +1,33 @@
+services:
+  # The Soulseek Client
+  slskd:
+    image: slskd/slskd:latest
+    container_name: slskd
+    environment:
+      - SLSKD_USERNAME=knse
+      - SLSKD_PASSWORD=P@rrot123sou
+      - SLSKD_REMOTE_CONFIGURATION=true # Allows config via the Web UI
+      - SLSKD_DND=false # Set to true if you don't want download notifications
+      - PUID=501 # 501 is the standard User ID for the first user on macOS
+      - PGID=20 # 20 is the standard Group ID for "staff" on macOS
+      - TZ=America/New_York # Change to your Timezone
+    volumes:
+      # Where the app stores its database/settings
+      - ./app-data:/app
+      # Where your music lives (Edit the path before the colon!)
+      - /Volumes/Media HDD/Music/Soulseek:/music
+    ports:
+      - "5030:5030" # Web Interface (Local access)
+      - "50300:50300" # Soulseek Network Port (TCP)
+      - "50300:50300/udp" # Soulseek Network Port (UDP)
+    restart: unless-stopped
+
+  # The Tunnel (Exposes the UI to the internet)
+  tunnel:
+    image: cloudflare/cloudflared:latest
+    container_name: cloudflare-tunnel
+    restart: unless-stopped
+    command: tunnel run
+    environment:
+      # Paste your long token from Step 1 here
+      - TUNNEL_TOKEN=eyJhIjoiMDNjMWVlZTVhYmEwNGMwNTA0ZjQ5NzM2ZjY2MjQzZDciLCJ0IjoiMzY4NjgzZjQtMDE1OS00NjQ4LTljN2UtNzhhOWRkMTNjNWFiIiwicyI6IlltWTJaRGc0TjJRdFl6RTRaQzAwTUdWbUxXRmpZak10TWpneU1URm1aV0pqTkRKaSJ9
