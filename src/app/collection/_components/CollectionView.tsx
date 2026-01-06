@@ -192,7 +192,9 @@ const CollectionView = ({ initialActivePath }: { initialActivePath?: string }) =
   };
 
   const handleDuplicatePlaylist = () => {
+  const handleDuplicatePlaylist = () => {
     if (activeNode?.type !== 'PLAYLIST') return;
+    duplicatePlaylist.mutate({
     duplicatePlaylist.mutate({
       sourcePath: activeNode.path,
       targetFolderPath: selectedFolderPath ?? DEFAULT_FOLDER_PATH,
@@ -357,7 +359,10 @@ const CollectionView = ({ initialActivePath }: { initialActivePath?: string }) =
                   <button
                     onClick={handleDuplicatePlaylist}
                     disabled={activeNode?.type !== 'PLAYLIST' || duplicatePlaylist.isPending}
+                    onClick={handleDuplicatePlaylist}
+                    disabled={activeNode?.type !== 'PLAYLIST' || duplicatePlaylist.isPending}
                   >
+                    {duplicatePlaylist.isPending ? 'Working…' : 'Duplicate Playlist'}
                     {duplicatePlaylist.isPending ? 'Working…' : 'Duplicate Playlist'}
                   </button>
                 </div>
