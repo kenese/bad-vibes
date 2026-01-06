@@ -1,5 +1,13 @@
 # High Level Tasks
 
+Today
+
+- Add Google auth provider
+- Add create playlist from shazam
+- Add create playlist from discogs collection
+- Add create youtube playlist from playlist
+- Confirm editing traktor collection works
+
 - [ ] **Add other auth providers** (google at least)
 
 ## Traktor
@@ -12,7 +20,7 @@
 ## Playlist Tools
 
 - [ ] Create youtube music playlist from playlist
-- [ ] Open playlist in soulseek clone
+- [x] Open playlist in soulseek clone
 - [ ] Support shazam link to create playlist
 - [ ] Support create playlist from discogs collection
 
@@ -21,11 +29,12 @@
 - [x] Set up server
 - [x] Set up tunnel
 - [x] Use existing ui to download songs
-- [ ] Create bespoke features to download whole playlist of songs
+- [x] Create bespoke features to download whole playlist of songs
+- [ ] Allow search results to show in badvibes
 
 ## Shazam Route (or just make playlist tools take a shazam url?)
 
 - [ ] Create Shazam scraper
 - [ ] Create shazam auto playlist from audio (youtube music track)
 
-- [x] Lock down soulseek and bad-vibes routes to only my email
+- [ ] Lock down soulseek and bad-vibes routes to only my email
