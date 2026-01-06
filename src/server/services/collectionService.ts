@@ -273,7 +273,7 @@ export class CollectionService {
     return { success: true, createdEntries: orphans.length };
   }
 
-  async createReleaseCompanion(input: {
+  async duplicatePlaylist(input: {
     sourcePath: string;
     targetFolderPath: string;
     name?: string;
@@ -288,7 +288,7 @@ export class CollectionService {
       .map((entry) => entry.PRIMARYKEY?.KEY)
       .filter((key): key is string => Boolean(key));
     const parentNode = this.assertFolder(this.getNodeRef(input.targetFolderPath));
-    const playlistName = input.name?.trim() ?? `${sourceRef.rawNode.NAME ?? 'Playlist'} Companion`;
+    const playlistName = input.name?.trim() ?? `${sourceRef.rawNode.NAME ?? 'Playlist'} Copy`;
     const playlistNode = this.buildPlaylistNode(playlistName, keys);
     const children = this.getChildrenArray(parentNode);
     children.unshift(playlistNode);
@@ -331,36 +331,45 @@ export class CollectionService {
     return { success: true };
   }
 
+  async loadFromXml(xml: string) {
+    this.document = parser.parse(xml) as NmlDocument;
+    this.refreshTrackIndex();
+    this.invalidateTree();
+    this.loadingPromise = null;
+  }
+
   private async readDocument() {
     let xml: string;
 
+    if (this.collectionPath.startsWith('memory:')) {
+      if (this.document) {
+        // Already loaded in memory
+        return;
+      }
+      throw new Error('Session Expired: In-memory collection lost. Please upload again.');
+    }
+
     try {
       if (this.collectionPath.startsWith('http')) {
+        console.log(`[CollectionService] Fetching remote collection from: ${this.collectionPath}`);
         const response = await fetch(this.collectionPath);
+        console.log(`[CollectionService] Fetch status: ${response.status} ${response.statusText}`);
+        
         if (!response.ok) {
-          // Handle missing remote file (404, etc.)
-          console.warn(`Collection file missing at ${this.collectionPath}. Clearing stale path.`);
-          await db.user.update({
-            where: { id: this.userId },
-            data: { collectionPath: null }
-          });
-          // Return early - page will load with no collection
+          console.error(`Collection file missing or error at ${this.collectionPath}. Status: ${response.status}`);
           return;
         }
         xml = await response.text();
+        console.log(`[CollectionService] Fetched ${xml.length} bytes`);
       } else {
         // Local file path - use Node.js fs
         const fs = await import('node:fs/promises');
         xml = await fs.readFile(this.collectionPath, 'utf-8');
       }
     } catch (error) {
+      console.error('[CollectionService] Error reading document:', error);
       if ((error as NodeJS.ErrnoException)?.code === 'ENOENT') {
         console.warn(`Collection file missing at ${this.collectionPath}. Clearing stale path.`);
-        await db.user.update({
-          where: { id: this.userId },
-          data: { collectionPath: null }
-        });
-        // Return early - page will load with no collection
         return;
       }
       throw error;
@@ -372,6 +381,7 @@ export class CollectionService {
   }
 
   private async ensureLoaded() {
+    // If it's a memory path and no document, load() will call readDocument which throws
     if (!this.document) {
       await this.load();
     }
@@ -618,6 +628,16 @@ export class CollectionService {
     if (!this.document) {
       throw new Error('Collection not loaded');
     }
+
+    if (this.collectionPath.startsWith('memory:')) {
+      // In-memory collection: state is already updated in this.document
+      // No persistence to disk or blob needed.
+      // We might want to invalidate tree cache though if we want to force re-render logic,
+      // but invalidating tree happens in operations usually.
+      this.invalidateTree();
+      return;
+    }
+
     const xmlBody = compactBuilder.build(this.document);
     const output = xmlBody.startsWith('<?xml')
       ? xmlBody
@@ -627,7 +647,7 @@ export class CollectionService {
     const { url } = await put(`collections/${this.userId}/collection.nml`, output, {
       access: 'public',
       contentType: 'text/xml',
-      addRandomSuffix: true // Avoid caching issues
+      addRandomSuffix: false // Overwrite existing file
     });
 
     // Update the database with the new URL

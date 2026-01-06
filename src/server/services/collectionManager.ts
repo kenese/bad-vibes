@@ -27,8 +27,23 @@ class CollectionManager {
     return service;
   }
 
+  async setFromMemory(userId: string, xmlContent: string): Promise<void> {
+    const service = new CollectionService(userId, `memory:${userId}`);
+    await service.loadFromXml(xmlContent);
+    this.instances.set(userId, { service, lastAccess: Date.now() });
+    
+    if (this.instances.size > this.MAX_INSTANCES) {
+      this.evictOldest();
+    }
+  }
+
   invalidate(userId: string) {
     this.instances.delete(userId);
+  }
+
+  hasMemoryInstance(userId: string): boolean {
+    const existing = this.instances.get(userId);
+    return !!existing;
   }
 
   getBlobPathname(userId: string): string {

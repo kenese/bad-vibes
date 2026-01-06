@@ -28,7 +28,7 @@ const CollectionView = ({ initialActivePath }: { initialActivePath?: string }) =
   const [activePath, setActivePath] = useState<string | null>(initialActivePath ?? null);
 
   const [selectedPaths, setSelectedPaths] = useState<string[]>([]);
-  const [companionName, setCompanionName] = useState('');
+  const [duplicateName, setDuplicateName] = useState('');
   const [folderName, setFolderName] = useState('');
   const [playlistName, setPlaylistName] = useState('');
   const [moveTargetPath, setMoveTargetPath] = useState(DEFAULT_FOLDER_PATH);
@@ -99,7 +99,7 @@ const CollectionView = ({ initialActivePath }: { initialActivePath?: string }) =
   const createOrphans = api.collection.createOrphansPlaylist.useMutation({
     onSuccess: () => void utils.collection.sidebar.invalidate()
   });
-  const createReleaseCompanion = api.collection.createReleaseCompanionPlaylist.useMutation({
+  const duplicatePlaylist = api.collection.duplicatePlaylist.useMutation({
     onSuccess: () => void utils.collection.sidebar.invalidate()
   });
   const deleteNodes = api.collection.deleteNodes.useMutation({
@@ -191,14 +191,14 @@ const CollectionView = ({ initialActivePath }: { initialActivePath?: string }) =
     });
   };
 
-  const handleCreateReleaseCompanion = () => {
+  const handleDuplicatePlaylist = () => {
     if (activeNode?.type !== 'PLAYLIST') return;
-    createReleaseCompanion.mutate({
+    duplicatePlaylist.mutate({
       sourcePath: activeNode.path,
       targetFolderPath: selectedFolderPath ?? DEFAULT_FOLDER_PATH,
-      name: companionName.trim() || undefined
+      name: duplicateName.trim() || undefined
     });
-    setCompanionName('');
+    setDuplicateName('');
   };
   const handleDeleteSelected = async () => {
     if (!selectedPaths.length) return;
@@ -348,17 +348,17 @@ const CollectionView = ({ initialActivePath }: { initialActivePath?: string }) =
                 <button onClick={handleCreateOrphans} disabled={createOrphans.isPending}>
                   {createOrphans.isPending ? 'Working…' : 'Create Orphans Playlist'}
                 </button>
-                <div className="companion">
+                <div className="duplicate">
                   <input
-                    value={companionName}
-                    onChange={(e) => setCompanionName(e.target.value)}
-                    placeholder="Companion playlist name (optional)"
+                    value={duplicateName}
+                    onChange={(e) => setDuplicateName(e.target.value)}
+                    placeholder="Duplicate name (optional)"
                   />
                   <button
-                    onClick={handleCreateReleaseCompanion}
-                    disabled={activeNode?.type !== 'PLAYLIST' || createReleaseCompanion.isPending}
+                    onClick={handleDuplicatePlaylist}
+                    disabled={activeNode?.type !== 'PLAYLIST' || duplicatePlaylist.isPending}
                   >
-                    {createReleaseCompanion.isPending ? 'Working…' : 'Create Release Companion'}
+                    {duplicatePlaylist.isPending ? 'Working…' : 'Duplicate Playlist'}
                   </button>
                 </div>
               </div>

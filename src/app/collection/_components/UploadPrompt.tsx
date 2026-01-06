@@ -2,12 +2,15 @@
 
 import { useState } from 'react';
 import { upload } from '@vercel/blob/client';
+import { useSession } from 'next-auth/react';
 import { api } from '~/trpc/react';
 
 const UploadPrompt = ({ onUploadSuccess }: { onUploadSuccess: () => void }) => {
+  const { data: session } = useSession();
   const [file, setFile] = useState<File | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [useCloud, setUseCloud] = useState(false);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files?.[0]) {
@@ -47,19 +50,39 @@ const UploadPrompt = ({ onUploadSuccess }: { onUploadSuccess: () => void }) => {
 
   const handleUpload = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!file) return;
+    if (!file || !session?.user?.id) return;
 
     setIsUploading(true);
     setError(null);
 
     try {
-      const newBlob = await upload(file.name, file, {
-        access: 'public',
-        handleUploadUrl: '/api/collection/upload/vercel-blob',
-      });
+      let collectionUrl: string;
 
-      console.log('Blob uploaded:', newBlob.url);
-      registerCollection.mutate({ url: newBlob.url });
+      if (useCloud) {
+        const newBlob = await upload(`collections/${session.user.id}/collection.nml`, file, {
+          access: 'public',
+          handleUploadUrl: '/api/collection/upload/vercel-blob',
+        });
+        console.log('Blob uploaded:', newBlob.url);
+        collectionUrl = newBlob.url;
+      } else {
+        const formData = new FormData();
+        formData.append('file', file);
+        
+        const res = await fetch('/api/collection/upload/memory', {
+          method: 'POST',
+          body: formData
+        });
+
+        if (!res.ok) {
+          throw new Error('Memory upload failed');
+        }
+        
+        const data = (await res.json()) as { url: string };
+        collectionUrl = data.url;
+      }
+
+      registerCollection.mutate({ url: collectionUrl });
     } catch (err) {
       console.error('Upload error:', err);
       setError('Failed to upload collection. Please try again.');
@@ -98,6 +121,19 @@ const UploadPrompt = ({ onUploadSuccess }: { onUploadSuccess: () => void }) => {
                   {(file.size / (1024 * 1024)).toFixed(2)} MB
                 </span>
               )}
+            </label>
+          </div>
+
+          <div className="flex items-center justify-center gap-2">
+            <input
+              type="checkbox"
+              id="cloud-backup"
+              checked={useCloud}
+              onChange={(e) => setUseCloud(e.target.checked)}
+              className="rounded border-[#30363d] bg-[#0d1117] checked:bg-[#238636] focus:ring-0 focus:ring-offset-0"
+            />
+            <label htmlFor="cloud-backup" className="text-sm text-[#c9d1d9] cursor-pointer select-none">
+              Enable Cloud Backup (Slower, Persistent)
             </label>
           </div>
 
