@@ -164,6 +164,17 @@ export class CollectionService {
     };
   }
 
+  async getXml(): Promise<string> {
+    await this.ensureLoaded();
+    if (!this.document) {
+      throw new Error('Collection not loaded');
+    }
+    const xmlBody = compactBuilder.build(this.document);
+    return xmlBody.startsWith('<?xml')
+      ? xmlBody
+      : `<?xml version="1.0" encoding="UTF-8"?>\n${xmlBody}`;
+  }
+
   async getPlaylistTracks(nodePath: string) {
     await this.ensureLoaded();
     const ref = this.getNodeRef(nodePath);
