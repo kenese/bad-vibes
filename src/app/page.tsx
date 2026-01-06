@@ -15,7 +15,7 @@ export default async function Home() {
             </h1>
             <p className="text-xl text-[#8b949e] max-w-lg mx-auto leading-relaxed">
               a vibe coded dj multi tool for me to use with traktor. <br />
-              <span className="italic text-[#f85149]">I wouldn&apos;t trust any of it to be honest.</span>
+              <span className="italic text-[#676767]">I wouldn&apos;t trust any of it to be honest.</span>
             </p>
           </div>
 

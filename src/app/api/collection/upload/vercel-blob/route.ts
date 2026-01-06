@@ -19,6 +19,7 @@ export async function POST(request: Request): Promise<NextResponse> {
         return {
           allowedContentTypes: ['text/xml', 'application/xml', 'application/vnd.enliven', 'application/octet-stream'],
           allowOverwrite: true,
+          addRandomSuffix: false,
           tokenPayload: JSON.stringify({
             userId: session.user.id,
           }),

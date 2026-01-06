@@ -37,7 +37,25 @@ export const collectionRouter = createTRPCRouter({
       where: { id: ctx.session.user.id },
       select: { collectionPath: true }
     });
-    return !!user?.collectionPath;
+    
+    if (!user?.collectionPath) {
+      return false;
+    }
+    
+    // For memory paths, check if the in-memory instance still exists
+    if (user.collectionPath.startsWith('memory:')) {
+      const hasInstance = collectionManager.hasMemoryInstance(ctx.session.user.id);
+      if (!hasInstance) {
+        // Clear stale memory path from database
+        await ctx.db.user.update({
+          where: { id: ctx.session.user.id },
+          data: { collectionPath: null }
+        });
+        return false;
+      }
+    }
+    
+    return true;
   }),
 
   deleteCollection: protectedProcedure.mutation(async ({ ctx }) => {
@@ -67,14 +85,17 @@ export const collectionRouter = createTRPCRouter({
   }),
 
   registerCollection: protectedProcedure
-    .input(z.object({ url: z.string().url() }))
+    .input(z.object({ url: z.string() })) // Not enforcing .url() for memory: paths
     .mutation(async ({ ctx, input }) => {
+      console.log(`[CollectionRouter] Registering collection for user ${ctx.session.user.id} at url: ${input.url}`);
       await ctx.db.user.update({
         where: { id: ctx.session.user.id },
         data: { collectionPath: input.url }
       });
-      // Clear any existing service instance for this user to ensure fresh reload
-      collectionManager.invalidate(ctx.session.user.id);
+      // Only invalidate for non-memory paths (memory paths are pre-loaded by upload route)
+      if (!input.url.startsWith('memory:')) {
+        collectionManager.invalidate(ctx.session.user.id);
+      }
       return { success: true };
     }),
 
@@ -142,7 +163,7 @@ export const collectionRouter = createTRPCRouter({
       return service.createOrphansPlaylist(input);
     }),
 
-  createReleaseCompanionPlaylist: protectedProcedure
+  duplicatePlaylist: protectedProcedure
     .input(
       z.object({
         sourcePath: z.string().min(1),
@@ -152,7 +173,7 @@ export const collectionRouter = createTRPCRouter({
     )
     .mutation(async ({ ctx, input }) => {
       const service = await getServiceForUser(ctx);
-      return service.createReleaseCompanion(input);
+      return service.duplicatePlaylist(input);
     }),
 
   renamePlaylist: protectedProcedure

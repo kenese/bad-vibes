@@ -99,7 +99,7 @@ const CollectionView = ({ initialActivePath }: { initialActivePath?: string }) =
   const createOrphans = api.collection.createOrphansPlaylist.useMutation({
     onSuccess: () => void utils.collection.sidebar.invalidate()
   });
-  const createReleaseCompanion = api.collection.createReleaseCompanionPlaylist.useMutation({
+  const duplicatePlaylist = api.collection.duplicatePlaylist.useMutation({
     onSuccess: () => void utils.collection.sidebar.invalidate()
   });
   const deleteNodes = api.collection.deleteNodes.useMutation({
@@ -191,9 +191,9 @@ const CollectionView = ({ initialActivePath }: { initialActivePath?: string }) =
     });
   };
 
-  const handleCreateReleaseCompanion = () => {
+  const handleDuplicatePlaylist = () => {
     if (activeNode?.type !== 'PLAYLIST') return;
-    createReleaseCompanion.mutate({
+    duplicatePlaylist.mutate({
       sourcePath: activeNode.path,
       targetFolderPath: selectedFolderPath ?? DEFAULT_FOLDER_PATH,
       name: companionName.trim() || undefined
@@ -352,13 +352,13 @@ const CollectionView = ({ initialActivePath }: { initialActivePath?: string }) =
                   <input
                     value={companionName}
                     onChange={(e) => setCompanionName(e.target.value)}
-                    placeholder="Companion playlist name (optional)"
+                    placeholder="Duplicate name (optional)"
                   />
                   <button
-                    onClick={handleCreateReleaseCompanion}
-                    disabled={activeNode?.type !== 'PLAYLIST' || createReleaseCompanion.isPending}
+                    onClick={handleDuplicatePlaylist}
+                    disabled={activeNode?.type !== 'PLAYLIST' || duplicatePlaylist.isPending}
                   >
-                    {createReleaseCompanion.isPending ? 'Working…' : 'Create Release Companion'}
+                    {duplicatePlaylist.isPending ? 'Working…' : 'Duplicate Playlist'}
                   </button>
                 </div>
               </div>
