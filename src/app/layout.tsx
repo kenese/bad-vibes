@@ -17,6 +17,7 @@ const geist = Geist({
 });
 
 import Navbar from "./_components/Navbar";
+import { AuthProvider } from "./_components/AuthProvider";
 
 export default function RootLayout({
   children,
@@ -25,12 +26,14 @@ export default function RootLayout({
     <html lang="en" className={`${geist.variable}`}>
       <body>
         <TRPCReactProvider>
-          <div className="app-container">
-            <Navbar />
-            <main className="content-area">
-              {children}
-            </main>
-          </div>
+          <AuthProvider>
+            <div className="app-container">
+              <Navbar />
+              <main className="content-area">
+                {children}
+              </main>
+            </div>
+          </AuthProvider>
         </TRPCReactProvider>
       </body>
     </html>

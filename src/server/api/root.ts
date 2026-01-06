@@ -1,6 +1,7 @@
 import { collectionRouter } from '~/server/api/routers/collection';
 import { preferencesRouter } from '~/server/api/routers/preferences';
 import { playlistToolsRouter } from '~/server/api/routers/playlistTools';
+import { discogsRouter } from '~/server/api/routers/discogs';
 import { createCallerFactory, createTRPCRouter } from '~/server/api/trpc';
 
 /**
@@ -12,6 +13,7 @@ export const appRouter = createTRPCRouter({
   collection: collectionRouter,
   preferences: preferencesRouter,
   playlistTools: playlistToolsRouter,
+  discogs: discogsRouter,
 });
 
 // export type definition of API

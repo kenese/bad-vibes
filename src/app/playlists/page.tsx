@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { api } from '~/trpc/react';
+import { DiscogsImport } from './DiscogsImport';
 
 export default function PlaylistToolsPage() {
     const utils = api.useUtils();
@@ -11,6 +12,7 @@ export default function PlaylistToolsPage() {
     const [parsedItems, setParsedItems] = useState<{ track: string; artist: string }[]>([]);
     const [history, setHistory] = useState<{ track: string; artist: string }[] | null>(null);
     const [isInputFocused, setIsInputFocused] = useState(false);
+    const [showDiscogsModal, setShowDiscogsModal] = useState(false);
     
     const playlistsQuery = api.playlistTools.getPlaylists.useQuery();
     
@@ -163,13 +165,13 @@ export default function PlaylistToolsPage() {
                 {/* Import Section */}
                 <div className="bg-[#161b22] border border-[#30363d] rounded-xl p-6 shadow-sm flex flex-col justify-center">
                     <label className="block text-sm font-medium text-[#8b949e] mb-3 uppercase tracking-wider">
-                        Import from Link (Spotify/YT)
+                        Import from Link
                     </label>
                     <div className="flex gap-2">
                         <input
                             type="text"
                             className="flex-1 bg-[#0d1117] border border-[#30363d] rounded-lg p-3 text-[#c9d1d9] outline-none focus:ring-2 focus:ring-[#388bfd]"
-                            placeholder="Paste Spotify/YouTube playlist URL"
+                            placeholder="Paste Spotify/YouTube/YouTubeMusic playlist URL"
                             value={externalUrl}
                             onChange={(e) => setExternalUrl(e.target.value)}
                         />
@@ -184,8 +186,29 @@ export default function PlaylistToolsPage() {
                     {fetchExternal.error && (
                         <p className="mt-2 text-xs text-[#f85149]">{fetchExternal.error.message}</p>
                     )}
+                    
+                    <div className="mt-4 pt-4 border-t border-[#30363d]">
+                        <button
+                            onClick={() => setShowDiscogsModal(true)}
+                            className="w-full bg-[#1f6feb]/10 hover:bg-[#1f6feb]/20 text-[#58a6ff] border border-[#1f6feb]/30 hover:border-[#58a6ff] font-bold py-2.5 px-6 rounded-lg transition-all flex items-center justify-center gap-2"
+                        >
+                            <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 24C5.373 24 0 18.627 0 12S5.373 0 12 0s12 5.373 12 12-5.373 12-12 12zm0-2c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10zm0-3a7 7 0 1 1 0-14 7 7 0 0 1 0 14zm0-2a5 5 0 1 0 0-10 5 5 0 0 0 0 10zm3.5-5a3.5 3.5 0 1 1-7 0 3.5 3.5 0 0 1 7 0z"/></svg>
+                            Import from Discogs Collection
+                        </button>
+                    </div>
                 </div>
             </div>
+            
+            {showDiscogsModal && (
+                <DiscogsImport 
+                    onClose={() => setShowDiscogsModal(false)}
+                    onImport={(items) => {
+                        setHistory(parsedItems);
+                        setParsedItems(current => [...current, ...items]);
+                        setShowDiscogsModal(false);
+                    }}
+                />
+            )}
 
             <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
                 {/* Side List */}

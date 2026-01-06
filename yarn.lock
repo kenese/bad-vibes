@@ -3106,6 +3106,11 @@ nypm@^0.6.0:
     pkg-types "^2.3.0"
     tinyexec "^1.0.1"
 
+oauth-1.0a@^2.2.6:
+  version "2.2.6"
+  resolved "https://registry.yarnpkg.com/oauth-1.0a/-/oauth-1.0a-2.2.6.tgz#eadbccdb3bceea412d24586e6f39b2b412f0e491"
+  integrity sha512-6bkxv3N4Gu5lty4viIcIAnq5GbxECviMBeKR3WX/q87SPQ8E8aursPZUtsXDnxCs787af09WPRBLqYrf/lwoYQ==
+
 oauth4webapi@^3.0.0, oauth4webapi@^3.3.0:
   version "3.8.3"
   resolved "https://registry.yarnpkg.com/oauth4webapi/-/oauth4webapi-3.8.3.tgz#8a3e36b88a52db5e619907f031bff3770b2ed1a4"

@@ -15,6 +15,8 @@ export const env = createEnv({
     AUTH_DISCORD_SECRET: z.string(),
     AUTH_GOOGLE_ID: z.string(),
     AUTH_GOOGLE_SECRET: z.string(),
+    DISCOGS_CLIENT_ID: z.string(),
+    DISCOGS_CLIENT_SECRET: z.string(),
     DATABASE_URL: z.string().url(),
     STORAGE_DATABASE_URL: z.string().url(),
     STORAGE_PRISMA_DATABASE_URL: z.string(), // prisma+postgres protocol might not be recognized as a valid URL by some versions of zod if it's strict on protocol
@@ -49,6 +51,8 @@ export const env = createEnv({
     AUTH_DISCORD_SECRET: process.env.AUTH_DISCORD_SECRET,
     AUTH_GOOGLE_ID: process.env.AUTH_GOOGLE_ID,
     AUTH_GOOGLE_SECRET: process.env.AUTH_GOOGLE_SECRET,
+    DISCOGS_CLIENT_ID: process.env.DISCOGS_CLIENT_ID,
+    DISCOGS_CLIENT_SECRET: process.env.DISCOGS_CLIENT_SECRET,
     DATABASE_URL: process.env.DATABASE_URL,
     STORAGE_DATABASE_URL: process.env.STORAGE_DATABASE_URL,
     STORAGE_PRISMA_DATABASE_URL: process.env.STORAGE_PRISMA_DATABASE_URL,

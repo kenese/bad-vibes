@@ -2,11 +2,15 @@
 
 Today
 
-- Add Google auth provider
-- Add create playlist from shazam
 - Add create playlist from discogs collection
 - Add create youtube playlist from playlist
 - Confirm editing traktor collection works
+
+- Add create playlist from shazam
+  DEFER - I dont seem to be able to find my tracks in shazam web. I have emailed for my data, lets see
+  DONE - Pragmatic answer - connect shazam to spotify, it syncs to a playlist. Gets me the tracks to now, but not once my spotify trial ends
+
+- DONE Add Google auth provider
 
 - [ ] **Add other auth providers** (google at least)
 
@@ -30,6 +34,7 @@ Today
 - [x] Set up tunnel
 - [x] Use existing ui to download songs
 - [x] Create bespoke features to download whole playlist of songs
+- [ ] AI Search expand isnt really doing anything i think
 - [ ] Allow search results to show in badvibes
 
 ## Shazam Route (or just make playlist tools take a shazam url?)

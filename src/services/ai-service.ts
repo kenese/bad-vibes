@@ -77,7 +77,7 @@ export class AiExpansionService {
         }
         return [];
       } catch (parseError) {
-        console.error('Failed to parse AI JSON response:', content);
+        console.error('Failed to parse AI JSON response:', parseError, content);
         return [];
       }
 
