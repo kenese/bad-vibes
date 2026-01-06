@@ -151,6 +151,20 @@ export const collectionRouter = createTRPCRouter({
       return service.movePlaylist(input);
     }),
 
+  movePlaylistBatch: protectedProcedure
+    .input(
+      z.object({
+        moves: z.array(z.object({
+          sourcePath: z.string().min(1),
+          targetFolderPath: z.string().min(1)
+        }))
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      const service = await getServiceForUser(ctx);
+      return service.movePlaylistBatch(input.moves);
+    }),
+
   createOrphansPlaylist: protectedProcedure
     .input(
       z.object({

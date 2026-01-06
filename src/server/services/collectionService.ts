@@ -22,8 +22,8 @@ export type PlaylistTrackRow = {
   rating?: number;
 };
 
-type NodeKind = 'FOLDER' | 'PLAYLIST';
-type RawNode = RawFolderNode | RawPlaylistNode;
+type NodeKind = 'FOLDER' | 'PLAYLIST' | 'SMARTLIST';
+type RawNode = RawFolderNode | RawPlaylistNode | RawSmartListNode;
 
 type RawFolderNode = {
   TYPE: 'FOLDER';
@@ -42,6 +42,14 @@ type RawPlaylistNode = {
     TYPE?: string;
     ENTRIES?: string;
     ENTRY?: RawPlaylistEntry | RawPlaylistEntry[];
+  };
+};
+
+type RawSmartListNode = {
+  TYPE: 'SMARTLIST';
+  NAME?: string;
+  SMARTLIST?: {
+    UUID?: string;
   };
 };
 
@@ -261,6 +269,55 @@ export class CollectionService {
     }
     await this.persist();
     return { success: true };
+  }
+
+  async movePlaylistBatch(moves: Array<{ sourcePath: string; targetFolderPath: string }>) {
+    await this.ensureLoaded();
+    
+    const results: Array<{ sourcePath: string; success: boolean; error?: string }> = [];
+    
+    for (const move of moves) {
+      try {
+        const sourceRef = this.getNodeRef(move.sourcePath);
+        if (sourceRef.type !== 'PLAYLIST') {
+          results.push({ sourcePath: move.sourcePath, success: false, error: 'Only playlists can be moved' });
+          continue;
+        }
+        const sourceSiblings = sourceRef.siblings;
+        if (!sourceSiblings) {
+          results.push({ sourcePath: move.sourcePath, success: false, error: 'Unable to locate playlist parent' });
+          continue;
+        }
+        const sourceIndex = sourceSiblings.findIndex((node) => node === sourceRef.rawNode);
+        if (sourceIndex === -1) {
+          results.push({ sourcePath: move.sourcePath, success: false, error: 'Playlist missing from its parent' });
+          continue;
+        }
+        
+        // Move the node
+        sourceSiblings.splice(sourceIndex, 1);
+        const parentNode = this.assertFolder(this.getNodeRef(move.targetFolderPath));
+        const targetChildren = this.getChildrenArray(parentNode);
+        targetChildren.unshift(sourceRef.rawNode as RawPlaylistNode);
+        parentNode.SUBNODES!.COUNT = String(targetChildren.length);
+        if (sourceRef.parentNode && (sourceRef.parentNode as RawFolderNode).SUBNODES) {
+          (sourceRef.parentNode as RawFolderNode).SUBNODES!.COUNT = String(sourceSiblings.length);
+        }
+        
+        results.push({ sourcePath: move.sourcePath, success: true });
+      } catch (err) {
+        results.push({ 
+          sourcePath: move.sourcePath, 
+          success: false, 
+          error: err instanceof Error ? err.message : 'Unknown error' 
+        });
+      }
+    }
+    
+    // Only persist once after all moves
+    await this.persist();
+    
+    return { results, movedCount: results.filter(r => r.success).length };
   }
 
   async createOrphansPlaylist(input: { targetFolderPath: string; name?: string }) {
@@ -499,6 +556,11 @@ export class CollectionService {
         const entryCount = toArray(node.PLAYLIST?.ENTRY).length;
         sidebarNode.playlistSize = entryCount;
         return { tree: sidebarNode, playlistCount: 1 };
+      }
+
+      // SMARTLIST nodes don't have children in the same way as folders
+      if (node.TYPE === 'SMARTLIST') {
+        return { tree: sidebarNode, playlistCount: 0 };
       }
 
       const childrenArray = this.getChildrenArray(node);

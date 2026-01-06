@@ -93,10 +93,10 @@ const CollectionView = ({ initialActivePath }: { initialActivePath?: string }) =
   const createPlaylist = api.collection.createPlaylist.useMutation({
     onSuccess: () => void utils.collection.sidebar.invalidate()
   });
-  const movePlaylist = api.collection.movePlaylist.useMutation({
+  // Use batch move to avoid path invalidation issues between moves
+  const movePlaylistBatch = api.collection.movePlaylistBatch.useMutation({
     onSuccess: () => {
       void utils.collection.sidebar.invalidate();
-      // Clear active path since it might be stale after move
       setActivePath(null);
     }
   });
@@ -181,14 +181,16 @@ const CollectionView = ({ initialActivePath }: { initialActivePath?: string }) =
   const handleMovePlaylists = async (evt: React.FormEvent) => {
     evt.preventDefault();
     if (!selectedPaths.length) return;
-    // Move playlists one at a time since paths change after each move
-    for (const sourcePath of selectedPaths) {
-      try {
-        await movePlaylist.mutateAsync({ sourcePath, targetFolderPath: moveTargetPath });
-      } catch (err) {
-        console.error(`Failed to move playlist at ${sourcePath}:`, err);
-        // Continue with remaining playlists
-      }
+    // Use batch move to process all moves in a single request
+    const moves = selectedPaths.map(sourcePath => ({
+      sourcePath,
+      targetFolderPath: moveTargetPath
+    }));
+    try {
+      const result = await movePlaylistBatch.mutateAsync({ moves });
+      console.log(`Moved ${result.movedCount} of ${moves.length} playlists`);
+    } catch (err) {
+      console.error('Batch move failed:', err);
     }
     setSelectedPaths([]);
   };
@@ -346,8 +348,8 @@ const CollectionView = ({ initialActivePath }: { initialActivePath?: string }) =
                       </option>
                     ))}
                   </select>
-                  <button type="submit" disabled={!selectedPaths.length || movePlaylist.isPending}>
-                    {movePlaylist.isPending ? 'Moving…' : 'Move'}
+                  <button type="submit" disabled={!selectedPaths.length || movePlaylistBatch.isPending}>
+                    {movePlaylistBatch.isPending ? 'Moving…' : 'Move'}
                   </button>
                 </div>
               </form>
