@@ -94,7 +94,11 @@ const CollectionView = ({ initialActivePath }: { initialActivePath?: string }) =
     onSuccess: () => void utils.collection.sidebar.invalidate()
   });
   const movePlaylist = api.collection.movePlaylist.useMutation({
-    onSuccess: () => void utils.collection.sidebar.invalidate()
+    onSuccess: () => {
+      void utils.collection.sidebar.invalidate();
+      // Clear active path since it might be stale after move
+      setActivePath(null);
+    }
   });
   const createOrphans = api.collection.createOrphansPlaylist.useMutation({
     onSuccess: () => void utils.collection.sidebar.invalidate()
@@ -177,11 +181,15 @@ const CollectionView = ({ initialActivePath }: { initialActivePath?: string }) =
   const handleMovePlaylists = async (evt: React.FormEvent) => {
     evt.preventDefault();
     if (!selectedPaths.length) return;
-    await Promise.all(
-      selectedPaths.map((sourcePath) =>
-        movePlaylist.mutateAsync({ sourcePath, targetFolderPath: moveTargetPath })
-      )
-    );
+    // Move playlists one at a time since paths change after each move
+    for (const sourcePath of selectedPaths) {
+      try {
+        await movePlaylist.mutateAsync({ sourcePath, targetFolderPath: moveTargetPath });
+      } catch (err) {
+        console.error(`Failed to move playlist at ${sourcePath}:`, err);
+        // Continue with remaining playlists
+      }
+    }
     setSelectedPaths([]);
   };
 

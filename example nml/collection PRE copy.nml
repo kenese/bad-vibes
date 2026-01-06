@@ -1,0 +1,416 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<NML VERSION="20">
+    <HEAD COMPANY="www.native-instruments.com" PROGRAM="Traktor Pro 4"></HEAD>
+    <COLLECTION ENTRIES="13">
+        <ENTRY TITLE="Bumpin Flava - Bumpy">
+            <LOCATION DIR="/:" FILE="Bumpin Flava - Bumpy.mp3" VOLUME="" VOLUMEID=""></LOCATION>
+            <ALBUM TITLE="Traktor Pro 4"></ALBUM>
+            <MODIFICATION_INFO AUTHOR_TYPE="importer"></MODIFICATION_INFO>
+            <INFO LABEL="Native Instruments"></INFO>
+            <TEMPO BPM="40.000000"></TEMPO>
+            <CUE_V2 NAME="n.n." DISPL_ORDER="0" TYPE="0" START="71.622549" LEN="0.000000"
+                REPEATS="-1" HOTCUE="0"></CUE_V2>
+            <CUE_V2 NAME="AutoGrid" DISPL_ORDER="0" TYPE="4" START="1836.328431" LEN="0.000000"
+                REPEATS="-1" HOTCUE="-1">
+                <GRID BPM="40.000000"></GRID>
+            </CUE_V2>
+            <CUE_V2 NAME="n.n." DISPL_ORDER="0" TYPE="0" START="28306.916666" LEN="0.000000"
+                REPEATS="-1" HOTCUE="1"></CUE_V2>
+            <CUE_V2 NAME="n.n." DISPL_ORDER="0" TYPE="0" START="70659.857843" LEN="0.000000"
+                REPEATS="-1" HOTCUE="2"></CUE_V2>
+            <CUE_V2 NAME="n.n." DISPL_ORDER="0" TYPE="0" START="98895.151960" LEN="0.000000"
+                REPEATS="-1" HOTCUE="3"></CUE_V2>
+            <CUE_V2 NAME="n.n." DISPL_ORDER="0" TYPE="0" START="127130.446078" LEN="0.000000"
+                REPEATS="-1" HOTCUE="4"></CUE_V2>
+        </ENTRY>
+        <ENTRY TITLE="Bumpin Flava - A Wee Dub">
+            <LOCATION DIR="/:" FILE="Bumpin Flava - A Wee Dub.mp3" VOLUME="" VOLUMEID=""></LOCATION>
+            <ALBUM TITLE="Traktor Pro 4"></ALBUM>
+            <MODIFICATION_INFO AUTHOR_TYPE="importer"></MODIFICATION_INFO>
+            <INFO LABEL="Native Instruments"></INFO>
+            <TEMPO BPM="40.000000"></TEMPO>
+            <CUE_V2 NAME="AutoGrid" DISPL_ORDER="0" TYPE="4" START="72.832666" LEN="0.000000"
+                REPEATS="-1" HOTCUE="-1">
+                <GRID BPM="40.000000"></GRID>
+            </CUE_V2>
+            <CUE_V2 NAME="n.n." DISPL_ORDER="0" TYPE="0" START="72.832666" LEN="0.000000"
+                REPEATS="-1" HOTCUE="0"></CUE_V2>
+            <CUE_V2 NAME="n.n." DISPL_ORDER="0" TYPE="0" START="7183.934928" LEN="0.000000"
+                REPEATS="-1" HOTCUE="1"></CUE_V2>
+            <CUE_V2 NAME="n.n." DISPL_ORDER="0" TYPE="0" START="35628.343975" LEN="0.000000"
+                REPEATS="-1" HOTCUE="2"></CUE_V2>
+            <CUE_V2 NAME="n.n." DISPL_ORDER="0" TYPE="0" START="60517.201891" LEN="0.000000"
+                REPEATS="-1" HOTCUE="3"></CUE_V2>
+            <CUE_V2 NAME="n.n." DISPL_ORDER="0" TYPE="0" START="64072.753022" LEN="0.000000"
+                REPEATS="-1" HOTCUE="4"></CUE_V2>
+            <CUE_V2 NAME="n.n." DISPL_ORDER="0" TYPE="0" START="106739.366592" LEN="0.000000"
+                REPEATS="-1" HOTCUE="5"></CUE_V2>
+            <CUE_V2 NAME="n.n." DISPL_ORDER="0" TYPE="5" START="106739.366592" LEN="7111.102262"
+                REPEATS="-1" HOTCUE="6"></CUE_V2>
+        </ENTRY>
+        <ENTRY TITLE="Bumpin Flava - Bae">
+            <LOCATION DIR="/:" FILE="Bumpin Flava - Bae.mp3" VOLUME="" VOLUMEID=""></LOCATION>
+            <ALBUM TITLE="Traktor Pro 4"></ALBUM>
+            <MODIFICATION_INFO AUTHOR_TYPE="importer"></MODIFICATION_INFO>
+            <INFO LABEL="Native Instruments"></INFO>
+            <TEMPO BPM="40.000000"></TEMPO>
+            <CUE_V2 NAME="AutoGrid" DISPL_ORDER="0" TYPE="4" START="73.127575" LEN="0.000000"
+                REPEATS="-1" HOTCUE="-1">
+                <GRID BPM="40.000000"></GRID>
+            </CUE_V2>
+            <CUE_V2 NAME="n.n." DISPL_ORDER="0" TYPE="0" START="73.127575" LEN="0.000000"
+                REPEATS="-1" HOTCUE="0"></CUE_V2>
+            <CUE_V2 NAME="n.n." DISPL_ORDER="0" TYPE="0" START="14295.296701" LEN="0.000000"
+                REPEATS="-1" HOTCUE="1"></CUE_V2>
+            <CUE_V2 NAME="n.n." DISPL_ORDER="0" TYPE="0" START="42739.634953" LEN="0.000000"
+                REPEATS="-1" HOTCUE="2"></CUE_V2>
+            <CUE_V2 NAME="n.n." DISPL_ORDER="0" TYPE="0" START="71183.973206" LEN="0.000000"
+                REPEATS="-1" HOTCUE="3"></CUE_V2>
+            <CUE_V2 NAME="n.n." DISPL_ORDER="0" TYPE="0" START="99628.311458" LEN="0.000000"
+                REPEATS="-1" HOTCUE="4"></CUE_V2>
+            <CUE_V2 NAME="n.n." DISPL_ORDER="0" TYPE="0" START="113850.480584" LEN="0.000000"
+                REPEATS="-1" HOTCUE="5"></CUE_V2>
+            <CUE_V2 NAME="n.n." DISPL_ORDER="0" TYPE="5" START="120961.565147" LEN="7111.084563"
+                REPEATS="-1" HOTCUE="6"></CUE_V2>
+        </ENTRY>
+        <ENTRY TITLE="Higher place - Diafonie">
+            <LOCATION DIR="/:" FILE="Higher place - Diafonie.mp3" VOLUME="" VOLUMEID=""></LOCATION>
+            <ALBUM TITLE="Traktor Pro 4"></ALBUM>
+            <MODIFICATION_INFO AUTHOR_TYPE="importer"></MODIFICATION_INFO>
+            <INFO LABEL="Native Instruments"></INFO>
+            <TEMPO BPM="40.000000"></TEMPO>
+            <CUE_V2 NAME="AutoGrid" DISPL_ORDER="0" TYPE="4" START="71.643859" LEN="0.000000"
+                REPEATS="-1" HOTCUE="-1">
+                <GRID BPM="40.000000"></GRID>
+            </CUE_V2>
+            <CUE_V2 NAME="n.n." DISPL_ORDER="0" TYPE="0" START="71.643859" LEN="0.000000"
+                REPEATS="-1" HOTCUE="0"></CUE_V2>
+            <CUE_V2 NAME="n.n." DISPL_ORDER="0" TYPE="0" START="13404.987669" LEN="0.000000"
+                REPEATS="-1" HOTCUE="1"></CUE_V2>
+            <CUE_V2 NAME="n.n." DISPL_ORDER="0" TYPE="0" START="26738.331478" LEN="0.000000"
+                REPEATS="-1" HOTCUE="2"></CUE_V2>
+            <CUE_V2 NAME="n.n." DISPL_ORDER="0" TYPE="0" START="30547.858281" LEN="0.000000"
+                REPEATS="-1" HOTCUE="3"></CUE_V2>
+            <CUE_V2 NAME="n.n." DISPL_ORDER="0" TYPE="0" START="61024.072703" LEN="0.000000"
+                REPEATS="-1" HOTCUE="4"></CUE_V2>
+            <CUE_V2 NAME="n.n." DISPL_ORDER="0" TYPE="0" START="137214.608757" LEN="0.000000"
+                REPEATS="-1" HOTCUE="5"></CUE_V2>
+        </ENTRY>
+        <ENTRY TITLE="Higher Place - Treatwave">
+            <LOCATION DIR="/:" FILE="Higher Place - Treatwave.mp3" VOLUME="" VOLUMEID=""></LOCATION>
+            <ALBUM TITLE="Traktor Pro 4"></ALBUM>
+            <MODIFICATION_INFO AUTHOR_TYPE="importer"></MODIFICATION_INFO>
+            <INFO LABEL="Native Instruments"></INFO>
+            <TEMPO BPM="40.000000"></TEMPO>
+            <CUE_V2 NAME="AutoGrid" DISPL_ORDER="0" TYPE="4" START="68.438502" LEN="0.000000"
+                REPEATS="-1" HOTCUE="-1">
+                <GRID BPM="40.000000"></GRID>
+            </CUE_V2>
+            <CUE_V2 NAME="n.n." DISPL_ORDER="0" TYPE="0" START="68.438502" LEN="0.000000"
+                REPEATS="-1" HOTCUE="0"></CUE_V2>
+            <CUE_V2 NAME="n.n." DISPL_ORDER="0" TYPE="0" START="15428.432850" LEN="0.000000"
+                REPEATS="-1" HOTCUE="1"></CUE_V2>
+            <CUE_V2 NAME="n.n." DISPL_ORDER="0" TYPE="0" START="38468.424371" LEN="0.000000"
+                REPEATS="-1" HOTCUE="2"></CUE_V2>
+            <CUE_V2 NAME="n.n." DISPL_ORDER="0" TYPE="0" START="65348.414479" LEN="0.000000"
+                REPEATS="-1" HOTCUE="3"></CUE_V2>
+            <CUE_V2 NAME="n.n." DISPL_ORDER="0" TYPE="0" START="111428.397522" LEN="0.000000"
+                REPEATS="-1" HOTCUE="4"></CUE_V2>
+            <CUE_V2 NAME="n.n." DISPL_ORDER="0" TYPE="0" START="119108.394695" LEN="0.000000"
+                REPEATS="-1" HOTCUE="5"></CUE_V2>
+        </ENTRY>
+        <ENTRY TITLE="Higher Place - Words">
+            <LOCATION DIR="/:" FILE="Higher Place - Words.mp3" VOLUME="" VOLUMEID=""></LOCATION>
+            <ALBUM TITLE="Traktor Pro 4"></ALBUM>
+            <MODIFICATION_INFO AUTHOR_TYPE="importer"></MODIFICATION_INFO>
+            <INFO LABEL="Native Instruments"></INFO>
+            <TEMPO BPM="40.000000"></TEMPO>
+            <CUE_V2 NAME="AutoGrid" DISPL_ORDER="0" TYPE="4" START="71.136452" LEN="0.000000"
+                REPEATS="-1" HOTCUE="-1">
+                <GRID BPM="40.000000"></GRID>
+            </CUE_V2>
+            <CUE_V2 NAME="n.n." DISPL_ORDER="0" TYPE="0" START="71.136452" LEN="0.000000"
+                REPEATS="-1" HOTCUE="0"></CUE_V2>
+            <CUE_V2 NAME="n.n." DISPL_ORDER="0" TYPE="0" START="7690.184978" LEN="0.000000"
+                REPEATS="-1" HOTCUE="1"></CUE_V2>
+            <CUE_V2 NAME="n.n." DISPL_ORDER="0" TYPE="0" START="26737.806293" LEN="0.000000"
+                REPEATS="-1" HOTCUE="2"></CUE_V2>
+            <CUE_V2 NAME="n.n." DISPL_ORDER="0" TYPE="0" START="30547.330556" LEN="0.000000"
+                REPEATS="-1" HOTCUE="3"></CUE_V2>
+            <CUE_V2 NAME="n.n." DISPL_ORDER="0" TYPE="0" START="45785.427608" LEN="0.000000"
+                REPEATS="-1" HOTCUE="4"></CUE_V2>
+            <CUE_V2 NAME="n.n." DISPL_ORDER="0" TYPE="0" START="61023.524661" LEN="0.000000"
+                REPEATS="-1" HOTCUE="5"></CUE_V2>
+            <CUE_V2 NAME="n.n." DISPL_ORDER="0" TYPE="0" START="91499.718765" LEN="0.000000"
+                REPEATS="-1" HOTCUE="6"></CUE_V2>
+            <CUE_V2 NAME="n.n." DISPL_ORDER="0" TYPE="0" START="137214.009921" LEN="0.000000"
+                REPEATS="-1" HOTCUE="7"></CUE_V2>
+        </ENTRY>
+        <ENTRY TITLE="Lunar Echoes - Born Under">
+            <LOCATION DIR="/:" FILE="Lunar Echoes - Born Under.mp3" VOLUME="" VOLUMEID=""></LOCATION>
+            <ALBUM TITLE="Traktor Pro 4"></ALBUM>
+            <MODIFICATION_INFO AUTHOR_TYPE="importer"></MODIFICATION_INFO>
+            <INFO LABEL="Native Instruments"></INFO>
+            <TEMPO BPM="40.000000"></TEMPO>
+            <CUE_V2 NAME="AutoGrid" DISPL_ORDER="0" TYPE="4" START="71.223512" LEN="0.000000"
+                REPEATS="-1" HOTCUE="-1">
+                <GRID BPM="40.000000"></GRID>
+            </CUE_V2>
+            <CUE_V2 NAME="n.n." DISPL_ORDER="0" TYPE="0" START="71.223512" LEN="0.000000"
+                REPEATS="-1" HOTCUE="0"></CUE_V2>
+            <CUE_V2 NAME="n.n." DISPL_ORDER="0" TYPE="0" START="7630.266845" LEN="0.000000"
+                REPEATS="-1" HOTCUE="1"></CUE_V2>
+            <CUE_V2 NAME="n.n." DISPL_ORDER="0" TYPE="0" START="22748.353511" LEN="0.000000"
+                REPEATS="-1" HOTCUE="2"></CUE_V2>
+            <CUE_V2 NAME="n.n." DISPL_ORDER="0" TYPE="0" START="51094.766011" LEN="0.000000"
+                REPEATS="-1" HOTCUE="3"></CUE_V2>
+            <CUE_V2 NAME="n.n." DISPL_ORDER="0" TYPE="0" START="83220.700177" LEN="0.000000"
+                REPEATS="-1" HOTCUE="4"></CUE_V2>
+            <CUE_V2 NAME="n.n." DISPL_ORDER="0" TYPE="0" START="113456.873509" LEN="0.000000"
+                REPEATS="-1" HOTCUE="5"></CUE_V2>
+        </ENTRY>
+        <ENTRY TITLE="Mother Board - Internal Logic">
+            <LOCATION DIR="/:" FILE="Mother Board - Internal Logic.mp3" VOLUME="" VOLUMEID=""></LOCATION>
+            <ALBUM TITLE="Traktor Pro 4"></ALBUM>
+            <MODIFICATION_INFO AUTHOR_TYPE="importer"></MODIFICATION_INFO>
+            <INFO LABEL="Native Instruments"></INFO>
+            <TEMPO BPM="40.000000"></TEMPO>
+            <CUE_V2 NAME="AutoGrid" DISPL_ORDER="0" TYPE="4" START="71.155932" LEN="0.000000"
+                REPEATS="-1" HOTCUE="-1">
+                <GRID BPM="40.000000"></GRID>
+            </CUE_V2>
+            <CUE_V2 NAME="n.n." DISPL_ORDER="0" TYPE="0" START="71.155932" LEN="0.000000"
+                REPEATS="-1" HOTCUE="0"></CUE_V2>
+            <CUE_V2 NAME="n.n." DISPL_ORDER="0" TYPE="0" START="22928.334708" LEN="0.000000"
+                REPEATS="-1" HOTCUE="1"></CUE_V2>
+            <CUE_V2 NAME="n.n." DISPL_ORDER="0" TYPE="0" START="53404.573075" LEN="0.000000"
+                REPEATS="-1" HOTCUE="2"></CUE_V2>
+        </ENTRY>
+        <ENTRY TITLE="Drum State - Cooking Swings">
+            <LOCATION DIR="/:" FILE="Drum State - Cooking Swings.mp3" VOLUME="" VOLUMEID=""></LOCATION>
+            <ALBUM TITLE="Traktor Pro 4"></ALBUM>
+            <MODIFICATION_INFO AUTHOR_TYPE="importer"></MODIFICATION_INFO>
+            <INFO LABEL="Native Instruments"></INFO>
+            <TEMPO BPM="40.000000"></TEMPO>
+            <CUE_V2 NAME="AutoGrid" DISPL_ORDER="0" TYPE="4" START="71.157508" LEN="0.000000"
+                REPEATS="-1" HOTCUE="-1">
+                <GRID BPM="40.000000"></GRID>
+            </CUE_V2>
+            <CUE_V2 NAME="n.n." DISPL_ORDER="0" TYPE="0" START="71.157508" LEN="0.000000"
+                REPEATS="-1" HOTCUE="0"></CUE_V2>
+            <CUE_V2 NAME="n.n." DISPL_ORDER="0" TYPE="0" START="7630.269825" LEN="0.000000"
+                REPEATS="-1" HOTCUE="1"></CUE_V2>
+            <CUE_V2 NAME="n.n." DISPL_ORDER="0" TYPE="0" START="15189.382143" LEN="0.000000"
+                REPEATS="-1" HOTCUE="2"></CUE_V2>
+            <CUE_V2 NAME="n.n." DISPL_ORDER="0" TYPE="0" START="45425.831412" LEN="0.000000"
+                REPEATS="-1" HOTCUE="3"></CUE_V2>
+            <CUE_V2 NAME="n.n." DISPL_ORDER="0" TYPE="0" START="52984.943730" LEN="0.000000"
+                REPEATS="-1" HOTCUE="4"></CUE_V2>
+            <CUE_V2 NAME="n.n." DISPL_ORDER="0" TYPE="0" START="113457.842269" LEN="0.000000"
+                REPEATS="-1" HOTCUE="5"></CUE_V2>
+        </ENTRY>
+        <ENTRY TITLE="Drum State - Drum Towers">
+            <LOCATION DIR="/:" FILE="Drum State - Drum Towers.mp3" VOLUME="" VOLUMEID=""></LOCATION>
+            <ALBUM TITLE="Traktor Pro 4"></ALBUM>
+            <MODIFICATION_INFO AUTHOR_TYPE="importer"></MODIFICATION_INFO>
+            <INFO LABEL="Native Instruments"></INFO>
+            <TEMPO BPM="40.000000"></TEMPO>
+            <CUE_V2 NAME="AutoGrid" DISPL_ORDER="0" TYPE="4" START="1808.363968" LEN="0.000000"
+                REPEATS="-1" HOTCUE="-1">
+                <GRID BPM="40.000000"></GRID>
+            </CUE_V2>
+            <CUE_V2 NAME="n.n." DISPL_ORDER="0" TYPE="0" START="3547.495172" LEN="0.000000"
+                REPEATS="-1" HOTCUE="0"></CUE_V2>
+            <CUE_V2 NAME="n.n." DISPL_ORDER="0" TYPE="0" START="34851.856835" LEN="0.000000"
+                REPEATS="-1" HOTCUE="1"></CUE_V2>
+            <CUE_V2 NAME="n.n." DISPL_ORDER="0" TYPE="5" START="41808.381649" LEN="13913.049628"
+                REPEATS="-1" HOTCUE="2"></CUE_V2>
+            <CUE_V2 NAME="n.n." DISPL_ORDER="0" TYPE="0" START="85286.661737" LEN="0.000000"
+                REPEATS="-1" HOTCUE="3"></CUE_V2>
+            <CUE_V2 NAME="n.n." DISPL_ORDER="0" TYPE="0" START="120069.285808" LEN="0.000000"
+                REPEATS="-1" HOTCUE="4"></CUE_V2>
+            <CUE_V2 NAME="n.n." DISPL_ORDER="0" TYPE="0" START="133982.335436" LEN="0.000000"
+                REPEATS="-1" HOTCUE="5"></CUE_V2>
+        </ENTRY>
+        <ENTRY TITLE="Drum State - Touch The Sunset">
+            <LOCATION DIR="/:" FILE="Drum State - Touch The Sunset.mp3" VOLUME="" VOLUMEID=""></LOCATION>
+            <ALBUM TITLE="Traktor Pro 4"></ALBUM>
+            <MODIFICATION_INFO AUTHOR_TYPE="importer"></MODIFICATION_INFO>
+            <INFO LABEL="Native Instruments"></INFO>
+            <TEMPO BPM="40.000000"></TEMPO>
+            <CUE_V2 NAME="AutoGrid" DISPL_ORDER="0" TYPE="4" START="73.000000" LEN="0.000000"
+                REPEATS="-1" HOTCUE="-1">
+                <GRID BPM="40.000000"></GRID>
+            </CUE_V2>
+            <CUE_V2 NAME="n.n." DISPL_ORDER="0" TYPE="0" START="73.000000" LEN="0.000000"
+                REPEATS="-1" HOTCUE="0"></CUE_V2>
+            <CUE_V2 NAME="n.n." DISPL_ORDER="0" TYPE="0" START="11065.394606" LEN="0.000000"
+                REPEATS="-1" HOTCUE="1"></CUE_V2>
+            <CUE_V2 NAME="n.n." DISPL_ORDER="0" TYPE="0" START="25721.920748" LEN="0.000000"
+                REPEATS="-1" HOTCUE="2"></CUE_V2>
+            <CUE_V2 NAME="n.n." DISPL_ORDER="0" TYPE="0" START="51370.841497" LEN="0.000000"
+                REPEATS="-1" HOTCUE="3"></CUE_V2>
+            <CUE_V2 NAME="n.n." DISPL_ORDER="0" TYPE="0" START="139309.998348" LEN="0.000000"
+                REPEATS="-1" HOTCUE="4"></CUE_V2>
+        </ENTRY>
+        <ENTRY TITLE="Salona - Connected">
+            <LOCATION DIR="/:" FILE="Salona - Connected.mp3" VOLUME="" VOLUMEID=""></LOCATION>
+            <ALBUM TITLE="Traktor Pro 4"></ALBUM>
+            <MODIFICATION_INFO AUTHOR_TYPE="importer"></MODIFICATION_INFO>
+            <INFO LABEL="Native Instruments"></INFO>
+            <TEMPO BPM="137.004074"></TEMPO>
+            <CUE_V2 NAME="Beat Marker" DISPL_ORDER="0" TYPE="4" START="53.759780" LEN="0.000000"
+                REPEATS="-1" HOTCUE="-1">
+                <GRID BPM="137.004074"></GRID>
+            </CUE_V2>
+            <CUE_V2 NAME="n.n." DISPL_ORDER="0" TYPE="0" START="53.759780" LEN="0.000000"
+                REPEATS="-1" HOTCUE="0"></CUE_V2>
+            <CUE_V2 NAME="Beat Marker" DISPL_ORDER="0" TYPE="4" START="28082.122397" LEN="0.000000"
+                REPEATS="-1" HOTCUE="-1">
+                <GRID BPM="119.988373"></GRID>
+            </CUE_V2>
+            <CUE_V2 NAME="n.n." DISPL_ORDER="0" TYPE="0" START="28082.122397" LEN="0.000000"
+                REPEATS="-1" HOTCUE="1"></CUE_V2>
+            <CUE_V2 NAME="Beat Marker" DISPL_ORDER="0" TYPE="4" START="44083.673033" LEN="0.000000"
+                REPEATS="-1" HOTCUE="-1">
+                <GRID BPM="137.002792"></GRID>
+            </CUE_V2>
+            <CUE_V2 NAME="n.n." DISPL_ORDER="0" TYPE="0" START="44083.673033" LEN="0.000000"
+                REPEATS="-1" HOTCUE="2"></CUE_V2>
+            <CUE_V2 NAME="Beat Marker" DISPL_ORDER="0" TYPE="4" START="79119.455225" LEN="0.000000"
+                REPEATS="-1" HOTCUE="-1">
+                <GRID BPM="119.996628"></GRID>
+            </CUE_V2>
+            <CUE_V2 NAME="n.n." DISPL_ORDER="0" TYPE="0" START="79119.455225" LEN="0.000000"
+                REPEATS="-1" HOTCUE="3"></CUE_V2>
+            <CUE_V2 NAME="Beat Marker" DISPL_ORDER="0" TYPE="4" START="95119.904427" LEN="0.000000"
+                REPEATS="-1" HOTCUE="-1">
+                <GRID BPM="137.001480"></GRID>
+            </CUE_V2>
+            <CUE_V2 NAME="n.n." DISPL_ORDER="0" TYPE="0" START="95119.904427" LEN="0.000000"
+                REPEATS="-1" HOTCUE="4"></CUE_V2>
+            <CUE_V2 NAME="Beat Marker" DISPL_ORDER="0" TYPE="4" START="129718.069594" LEN="0.000000"
+                REPEATS="-1" HOTCUE="-1">
+                <GRID BPM="136.971420"></GRID>
+            </CUE_V2>
+            <CUE_V2 NAME="n.n." DISPL_ORDER="0" TYPE="0" START="129718.069594" LEN="0.000000"
+                REPEATS="-1" HOTCUE="5"></CUE_V2>
+        </ENTRY>
+        <ENTRY TITLE="Salona - Leaps of Faith">
+            <LOCATION DIR="/:" FILE="Salona - Leaps of Faith.mp3" VOLUME="" VOLUMEID=""></LOCATION>
+            <ALBUM TITLE="Traktor Pro 4"></ALBUM>
+            <MODIFICATION_INFO AUTHOR_TYPE="importer"></MODIFICATION_INFO>
+            <INFO LABEL="Native Instruments"></INFO>
+            <TEMPO BPM="130.061707"></TEMPO>
+            <CUE_V2 NAME="Beat Marker" DISPL_ORDER="0" TYPE="4" START="285.053512" LEN="0.000000"
+                REPEATS="-1" HOTCUE="-1">
+                <GRID BPM="130.061707"></GRID>
+            </CUE_V2>
+            <CUE_V2 NAME="n.n." DISPL_ORDER="0" TYPE="0" START="285.053512" LEN="0.000000"
+                REPEATS="-1" HOTCUE="0"></CUE_V2>
+            <CUE_V2 NAME="Beat Marker" DISPL_ORDER="0" TYPE="4" START="15047.277852" LEN="0.000000"
+                REPEATS="-1" HOTCUE="-1">
+                <GRID BPM="173.997650"></GRID>
+            </CUE_V2>
+            <CUE_V2 NAME="n.n." DISPL_ORDER="0" TYPE="0" START="15047.277852" LEN="0.000000"
+                REPEATS="-1" HOTCUE="1"></CUE_V2>
+            <CUE_V2 NAME="n.n." DISPL_ORDER="0" TYPE="0" START="26081.909938" LEN="0.000000"
+                REPEATS="-1" HOTCUE="2"></CUE_V2>
+            <CUE_V2 NAME="Beat Marker" DISPL_ORDER="0" TYPE="4" START="70220.438281" LEN="0.000000"
+                REPEATS="-1" HOTCUE="-1">
+                <GRID BPM="130.129501"></GRID>
+            </CUE_V2>
+            <CUE_V2 NAME="n.n." DISPL_ORDER="0" TYPE="0" START="70220.438281" LEN="0.000000"
+                REPEATS="-1" HOTCUE="3"></CUE_V2>
+            <CUE_V2 NAME="Beat Marker" DISPL_ORDER="0" TYPE="4" START="77597.705004" LEN="0.000000"
+                REPEATS="-1" HOTCUE="-1">
+                <GRID BPM="130.541611"></GRID>
+            </CUE_V2>
+            <CUE_V2 NAME="Beat Marker" DISPL_ORDER="0" TYPE="4" START="84951.681844" LEN="0.000000"
+                REPEATS="-1" HOTCUE="-1">
+                <GRID BPM="130.937851"></GRID>
+            </CUE_V2>
+        </ENTRY>
+    </COLLECTION>
+    <SETS ENTRIES="0"></SETS>
+    <PLAYLISTS>
+        <NODE TYPE="FOLDER" NAME="$ROOT">
+            <SUBNODES COUNT="8">
+                <NODE TYPE="FOLDER" NAME="dogdog">
+                    <SUBNODES COUNT="0"></SUBNODES>
+                </NODE>
+                <NODE TYPE="SMARTLIST" NAME="Played in this session">
+                    <SMARTLIST UUID="d32f6b1f98344b418410aa2003316926">
+                        <SEARCH_EXPRESSION VERSION="1" QUERY="$PLAYED == TRUE"></SEARCH_EXPRESSION>
+                    </SMARTLIST>
+                </NODE>
+                <NODE TYPE="SMARTLIST" NAME="Recently added">
+                    <SMARTLIST UUID="906bf8a71e914150b56cd62bbbd23dd7">
+                        <SEARCH_EXPRESSION VERSION="1" QUERY="$IMPORTDATE >= MONTHS_AGO(1)"></SEARCH_EXPRESSION>
+                    </SMARTLIST>
+                </NODE>
+                <NODE TYPE="SMARTLIST" NAME="Top rated tracks">
+                    <SMARTLIST UUID="251bf6b22f9640e3b01120574b615226">
+                        <SEARCH_EXPRESSION VERSION="1" QUERY="$RATING == 5"></SEARCH_EXPRESSION>
+                    </SMARTLIST>
+                </NODE>
+                <NODE TYPE="PLAYLIST" NAME="_LOOPS">
+                    <PLAYLIST ENTRIES="0" TYPE="LIST" UUID="4f19a953a2a84d53beec22f5862bc39b"></PLAYLIST>
+                </NODE>
+                <NODE TYPE="PLAYLIST" NAME="_RECORDINGS">
+                    <PLAYLIST ENTRIES="0" TYPE="LIST" UUID="56d7d16b452f43ed960092c2a4488793"></PLAYLIST>
+                </NODE>
+                <NODE TYPE="PLAYLIST" NAME="Native Instruments">
+                    <PLAYLIST ENTRIES="13" TYPE="LIST" UUID="cf01f568a6ce4bcfa3feeedf75c84630">
+                        <ENTRY>
+                            <PRIMARYKEY TYPE="TRACK" KEY="/:Bumpin Flava - Bumpy.mp3"></PRIMARYKEY>
+                        </ENTRY>
+                        <ENTRY>
+                            <PRIMARYKEY TYPE="TRACK" KEY="/:Bumpin Flava - A Wee Dub.mp3"></PRIMARYKEY>
+                        </ENTRY>
+                        <ENTRY>
+                            <PRIMARYKEY TYPE="TRACK" KEY="/:Bumpin Flava - Bae.mp3"></PRIMARYKEY>
+                        </ENTRY>
+                        <ENTRY>
+                            <PRIMARYKEY TYPE="TRACK" KEY="/:Higher place - Diafonie.mp3"></PRIMARYKEY>
+                        </ENTRY>
+                        <ENTRY>
+                            <PRIMARYKEY TYPE="TRACK" KEY="/:Higher Place - Treatwave.mp3"></PRIMARYKEY>
+                        </ENTRY>
+                        <ENTRY>
+                            <PRIMARYKEY TYPE="TRACK" KEY="/:Higher Place - Words.mp3"></PRIMARYKEY>
+                        </ENTRY>
+                        <ENTRY>
+                            <PRIMARYKEY TYPE="TRACK" KEY="/:Lunar Echoes - Born Under.mp3"></PRIMARYKEY>
+                        </ENTRY>
+                        <ENTRY>
+                            <PRIMARYKEY TYPE="TRACK" KEY="/:Mother Board - Internal Logic.mp3"></PRIMARYKEY>
+                        </ENTRY>
+                        <ENTRY>
+                            <PRIMARYKEY TYPE="TRACK" KEY="/:Drum State - Cooking Swings.mp3"></PRIMARYKEY>
+                        </ENTRY>
+                        <ENTRY>
+                            <PRIMARYKEY TYPE="TRACK" KEY="/:Drum State - Drum Towers.mp3"></PRIMARYKEY>
+                        </ENTRY>
+                        <ENTRY>
+                            <PRIMARYKEY TYPE="TRACK" KEY="/:Drum State - Touch The Sunset.mp3"></PRIMARYKEY>
+                        </ENTRY>
+                        <ENTRY>
+                            <PRIMARYKEY TYPE="TRACK" KEY="/:Salona - Connected.mp3"></PRIMARYKEY>
+                        </ENTRY>
+                        <ENTRY>
+                            <PRIMARYKEY TYPE="TRACK" KEY="/:Salona - Leaps of Faith.mp3"></PRIMARYKEY>
+                        </ENTRY>
+                    </PLAYLIST>
+                </NODE>
+                <NODE TYPE="PLAYLIST" NAME="Preparation">
+                    <PLAYLIST ENTRIES="0" TYPE="LIST" UUID="6a9badc8b98b457d8fa25a43f3d1a1a4"></PLAYLIST>
+                </NODE>
+            </SUBNODES>
+        </NODE>
+    </PLAYLISTS>
+    <INDEXING>
+        <SORTING_INFO PATH="$COLLECTION"></SORTING_INFO>
+        <SORTING_INFO PATH="Native Instruments"></SORTING_INFO>
+    </INDEXING>
+</NML>

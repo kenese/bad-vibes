@@ -95,15 +95,15 @@ type NmlDocument = {
 const parser = new XMLParser({
   ignoreAttributes: false,
   attributeNamePrefix: '',
-  parseAttributeValue: true,
-  allowBooleanAttributes: true
+  parseAttributeValue: false,  // Keep values as strings to preserve "1.0", "20", etc.
+  allowBooleanAttributes: true,
 });
 
 const compactBuilder = new XMLBuilder({
   ignoreAttributes: false,
   attributeNamePrefix: '',
-  format: false,
-  suppressBooleanAttributes: false
+  format: true,                // Format with newlines for readability
+  suppressBooleanAttributes: false,
 });
 
 const slugify = (value: string) => {
@@ -129,6 +129,8 @@ export class CollectionService {
   private collectionPath: string;
   private readonly userId: string;
   private document: NmlDocument | null = null;
+  private originalXml: string | null = null;  // Store original XML for unchanged downloads
+  private modified = false;                    // Track if any changes were made
   private trackIndex = new Map<string, TrackEntry>();
   private pathIndex = new Map<string, NodeReference>();
   private treeCache: SidebarTreeNode | null = null;
@@ -168,6 +170,10 @@ export class CollectionService {
     await this.ensureLoaded();
     if (!this.document) {
       throw new Error('Collection not loaded');
+    }
+    // Return original XML if no modifications were made
+    if (!this.modified && this.originalXml) {
+      return this.originalXml;
     }
     const xmlBody = compactBuilder.build(this.document);
     return xmlBody.startsWith('<?xml')
@@ -343,6 +349,8 @@ export class CollectionService {
   }
 
   async loadFromXml(xml: string) {
+    this.originalXml = xml;
+    this.modified = false;
     this.document = parser.parse(xml) as NmlDocument;
     this.refreshTrackIndex();
     this.invalidateTree();
@@ -386,6 +394,8 @@ export class CollectionService {
       throw error;
     }
 
+    this.originalXml = xml;
+    this.modified = false;
     this.document = parser.parse(xml) as NmlDocument;
     this.refreshTrackIndex();
     this.invalidateTree();
@@ -640,11 +650,13 @@ export class CollectionService {
       throw new Error('Collection not loaded');
     }
 
+    // Mark as modified since we're changing something
+    this.modified = true;
+
     if (this.collectionPath.startsWith('memory:')) {
       // In-memory collection: state is already updated in this.document
-      // No persistence to disk or blob needed.
-      // We might want to invalidate tree cache though if we want to force re-render logic,
-      // but invalidating tree happens in operations usually.
+      // Clear originalXml since document has changed
+      this.originalXml = null;
       this.invalidateTree();
       return;
     }
@@ -669,6 +681,10 @@ export class CollectionService {
 
     // Update local reference to the new URL
     this.collectionPath = url;
+    
+    // After saving, the "output" becomes our new original
+    this.originalXml = output;
+    this.modified = false;
     
     this.invalidateTree();
   }
