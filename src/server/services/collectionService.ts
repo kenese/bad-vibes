@@ -105,6 +105,7 @@ const parser = new XMLParser({
   attributeNamePrefix: '',
   parseAttributeValue: false,  // Keep values as strings to preserve "1.0", "20", etc.
   allowBooleanAttributes: true,
+  trimValues: false,           // Preserve leading/trailing whitespace in attribute values (folder names use spaces for sort order)
 });
 
 const compactBuilder = new XMLBuilder({
@@ -112,6 +113,7 @@ const compactBuilder = new XMLBuilder({
   attributeNamePrefix: '',
   format: true,                // Format with newlines for readability
   suppressBooleanAttributes: false,
+  preserveOrder: false,        // We manage order via arrays, not preserveOrder mode
 });
 
 const slugify = (value: string) => {
