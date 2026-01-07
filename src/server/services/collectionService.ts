@@ -64,19 +64,53 @@ type TrackEntry = {
   LOCATION?: TrackLocation;
   TITLE?: string;
   ARTIST?: string;
-  ALBUM?: { TITLE?: string };
+  ALBUM?: { 
+    TITLE?: string; 
+    TRACK?: string;
+    OF_TRACKS?: string;
+  };
   INFO?: {
+    BITRATE?: string;
+    GENRE?: string;
+    LABEL?: string;
+    COMMENT?: string;
     RATING?: string;
+    KEY?: string;
+    PLAYCOUNT?: string;
+    PLAYTIME?: string;
+    PLAYTIME_FLOAT?: string;
+    IMPORT_DATE?: string;
+    LAST_PLAYED?: string;
+    RELEASE_DATE?: string;
+    COVERARTID?: string;
+    FILESIZE?: string;
+    FLAGS?: string;
+    PRODUCER?: string;
+    KEY_LYRICS?: string;
   };
-  TEMPO?: {
-    BPM?: string | number;
+  TEMPO?: { 
+    BPM?: string | number; 
+    BPM_QUALITY?: string;
   };
+  MUSICAL_KEY?: { VALUE?: string };
+  LOUDNESS?: { 
+    PEAK_DB?: string; 
+    PERCEIVED_DB?: string; 
+    ANALYZED_DB?: string;
+  };
+  MODIFICATION_INFO?: { AUTHOR_TYPE?: string };
+  MODIFIED_DATE?: string;
+  MODIFIED_TIME?: string;
+  AUDIO_ID?: string;
+  LOCK?: string;
+  LOCK_MODIFICATION_TIME?: string;
 };
 
 type TrackLocation = {
   VOLUME?: string;
   DIR?: string;
   FILE?: string;
+  VOLUMEID?: string;
 };
 
 type NodeReference = {
@@ -98,6 +132,57 @@ type NmlDocument = {
       NODE?: RawNode | RawNode[];
     };
   };
+};
+
+// ============ Track Management Types ============
+
+export type FullTrackRow = {
+  trackKey: string;  // Unique identifier for the track (volume+dir+file)
+  title: string;
+  artist: string;
+  album: string;
+  albumTrack: string;
+  bpm?: number;
+  bpmQuality: string;
+  rating: string;
+  comment: string;
+  genre: string;
+  label: string;
+  musicalKey: string;
+  playcount: string;
+  playtime: string;
+  importDate: string;
+  lastPlayed: string;
+  releaseDate: string;
+  bitrate: string;
+  filesize: string;
+  filepath: string;
+};
+
+export type TrackFieldUpdates = {
+  title?: string;
+  artist?: string;
+  album?: string;
+  comment?: string;
+  genre?: string;
+  label?: string;
+  rating?: string;
+  key?: string;
+  bpm?: number;
+};
+
+export type CombinationComment = {
+  comment: string;
+  categories: string[];
+};
+
+export type CategorizedComments = {
+  keyBpm: string[];
+  genre: string[];
+  url: string[];
+  hex: string[];
+  combination: CombinationComment[];
+  other: string[];
 };
 
 const parser = new XMLParser({
@@ -702,6 +787,214 @@ export class CollectionService {
         this.trackIndex.set(key, entry);
       }
     });
+  }
+
+  // ============ Track Management Methods ============
+
+  async getAllTracks(): Promise<FullTrackRow[]> {
+    await this.ensureLoaded();
+    const tracks: FullTrackRow[] = [];
+    
+    this.trackIndex.forEach((entry, key) => {
+      tracks.push(this.buildFullTrackRow(key, entry));
+    });
+    
+    return tracks;
+  }
+
+  async updateTrack(key: string, updates: TrackFieldUpdates): Promise<{ success: boolean }> {
+    await this.ensureLoaded();
+    const entry = this.trackIndex.get(key);
+    if (!entry) {
+      throw new Error(`Track not found: ${key}`);
+    }
+    
+    this.applyTrackUpdates(entry, updates);
+    await this.persist();
+    return { success: true };
+  }
+
+  async updateTracksBatch(updates: Array<{ key: string; updates: TrackFieldUpdates }>): Promise<{ 
+    success: boolean; 
+    updatedCount: number;
+    errors: Array<{ key: string; error: string }>;
+  }> {
+    await this.ensureLoaded();
+    const errors: Array<{ key: string; error: string }> = [];
+    let updatedCount = 0;
+
+    for (const { key, updates: trackUpdates } of updates) {
+      const entry = this.trackIndex.get(key);
+      if (!entry) {
+        errors.push({ key, error: 'Track not found' });
+        continue;
+      }
+      
+      this.applyTrackUpdates(entry, trackUpdates);
+      updatedCount++;
+    }
+
+    if (updatedCount > 0) {
+      await this.persist();
+    }
+    
+    return { success: errors.length === 0, updatedCount, errors };
+  }
+
+  async getUniqueComments(): Promise<CategorizedComments> {
+    await this.ensureLoaded();
+    
+    const comments = new Set<string>();
+    this.trackIndex.forEach((entry) => {
+      const comment = entry.INFO?.COMMENT;
+      if (comment?.trim()) {
+        comments.add(comment);
+      }
+    });
+
+    return this.categorizeComments([...comments]);
+  }
+
+  async updateCommentsBatch(
+    oldComments: string[], 
+    newComment: string
+  ): Promise<{ success: boolean; updatedCount: number }> {
+    await this.ensureLoaded();
+    const oldSet = new Set(oldComments);
+    let updatedCount = 0;
+
+    this.trackIndex.forEach((entry) => {
+      const current = entry.INFO?.COMMENT;
+      if (current && oldSet.has(current)) {
+        entry.INFO ??= {};
+        entry.INFO.COMMENT = newComment || undefined; // Empty string clears
+        updatedCount++;
+      }
+    });
+
+    if (updatedCount > 0) {
+      await this.persist();
+    }
+
+    return { success: true, updatedCount };
+  }
+
+  private buildFullTrackRow(key: string, entry: TrackEntry): FullTrackRow {
+    const bpmValue = entry.TEMPO?.BPM;
+    return {
+      trackKey: key,
+      title: entry.TITLE ?? '',
+      artist: entry.ARTIST ?? '',
+      album: entry.ALBUM?.TITLE ?? '',
+      albumTrack: entry.ALBUM?.TRACK ?? '',
+      bpm: typeof bpmValue === 'number' ? bpmValue : Number(bpmValue) || undefined,
+      bpmQuality: entry.TEMPO?.BPM_QUALITY ?? '',
+      rating: entry.INFO?.RATING ?? '',
+      comment: entry.INFO?.COMMENT ?? '',
+      genre: entry.INFO?.GENRE ?? '',
+      label: entry.INFO?.LABEL ?? '',
+      musicalKey: entry.INFO?.KEY ?? entry.MUSICAL_KEY?.VALUE ?? '',
+      playcount: entry.INFO?.PLAYCOUNT ?? '',
+      playtime: entry.INFO?.PLAYTIME ?? '',
+      importDate: entry.INFO?.IMPORT_DATE ?? '',
+      lastPlayed: entry.INFO?.LAST_PLAYED ?? '',
+      releaseDate: entry.INFO?.RELEASE_DATE ?? '',
+      bitrate: entry.INFO?.BITRATE ?? '',
+      filesize: entry.INFO?.FILESIZE ?? '',
+      filepath: `${entry.LOCATION?.VOLUME ?? ''}${entry.LOCATION?.DIR ?? ''}${entry.LOCATION?.FILE ?? ''}`,
+    };
+  }
+
+  private applyTrackUpdates(entry: TrackEntry, updates: TrackFieldUpdates): void {
+    if (updates.title !== undefined) entry.TITLE = updates.title || undefined;
+    if (updates.artist !== undefined) entry.ARTIST = updates.artist || undefined;
+    
+    if (updates.album !== undefined) {
+      entry.ALBUM ??= {};
+      entry.ALBUM.TITLE = updates.album || undefined;
+    }
+    
+    if (updates.comment !== undefined || updates.genre !== undefined || 
+        updates.label !== undefined || updates.rating !== undefined ||
+        updates.key !== undefined) {
+      entry.INFO ??= {};
+      if (updates.comment !== undefined) entry.INFO.COMMENT = updates.comment || undefined;
+      if (updates.genre !== undefined) entry.INFO.GENRE = updates.genre || undefined;
+      if (updates.label !== undefined) entry.INFO.LABEL = updates.label || undefined;
+      if (updates.rating !== undefined) entry.INFO.RATING = updates.rating || undefined;
+      if (updates.key !== undefined) entry.INFO.KEY = updates.key || undefined;
+    }
+    
+    if (updates.bpm !== undefined) {
+      entry.TEMPO ??= {};
+      entry.TEMPO.BPM = updates.bpm?.toString() ?? undefined;
+    }
+  }
+
+  private categorizeComments(comments: string[]): CategorizedComments {
+    const result: CategorizedComments = {
+      keyBpm: [],
+      genre: [],
+      url: [],
+      hex: [],
+      combination: [],
+      other: [],
+    };
+
+    const genres = [
+      'house', 'hip hop', 'hip-hop', 'hiphop', 'rap', 'r&b', 'rnb', 'soul', 'funk',
+      'jazz', 'disco', 'electronic', 'electro', 'techno', 'drum and bass', 'dnb',
+      'dubstep', 'garage', 'grime', 'afrobeat', 'afrobeats', 'reggae', 'dancehall',
+      'latin', 'salsa', 'cumbia', 'brazilian', 'bossa', 'downtempo', 'chillout',
+      'lounge', 'ambient', 'trap', 'drill', 'boom bap', 'breaks', 'breakbeat',
+      'booty', 'bass', 'nudisco', 'nu-disco', 'italo', 'boogie', 'pop', 'rock',
+      'indie', 'alternative', 'world', 'afro', 'tribal', 'minimal', 'progressive',
+      'trance', 'acid', 'dub', 'deep', 'soulful', 'classic', 'vocal', 'instrumental',
+      'remix', 'edit', 'bootleg', 'mashup',
+    ];
+    const genrePattern = new RegExp(`\\b(${genres.join('|')})\\b`, 'i');
+    const bracketStylePattern = /^\[.+\]\s*\[.+\]$/;  // Matches "[thing] [other]" style
+    // Key/BPM patterns: "4A - 128", "128 - 4A", "4A - 1", "8A - 138 -", etc.
+    const keyBpmPattern = /^[0-9]{1,2}[ABab][m]?\s*[-–]\s*[0-9]{1,3}(\s*[-–])?$|^[0-9]{1,3}\s*[-–]\s*[0-9]{1,2}[ABab][m]?$/;
+    const urlPattern = /https?:\/\/|www\.|\.com|\.net|\.org|\.info|\.io|\.fm|\.me|\.co\.uk|bandcamp|soundcloud|myspace|facebook|twitter|instagram|youtube|blogspot|tumblr|beatport|whitelabel|official\.fm/i;
+    const hexPattern = /^[\s0-9A-Fa-f]{40,}$/;
+
+    for (const comment of comments) {
+      const c = comment.trim();
+      if (!c) continue;
+
+      const categories: string[] = [];
+      
+      if (keyBpmPattern.test(c)) categories.push('keyBpm');
+      if (urlPattern.test(c)) categories.push('url');
+      if (hexPattern.test(c)) categories.push('hex');
+      // Genre: match word patterns OR bracket style like "[House] [Deep]"
+      if (!categories.includes('hex') && (genrePattern.test(c) || bracketStylePattern.test(c))) categories.push('genre');
+
+      // Store the ORIGINAL comment (not trimmed) so it matches exactly in updateCommentsBatch
+      if (categories.length === 0) {
+        result.other.push(comment);
+      } else if (categories.length === 1) {
+        const cat = categories[0]!;
+        if (cat === 'keyBpm') result.keyBpm.push(comment);
+        else if (cat === 'genre') result.genre.push(comment);
+        else if (cat === 'url') result.url.push(comment);
+        else if (cat === 'hex') result.hex.push(comment);
+        else result.other.push(comment);
+      } else {
+        result.combination.push({ comment, categories });
+      }
+    }
+
+    // Sort all arrays
+    result.keyBpm.sort();
+    result.genre.sort();
+    result.url.sort();
+    result.hex.sort();
+    result.other.sort();
+    result.combination.sort((a, b) => a.comment.localeCompare(b.comment));
+
+    return result;
   }
 
   private buildTrackKey(location?: TrackLocation) {

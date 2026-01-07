@@ -207,5 +207,77 @@ export const collectionRouter = createTRPCRouter({
     .mutation(async ({ ctx, input }) => {
       const service = await getServiceForUser(ctx);
       return service.deleteNodes(input.paths);
-    })
+    }),
+
+  // ============ Track Management Endpoints ============
+
+  allTracks: protectedProcedure.query(async ({ ctx }) => {
+    const service = await getServiceForUser(ctx);
+    return service.getAllTracks();
+  }),
+
+  updateTrack: protectedProcedure
+    .input(
+      z.object({
+        key: z.string().min(1),
+        updates: z.object({
+          title: z.string().optional(),
+          artist: z.string().optional(),
+          album: z.string().optional(),
+          comment: z.string().optional(),
+          genre: z.string().optional(),
+          label: z.string().optional(),
+          rating: z.string().optional(),
+          key: z.string().optional(),
+          bpm: z.number().optional(),
+        }),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      const service = await getServiceForUser(ctx);
+      return service.updateTrack(input.key, input.updates);
+    }),
+
+  updateTracksBatch: protectedProcedure
+    .input(
+      z.object({
+        updates: z.array(
+          z.object({
+            key: z.string().min(1),
+            updates: z.object({
+              title: z.string().optional(),
+              artist: z.string().optional(),
+              album: z.string().optional(),
+              comment: z.string().optional(),
+              genre: z.string().optional(),
+              label: z.string().optional(),
+              rating: z.string().optional(),
+              key: z.string().optional(),
+              bpm: z.number().optional(),
+            }),
+          })
+        ),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      const service = await getServiceForUser(ctx);
+      return service.updateTracksBatch(input.updates);
+    }),
+
+  uniqueComments: protectedProcedure.query(async ({ ctx }) => {
+    const service = await getServiceForUser(ctx);
+    return service.getUniqueComments();
+  }),
+
+  updateCommentsBatch: protectedProcedure
+    .input(
+      z.object({
+        oldComments: z.array(z.string()),
+        newComment: z.string(),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      const service = await getServiceForUser(ctx);
+      return service.updateCommentsBatch(input.oldComments, input.newComment);
+    }),
 });

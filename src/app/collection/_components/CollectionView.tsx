@@ -5,8 +5,11 @@ import { api } from '~/trpc/react';
 import Sidebar, { type FlattenedFolder } from './Sidebar';
 import PlaylistTable from './PlaylistTable';
 import UploadPrompt from './UploadPrompt';
+import TrackManagement from './TrackManagement';
 import type { AppRouter } from '~/server/api/root';
 import type { inferRouterOutputs } from '@trpc/server';
+
+type TabType = 'playlist' | 'tracks';
 
 const DEFAULT_FOLDER_PATH = 'root';
 
@@ -35,6 +38,7 @@ const CollectionView = ({ initialActivePath }: { initialActivePath?: string }) =
   const [sidebarWidth, setSidebarWidth] = useState(300);
   const [isResizing, setIsResizing] = useState(false);
   const [showUtilities, setShowUtilities] = useState(false);
+  const [activeTab, setActiveTab] = useState<TabType>('playlist');
 
   const handleMouseMove = useCallback((event: MouseEvent) => {
     setSidebarWidth(() => {
@@ -292,109 +296,131 @@ const CollectionView = ({ initialActivePath }: { initialActivePath?: string }) =
         aria-label="Resize sidebar"
       />
       <section className="main-panel">
-        <div className="utilities-container">
+        {/* Tab Navigation */}
+        <div className="tab-navigation">
           <button
-            className="utilities-toggle"
-            onClick={() => setShowUtilities(!showUtilities)}
-            aria-expanded={showUtilities}
+            className={`tab-button ${activeTab === 'playlist' ? 'active' : ''}`}
+            onClick={() => setActiveTab('playlist')}
           >
-            <span className="toggle-icon">{showUtilities ? '▾' : '▸'}</span>
-            Utilities
+            Playlist Management
           </button>
+          <button
+            className={`tab-button ${activeTab === 'tracks' ? 'active' : ''}`}
+            onClick={() => setActiveTab('tracks')}
+          >
+            Track Management
+          </button>
+        </div>
 
-          {showUtilities && (
-            <div className="actions">
-              <form onSubmit={handleCreateFolder}>
-                <label>Create folder under current selection</label>
-                <div className="row">
-                  <input
-                    value={folderName}
-                    onChange={(e) => setFolderName(e.target.value)}
-                    placeholder="Folder name"
-                  />
-                  <button type="submit" disabled={createFolder.isPending}>
-                    {createFolder.isPending ? 'Creating…' : 'Create'}
-                  </button>
-                </div>
-              </form>
+        {activeTab === 'playlist' ? (
+          <>
+            <div className="utilities-container">
+              <button
+                className="utilities-toggle"
+                onClick={() => setShowUtilities(!showUtilities)}
+                aria-expanded={showUtilities}
+              >
+                <span className="toggle-icon">{showUtilities ? '▾' : '▸'}</span>
+                Utilities
+              </button>
 
-              <form onSubmit={handleCreatePlaylist}>
-                <label>Create empty playlist in current folder</label>
-                <div className="row">
-                  <input
-                    value={playlistName}
-                    onChange={(e) => setPlaylistName(e.target.value)}
-                    placeholder="Playlist name"
-                  />
-                  <button type="submit" disabled={createPlaylist.isPending}>
-                    {createPlaylist.isPending ? 'Creating…' : 'Create'}
-                  </button>
-                </div>
-              </form>
+              {showUtilities && (
+                <div className="actions">
+                  <form onSubmit={handleCreateFolder}>
+                    <label>Create folder under current selection</label>
+                    <div className="row">
+                      <input
+                        value={folderName}
+                        onChange={(e) => setFolderName(e.target.value)}
+                        placeholder="Folder name"
+                      />
+                      <button type="submit" disabled={createFolder.isPending}>
+                        {createFolder.isPending ? 'Creating…' : 'Create'}
+                      </button>
+                    </div>
+                  </form>
 
-              <form onSubmit={handleMovePlaylists}>
-                <label>
-                  Move selected playlists
-                  {selectedPaths.length > 0 && ` (${selectedPaths.length})`}
-                </label>
-                <div className="row">
-                  <select
-                    value={moveTargetPath}
-                    onChange={(e) => setMoveTargetPath(e.target.value)}
-                  >
-                    {folderOptions.map((folder) => (
-                      <option key={folder.path} value={folder.path}>
-                        {folder.label}
-                      </option>
-                    ))}
-                  </select>
-                  <button type="submit" disabled={!selectedPaths.length || movePlaylistBatch.isPending}>
-                    {movePlaylistBatch.isPending ? 'Moving…' : 'Move'}
-                  </button>
-                </div>
-              </form>
+                  <form onSubmit={handleCreatePlaylist}>
+                    <label>Create empty playlist in current folder</label>
+                    <div className="row">
+                      <input
+                        value={playlistName}
+                        onChange={(e) => setPlaylistName(e.target.value)}
+                        placeholder="Playlist name"
+                      />
+                      <button type="submit" disabled={createPlaylist.isPending}>
+                        {createPlaylist.isPending ? 'Creating…' : 'Create'}
+                      </button>
+                    </div>
+                  </form>
 
-              <div className="row stack">
-                <button onClick={handleCreateOrphans} disabled={createOrphans.isPending}>
-                  {createOrphans.isPending ? 'Working…' : 'Create Orphans Playlist'}
-                </button>
-                <div className="duplicate">
-                  <input
-                    value={duplicateName}
-                    onChange={(e) => setDuplicateName(e.target.value)}
-                    placeholder="Duplicate name (optional)"
-                  />
-                  <button
-                    onClick={handleDuplicatePlaylist}
-                    disabled={activeNode?.type !== 'PLAYLIST' || duplicatePlaylist.isPending}
-                  >
-                    {duplicatePlaylist.isPending ? 'Working…' : 'Duplicate Playlist'}
-                  </button>
+                  <form onSubmit={handleMovePlaylists}>
+                    <label>
+                      Move selected playlists
+                      {selectedPaths.length > 0 && ` (${selectedPaths.length})`}
+                    </label>
+                    <div className="row">
+                      <select
+                        value={moveTargetPath}
+                        onChange={(e) => setMoveTargetPath(e.target.value)}
+                      >
+                        {folderOptions.map((folder) => (
+                          <option key={folder.path} value={folder.path}>
+                            {folder.label}
+                          </option>
+                        ))}
+                      </select>
+                      <button type="submit" disabled={!selectedPaths.length || movePlaylistBatch.isPending}>
+                        {movePlaylistBatch.isPending ? 'Moving…' : 'Move'}
+                      </button>
+                    </div>
+                  </form>
+
+                  <div className="row stack">
+                    <button onClick={handleCreateOrphans} disabled={createOrphans.isPending}>
+                      {createOrphans.isPending ? 'Working…' : 'Create Orphans Playlist'}
+                    </button>
+                    <div className="duplicate">
+                      <input
+                        value={duplicateName}
+                        onChange={(e) => setDuplicateName(e.target.value)}
+                        placeholder="Duplicate name (optional)"
+                      />
+                      <button
+                        onClick={handleDuplicatePlaylist}
+                        disabled={activeNode?.type !== 'PLAYLIST' || duplicatePlaylist.isPending}
+                      >
+                        {duplicatePlaylist.isPending ? 'Working…' : 'Duplicate Playlist'}
+                      </button>
+                    </div>
+                  </div>
+                  <div className="row stack">
+                    <label>Dangerous Actions</label>
+                    <button
+                      className="delete-button"
+                      onClick={handleDeleteSelected}
+                      disabled={!selectedPaths.length || deleteNodes.isPending}
+                    >
+                      {deleteNodes.isPending
+                        ? 'Deleting…'
+                        : `Delete Selected (${selectedPaths.length})`}
+                    </button>
+                  </div>
                 </div>
-              </div>
-              <div className="row stack">
-                <label>Dangerous Actions</label>
-                <button
-                  className="delete-button"
-                  onClick={handleDeleteSelected}
-                  disabled={!selectedPaths.length || deleteNodes.isPending}
-                >
-                  {deleteNodes.isPending
-                    ? 'Deleting…'
-                    : `Delete Selected (${selectedPaths.length})`}
-                </button>
-              </div>
+              )}
             </div>
-          )}
-        </div>
 
-        <div className="table-section">
-          <h2>{playlistQuery.data?.playlistName ?? 'Select a playlist'}</h2>
-          {playlistQuery.data?.playlistName && (<PlaylistTable
-            isLoading={playlistQuery.isLoading}
-            tracks={playlistQuery.data?.tracks ?? []}
-          />)}
-        </div>
+            <div className="table-section">
+              <h2>{playlistQuery.data?.playlistName ?? 'Select a playlist'}</h2>
+              {playlistQuery.data?.playlistName && (<PlaylistTable
+                isLoading={playlistQuery.isLoading}
+                tracks={playlistQuery.data?.tracks ?? []}
+              />)}
+            </div>
+          </>
+        ) : (
+          <TrackManagement />
+        )}
       </section>
     </div>
   );
