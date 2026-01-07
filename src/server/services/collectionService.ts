@@ -37,6 +37,7 @@ type RawFolderNode = {
 type RawPlaylistNode = {
   TYPE: 'PLAYLIST';
   NAME?: string;
+  UUID?: string;
   PLAYLIST?: {
     UUID?: string;
     TYPE?: string;
@@ -1285,6 +1286,126 @@ export class CollectionService {
     });
 
     return { wouldUpdate, alreadyHaveInSelection, totalInCollection };
+  }
+
+  async mergeDuplicateTracks(ops: Array<{ masterKey: string; redundantKeys: string[] }>): Promise<void> {
+    await this.ensureLoaded();
+
+    if (!ops.length) return;
+
+    // Create a map for fast lookup: redundantKey -> masterKey
+    const redundantToMaster = new Map<string, string>();
+    const allRedundantKeys = new Set<string>();
+
+    for (const op of ops) {
+      for (const redundantKey of op.redundantKeys) {
+        redundantToMaster.set(redundantKey, op.masterKey);
+        allRedundantKeys.add(redundantKey);
+      }
+    }
+
+    // 1. Iterate through ALL playlists and replace redundant keys with master key
+    // Also remove the master key from the playlist if it was already there (to avoid duplicates of master)
+    // Actually, simpler logic: Replace redundant with master. If playlist ends up with multiple masters, that's what Traktor would do if you dragged it in.
+    // The user requirement says: "REMOVE THE NON MASTER OPTIONS FROM THOSE PLAYLISTS." -> Implies replacement.
+
+    for (const ref of this.pathIndex.values()) {
+      if (ref.type !== 'PLAYLIST') continue;
+
+      const playlist = (ref.rawNode as RawPlaylistNode).PLAYLIST;
+      if (!playlist?.ENTRY) continue;
+
+      const entries = toArray(playlist.ENTRY);
+      let modified = false;
+
+      // Map entries to new keys (or keep existing)
+      const newEntries = entries.map(entry => {
+        const key = entry.PRIMARYKEY?.KEY;
+        if (key && redundantToMaster.has(key)) {
+          const masterKey = redundantToMaster.get(key)!;
+          modified = true;
+          // Create a new entry pointing to the master key
+          return {
+            ...entry,
+            PRIMARYKEY: {
+              ...entry.PRIMARYKEY,
+              KEY: masterKey,
+            }
+          };
+        }
+        return entry;
+      });
+
+      if (modified) {
+        playlist.ENTRY = newEntries;
+      }
+    }
+
+    // 2. Add all redundant keys to "DUPLICATED_TO_DELETE" playlist
+    await this.addToDuplicatesPlaylist(Array.from(allRedundantKeys));
+
+    await this.persist();
+  }
+
+  private async addToDuplicatesPlaylist(trackKeys: string[]) {
+    const playlistName = 'DUPLICATED_TO_DELETE';
+
+    // Ensure tree is built so that root node is properly initialized in the document
+    this.ensureTree();
+    const root = this.ensureRootNode();
+    
+    // Check if playlist exists in root children
+    let playlistNode: RawPlaylistNode | undefined;
+    const subnodes = root.SUBNODES ?? { NODE: [] };
+    const children = toArray(subnodes.NODE);
+
+    const existingNode = children.find(
+      (node) => node.TYPE === 'PLAYLIST' && node.NAME === playlistName
+    ) as RawPlaylistNode | undefined;
+
+    if (existingNode) {
+      playlistNode = existingNode;
+    } else {
+      // Create new playlist if it doesn't exist
+      const uuid = randomUUID().toUpperCase().replace(/-/g, '');
+      playlistNode = {
+        TYPE: 'PLAYLIST',
+        NAME: playlistName,
+        UUID: uuid,
+        PLAYLIST: {
+          TYPE: 'LIST',
+          UUID: uuid,
+          ENTRY: []
+        }
+      };
+
+      // Add to root
+      children.unshift(playlistNode);
+      
+      // Update root SUBNODES
+      subnodes.NODE = children;
+      // Also update count
+      subnodes.COUNT = String(children.length);
+      root.SUBNODES = subnodes;
+    }
+
+    // Add entries to the playlist
+    if (playlistNode?.PLAYLIST) {
+      const currentEntries = toArray(playlistNode.PLAYLIST.ENTRY);
+      
+      const newEntries = trackKeys.map(key => ({
+        PRIMARYKEY: {
+          TYPE: 'TRACK',
+          KEY: key
+        }
+      }));
+
+      playlistNode.PLAYLIST.ENTRY = [...currentEntries, ...newEntries];
+      playlistNode.PLAYLIST.ENTRIES = String(playlistNode.PLAYLIST.ENTRY.length);
+    }
+    
+    // Force a tree invalidation to ensure UI updates next time
+    this.invalidateTree();
   }
 }
 

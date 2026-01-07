@@ -25,8 +25,13 @@ type DuplicateGroup = {
 
 export default function FindDuplicates({ onClose }: FindDuplicatesProps) {
   const tracksQuery = api.collection.allTracks.useQuery();
+  const mergeMutation = api.collection.mergeDuplicates.useMutation();
+  const utils = api.useUtils();
+  
   const [minGroupSize, setMinGroupSize] = useState(2);
   const [matchBy, setMatchBy] = useState<'artist-title' | 'title-only'>('artist-title');
+  const [selectedMasters, setSelectedMasters] = useState<Record<string, string>>({}); // groupKey -> masterTrackKey
+  const [selectedGroups, setSelectedGroups] = useState<Set<string>>(new Set());
 
   const duplicateGroups = useMemo(() => {
     if (!tracksQuery.data) return [];
@@ -101,6 +106,64 @@ export default function FindDuplicates({ onClose }: FindDuplicatesProps) {
     return `${Math.round(bps / 1000)} kbps`;
   }, []);
 
+  const handleMasterSelect = (groupKey: string, trackKey: string) => {
+    setSelectedMasters(prev => ({ ...prev, [groupKey]: trackKey }));
+    
+    // Auto-select the group when a master is chosen, if not already selected
+    setSelectedGroups(prev => {
+      if (!prev.has(groupKey)) {
+        const next = new Set(prev);
+        next.add(groupKey);
+        return next;
+      }
+      return prev;
+    });
+  };
+
+  const toggleGroupSelect = (groupKey: string) => {
+    setSelectedGroups(prev => {
+      const next = new Set(prev);
+      if (next.has(groupKey)) {
+        next.delete(groupKey);
+      } else {
+        next.add(groupKey);
+      }
+      return next;
+    });
+  };
+
+  const handleMerge = async () => {
+    if (selectedGroups.size === 0) return;
+
+    const ops = Array.from(selectedGroups).map(groupKey => {
+      const masterKey = selectedMasters[groupKey];
+      if (!masterKey) return null;
+
+      const group = duplicateGroups.find(g => g.key === groupKey);
+      if (!group) return null;
+
+      const redundantKeys = group.tracks
+        .map(t => t.trackKey)
+        .filter(k => k !== masterKey);
+
+      return { masterKey, redundantKeys };
+    }).filter((op): op is { masterKey: string; redundantKeys: string[] } => op !== null);
+
+    if (ops.length === 0) return;
+
+    if (confirm(`Merge ${ops.length} groups? This will update playlists and move redundant tracks to 'DUPLICATED_TO_DELETE'.`)) {
+      try {
+        await mergeMutation.mutateAsync({ ops });
+        await utils.collection.allTracks.invalidate();
+        onClose();
+        alert('Merge complete!');
+      } catch (error) {
+        console.error('Merge failed:', error);
+        alert('Merge failed. Check console for details.');
+      }
+    }
+  };
+
   if (tracksQuery.isLoading) {
     return (
       <div className="modal-overlay">
@@ -122,7 +185,16 @@ export default function FindDuplicates({ onClose }: FindDuplicatesProps) {
       <div className="modal-content find-duplicates-modal">
         <div className="modal-header">
           <h2>Find Duplicates</h2>
-          <button className="close-button" onClick={onClose}>×</button>
+          <div className="header-actions">
+            <button 
+              className="merge-button" 
+              disabled={selectedGroups.size === 0 || mergeMutation.isPending}
+              onClick={handleMerge}
+            >
+              Merge Selected ({selectedGroups.size})
+            </button>
+            <button className="close-button" onClick={onClose}>×</button>
+          </div>
         </div>
 
         <div className="modal-body">
@@ -158,41 +230,69 @@ export default function FindDuplicates({ onClose }: FindDuplicatesProps) {
             {duplicateGroups.length === 0 ? (
               <p className="no-duplicates">No duplicates found with current settings.</p>
             ) : (
-              duplicateGroups.slice(0, 100).map((group, index) => (
-                <div key={`${group.key}-${index}`} className="duplicate-group">
-                  <div className="group-header">
-                    <span className="group-title">{group.displayTitle}</span>
-                    <span className="group-count">{group.tracks.length} copies</span>
-                  </div>
-                  <div className="group-tracks">
-                    {group.tracks.map((track, trackIndex) => (
-                      <div key={`${track.trackKey}-${trackIndex}`} className="duplicate-track">
-                        <div className="track-info">
-                          <span className="track-album">{track.album || '(No album)'}</span>
-                          <span className="track-meta">
-                            {formatBitrate(track.bitrate)}
-                            {formatBitrate(track.bitrate) && formatFilesize(track.filesize) ? ' • ' : ''}
-                            {formatFilesize(track.filesize)}
-                            {(track.playcount > 0 || track.cuePoints > 0) && (
-                              <>
-                                <span className="meta-separator">•</span>
-                                <span className="track-plays-cues">
-                                  {track.playcount > 0 && `${track.playcount} plays`}
-                                  {track.playcount > 0 && track.cuePoints > 0 && ', '}
-                                  {track.cuePoints > 0 && `${track.cuePoints} cues`}
-                                </span>
-                              </>
-                            )}
-                          </span>
-                        </div>
-                        <div className="track-path" title={track.filepath}>
-                          {track.filepath ? track.filepath.split('/').slice(-2).join('/') : '(No path)'}
-                        </div>
+              duplicateGroups.slice(0, 100).map((group, index) => {
+                const groupKey = group.key;
+                const hasMaster = !!selectedMasters[groupKey];
+                const isSelected = selectedGroups.has(groupKey);
+
+                return (
+                  <div key={`${groupKey}-${index}`} className={`duplicate-group ${isSelected ? 'selected' : ''}`}>
+                    <div className="group-header">
+                      <div className="group-header-left">
+                        <input 
+                          type="checkbox"
+                          checked={isSelected}
+                          disabled={!hasMaster}
+                          onChange={() => toggleGroupSelect(groupKey)}
+                          title={!hasMaster ? "Select a master track first" : "Select group for merge"}
+                        />
+                        <span className="group-title">{group.displayTitle}</span>
                       </div>
-                    ))}
+                      <span className="group-count">{group.tracks.length} copies</span>
+                    </div>
+                    <div className="group-tracks">
+                      {group.tracks.map((track, trackIndex) => {
+                        const isMaster = selectedMasters[groupKey] === track.trackKey;
+                        return (
+                          <div key={`${track.trackKey}-${trackIndex}`} className={`duplicate-track ${isMaster ? 'is-master' : ''}`}>
+                            <div className="track-select">
+                              <input 
+                                type="radio" 
+                                name={`master-${groupKey}-${index}`}
+                                checked={isMaster}
+                                onChange={() => handleMasterSelect(groupKey, track.trackKey)}
+                                title="Set as master track"
+                              />
+                            </div>
+                            <div className="track-info">
+                              <span className="track-album">{track.album || '(No album)'}</span>
+                              <span className="track-meta">
+                                {formatBitrate(track.bitrate)}
+                                {formatBitrate(track.bitrate) && formatFilesize(track.filesize) ? ' • ' : ''}
+                                {formatFilesize(track.filesize)}
+                                {(track.playcount > 0 || track.cuePoints > 0) && (
+                                  <>
+                                    <span className="meta-separator">•</span>
+                                    <span className="track-plays-cues">
+                                      {track.playcount > 0 && `${track.playcount} plays`}
+                                      {track.playcount > 0 && track.cuePoints > 0 && ', '}
+                                      {track.cuePoints > 0 && `${track.cuePoints} cues`}
+                                    </span>
+                                  </>
+                                )}
+                              </span>
+                            </div>
+                            <div className="track-path" title={track.filepath}>
+                              {track.filepath ? track.filepath.split('/').slice(-2).join('/') : '(No path)'}
+                            </div>
+                            {isMaster && <div className="master-badge">MASTER</div>}
+                          </div>
+                        );
+                      })}
+                    </div>
                   </div>
-                </div>
-              ))
+                );
+              })
             )}
             {duplicateGroups.length > 100 && (
               <p className="more-results">

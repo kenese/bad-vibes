@@ -332,4 +332,18 @@ export const collectionRouter = createTRPCRouter({
       const service = await getServiceForUser(ctx);
       return service.getTagCountPreview(input.playlistPaths, input.tag);
     }),
+
+  mergeDuplicates: protectedProcedure
+    .input(
+      z.object({
+        ops: z.array(z.object({
+          masterKey: z.string().min(1),
+          redundantKeys: z.array(z.string().min(1))
+        }))
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      const service = await getServiceForUser(ctx);
+      return service.mergeDuplicateTracks(input.ops);
+    }),
 });

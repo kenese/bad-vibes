@@ -1423,6 +1423,40 @@
   border-bottom: 1px solid rgba(240, 246, 252, 0.1);
 }
 
+.group-header-left {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.merge-button {
+  background: #238636;
+  color: white;
+  border: 1px solid rgba(240, 246, 252, 0.1);
+  padding: 0.4rem 0.8rem;
+  border-radius: 0.375rem;
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.merge-button:hover:not(:disabled) {
+  background: #2ea043;
+}
+
+.merge-button:disabled {
+  background: rgba(240, 246, 252, 0.05);
+  color: rgba(240, 246, 252, 0.3);
+  cursor: not-allowed;
+}
+
 .group-title {
   font-weight: 500;
   color: #f0f6fc;
@@ -1442,8 +1476,35 @@
 }
 
 .duplicate-track {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
   padding: 0.5rem 0.75rem;
   border-bottom: 1px solid rgba(240, 246, 252, 0.05);
+  position: relative;
+}
+
+.duplicate-track.is-master {
+  background: rgba(46, 160, 67, 0.05);
+}
+
+.track-select {
+  display: flex;
+  align-items: center;
+}
+
+.track-content {
+  flex: 1;
+}
+
+.master-badge {
+  font-size: 0.65rem;
+  font-weight: 600;
+  color: #2ea043;
+  background: rgba(46, 160, 67, 0.1);
+  padding: 0.1rem 0.3rem;
+  border-radius: 0.25rem;
+  margin-left: auto;
 }
 
 .duplicate-track:last-child {
