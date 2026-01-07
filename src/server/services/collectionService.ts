@@ -1171,7 +1171,7 @@ export class CollectionService {
     
     for (const path of playlistPaths) {
       const ref = this.pathIndex.get(path);
-      if (!ref || ref.type !== 'PLAYLIST') continue;
+      if (ref?.type !== 'PLAYLIST') continue;
       
       const playlist = (ref.rawNode as RawPlaylistNode).PLAYLIST;
       const entries = toArray(playlist?.ENTRY);
@@ -1229,7 +1229,7 @@ export class CollectionService {
     
     for (const path of playlistPaths) {
       const ref = this.pathIndex.get(path);
-      if (!ref || ref.type !== 'PLAYLIST') continue;
+      if (ref?.type !== 'PLAYLIST') continue;
       
       const playlist = (ref.rawNode as RawPlaylistNode).PLAYLIST;
       const entries = toArray(playlist?.ENTRY);
