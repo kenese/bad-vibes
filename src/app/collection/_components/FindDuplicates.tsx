@@ -18,6 +18,8 @@ type DuplicateGroup = {
     filepath: string;
     bitrate: string;
     filesize: string;
+    playcount: number;
+    cuePoints: number;
   }[];
 };
 
@@ -57,6 +59,8 @@ export default function FindDuplicates({ onClose }: FindDuplicatesProps) {
         filepath: track.filepath ?? '',
         bitrate: track.bitrate ?? '',
         filesize: track.filesize ?? '',
+        playcount: track.playcount ? parseInt(track.playcount) : 0,
+        cuePoints: track.cuePoints ?? 0,
       };
 
       if (existing) {
@@ -166,7 +170,19 @@ export default function FindDuplicates({ onClose }: FindDuplicatesProps) {
                         <div className="track-info">
                           <span className="track-album">{track.album || '(No album)'}</span>
                           <span className="track-meta">
-                            {formatBitrate(track.bitrate)}{formatBitrate(track.bitrate) && formatFilesize(track.filesize) ? ' • ' : ''}{formatFilesize(track.filesize)}
+                            {formatBitrate(track.bitrate)}
+                            {formatBitrate(track.bitrate) && formatFilesize(track.filesize) ? ' • ' : ''}
+                            {formatFilesize(track.filesize)}
+                            {(track.playcount > 0 || track.cuePoints > 0) && (
+                              <>
+                                <span className="meta-separator">•</span>
+                                <span className="track-plays-cues">
+                                  {track.playcount > 0 && `${track.playcount} plays`}
+                                  {track.playcount > 0 && track.cuePoints > 0 && ', '}
+                                  {track.cuePoints > 0 && `${track.cuePoints} cues`}
+                                </span>
+                              </>
+                            )}
                           </span>
                         </div>
                         <div className="track-path" title={track.filepath}>

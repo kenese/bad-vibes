@@ -1463,8 +1463,18 @@
 }
 
 .track-meta {
-  font-size: 0.75rem;
-  color: rgba(240, 246, 252, 0.5);
+  font-size: 0.8rem;
+  color: rgba(240, 246, 252, 0.4);
+}
+
+.meta-separator {
+  margin: 0 0.4rem;
+  color: rgba(240, 246, 252, 0.2);
+}
+
+.track-plays-cues {
+  color: rgba(240, 246, 252, 0.6);
+  font-weight: 500;
 }
 
 .track-path {

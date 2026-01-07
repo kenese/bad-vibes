@@ -98,6 +98,23 @@ type TrackEntry = {
     PERCEIVED_DB?: string; 
     ANALYZED_DB?: string;
   };
+  CUE_V2?: {
+    NAME?: string;
+    DISPL_ORDER?: string;
+    TYPE?: string;
+    START?: string;
+    LEN?: string;
+    REPEATS?: string;
+    HOTCUE?: string;
+  } | {
+    NAME?: string;
+    DISPL_ORDER?: string;
+    TYPE?: string;
+    START?: string;
+    LEN?: string;
+    REPEATS?: string;
+    HOTCUE?: string;
+  }[];
   MODIFICATION_INFO?: { AUTHOR_TYPE?: string };
   MODIFIED_DATE?: string;
   MODIFIED_TIME?: string;
@@ -157,6 +174,7 @@ export type FullTrackRow = {
   bitrate: string;
   filesize: string;
   filepath: string;
+  cuePoints: number;
 };
 
 export type TrackFieldUpdates = {
@@ -919,6 +937,7 @@ export class CollectionService {
       bitrate: entry.INFO?.BITRATE ?? '',
       filesize: entry.INFO?.FILESIZE ?? '',
       filepath: `${entry.LOCATION?.VOLUME ?? ''}${entry.LOCATION?.DIR ?? ''}${entry.LOCATION?.FILE ?? ''}`,
+      cuePoints: toArray(entry.CUE_V2).length,
     };
   }
 
