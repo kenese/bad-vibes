@@ -185,6 +185,23 @@ export type CategorizedComments = {
   other: string[];
 };
 
+// ============ Apply Style Tags Types ============
+
+export type PlaylistTagInfo = {
+  path: string;
+  name: string;
+};
+
+export type TagWithPlaylists = {
+  tag: string;
+  count: number;
+  playlists: PlaylistTagInfo[];
+};
+
+export type ExtractedTags = {
+  tags: TagWithPlaylists[];
+};
+
 const parser = new XMLParser({
   ignoreAttributes: false,
   attributeNamePrefix: '',
@@ -1044,6 +1061,211 @@ export class CollectionService {
     this.modified = false;
     
     this.invalidateTree();
+  }
+
+  // ============ Apply Style Tags Methods ============
+
+  async getPlaylistsWithTags(): Promise<ExtractedTags> {
+    await this.ensureLoaded();
+    this.ensureTree();
+    
+    // Helper to get all folder names in path to a playlist
+    const getPathNames = (path: string): string[] => {
+      const names: string[] = [];
+      let currentPath: string | null = path;
+      
+      while (currentPath) {
+        const ref = this.pathIndex.get(currentPath);
+        if (!ref) break;
+        
+        const name = ref.rawNode.NAME;
+        // Skip ROOT and add the name
+        if (name && name !== 'ROOT' && name !== '$ROOT') {
+          names.push(name);
+        }
+        currentPath = ref.parentPath;
+      }
+      
+      return names;
+    };
+    
+    // Collect all playlists with their names and path names
+    const playlists: PlaylistTagInfo[] = [];
+    this.pathIndex.forEach((ref, path) => {
+      if (ref.type === 'PLAYLIST') {
+        playlists.push({
+          path,
+          name: ref.rawNode.NAME ?? 'Untitled'
+        });
+      }
+    });
+
+    // Extract words from playlist AND folder names, count occurrences
+    const wordToPlaylists = new Map<string, PlaylistTagInfo[]>();
+    
+    // Common words to exclude
+    const stopWords = new Set([
+      'the', 'a', 'an', 'and', 'or', 'of', 'to', 'in', 'for', 'on', 'at', 'by',
+      'with', 'from', 'up', 'down', 'out', 'off', 'over', 'under', 'again',
+      'new', 'old', 'best', 'top', 'all', 'my', 'your', 'our', 'their', 'his', 'her',
+      'mix', 'set', 'dj', 'playlist', 'tracks', 'songs', 'music', 'vol', 'volume',
+      'pt', 'part', 'ep', 'lp', 'radio', 'show', 'session', 'sessions',
+      '01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '2024', '2023', '2022', '2021', '2020'
+    ]);
+
+    for (const playlist of playlists) {
+      // Get all names in the path (playlist + all parent folders)
+      const allNames = getPathNames(playlist.path);
+      
+      // Extract words from all names
+      const allWords = new Set<string>();
+      for (const name of allNames) {
+        const words = name
+          .toLowerCase()
+          .split(/[\s\-_/\\|,;:()[\]{}]+/)
+          .map(w => w.trim())
+          .filter(w => w.length >= 2 && !stopWords.has(w) && !/^\d+$/.test(w));
+        
+        words.forEach(w => allWords.add(w));
+      }
+
+      for (const word of allWords) {
+        const existing = wordToPlaylists.get(word) ?? [];
+        // Avoid duplicates for same playlist
+        if (!existing.some(p => p.path === playlist.path)) {
+          existing.push(playlist);
+          wordToPlaylists.set(word, existing);
+        }
+      }
+    }
+
+    // Build result: tags that appear in 2+ playlists, sorted by count desc
+    const tags: TagWithPlaylists[] = [];
+    wordToPlaylists.forEach((playlistList, word) => {
+      if (playlistList.length >= 2) {
+        tags.push({
+          tag: word,
+          count: playlistList.length,
+          playlists: playlistList
+        });
+      }
+    });
+
+    tags.sort((a, b) => b.count - a.count);
+
+    return { tags };
+  }
+
+  async writeStyleTagToTracks(playlistPaths: string[], tag: string): Promise<{ updatedCount: number }> {
+    await this.ensureLoaded();
+    
+    // Title case: capitalize first letter of each word
+    const toTitleCase = (str: string) => 
+      str.replace(/\b\w/g, char => char.toUpperCase());
+    
+    const formattedTag = toTitleCase(tag.startsWith('[') ? tag.slice(1, -1) : tag);
+    const bracketTag = `[${formattedTag}]`;
+    
+    // Collect all track keys from specified playlists
+    const trackKeys = new Set<string>();
+    
+    for (const path of playlistPaths) {
+      const ref = this.pathIndex.get(path);
+      if (!ref || ref.type !== 'PLAYLIST') continue;
+      
+      const playlist = (ref.rawNode as RawPlaylistNode).PLAYLIST;
+      const entries = toArray(playlist?.ENTRY);
+      
+      for (const entry of entries) {
+        const key = entry.PRIMARYKEY?.KEY;
+        if (key) trackKeys.add(key);
+      }
+    }
+
+    // Update tracks that don't already have this tag
+    let updatedCount = 0;
+    const tagLower = bracketTag.toLowerCase();
+
+    trackKeys.forEach(key => {
+      const entry = this.trackIndex.get(key);
+      if (!entry) return;
+
+      const currentComment = entry.INFO?.COMMENT ?? '';
+      
+      // Check if tag already exists in comment (case-insensitive)
+      if (currentComment.toLowerCase().includes(tagLower)) {
+        return; // Skip - already has this tag
+      }
+
+      // Add the tag
+      entry.INFO ??= {};
+      entry.INFO.COMMENT = currentComment 
+        ? `${currentComment} ${bracketTag}` 
+        : bracketTag;
+      
+      updatedCount++;
+    });
+
+    if (updatedCount > 0) {
+      this.modified = true;
+      await this.persist();
+    }
+
+    return { updatedCount };
+  }
+
+  async getTagCountPreview(playlistPaths: string[], tag: string): Promise<{
+    wouldUpdate: number;
+    alreadyHaveInSelection: number;
+    totalInCollection: number;
+  }> {
+    await this.ensureLoaded();
+    
+    const bracketTag = tag.startsWith('[') ? tag : `[${tag}]`;
+    const tagLower = bracketTag.toLowerCase();
+    
+    // Collect track keys from specified playlists
+    const trackKeysInSelection = new Set<string>();
+    
+    for (const path of playlistPaths) {
+      const ref = this.pathIndex.get(path);
+      if (!ref || ref.type !== 'PLAYLIST') continue;
+      
+      const playlist = (ref.rawNode as RawPlaylistNode).PLAYLIST;
+      const entries = toArray(playlist?.ENTRY);
+      
+      for (const entry of entries) {
+        const key = entry.PRIMARYKEY?.KEY;
+        if (key) trackKeysInSelection.add(key);
+      }
+    }
+
+    // Count tracks in selection that would be updated vs already have tag
+    let wouldUpdate = 0;
+    let alreadyHaveInSelection = 0;
+
+    trackKeysInSelection.forEach(key => {
+      const entry = this.trackIndex.get(key);
+      if (!entry) return;
+
+      const currentComment = entry.INFO?.COMMENT ?? '';
+      if (currentComment.toLowerCase().includes(tagLower)) {
+        alreadyHaveInSelection++;
+      } else {
+        wouldUpdate++;
+      }
+    });
+
+    // Count total tracks in collection with this tag
+    let totalInCollection = 0;
+    this.trackIndex.forEach(entry => {
+      const currentComment = entry.INFO?.COMMENT ?? '';
+      if (currentComment.toLowerCase().includes(tagLower)) {
+        totalInCollection++;
+      }
+    });
+
+    return { wouldUpdate, alreadyHaveInSelection, totalInCollection };
   }
 }
 

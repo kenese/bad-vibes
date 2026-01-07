@@ -16,6 +16,18 @@ interface TRPCContext {
 }
 
 const getServiceForUser = async (ctx: TRPCContext) => {
+  // For dev user, use memory path directly (no database record)
+  if (ctx.session.user.id === 'dev-user-001') {
+    const memoryPath = `memory:${ctx.session.user.id}`;
+    if (!collectionManager.hasMemoryInstance(ctx.session.user.id)) {
+      throw new TRPCError({
+        code: 'NOT_FOUND',
+        message: 'No collection uploaded. Please upload your collection.nml file.'
+      });
+    }
+    return collectionManager.getService(ctx.session.user.id, memoryPath);
+  }
+
   const user = await ctx.db.user.findUnique({
     where: { id: ctx.session.user.id },
     select: { collectionPath: true }
@@ -33,6 +45,11 @@ const getServiceForUser = async (ctx: TRPCContext) => {
 
 export const collectionRouter = createTRPCRouter({
   hasCollection: protectedProcedure.query(async ({ ctx }) => {
+    // For dev user, check memory instance directly (no database record)
+    if (ctx.session.user.id === 'dev-user-001') {
+      return collectionManager.hasMemoryInstance(ctx.session.user.id);
+    }
+
     const user = await ctx.db.user.findUnique({
       where: { id: ctx.session.user.id },
       select: { collectionPath: true }
@@ -88,10 +105,15 @@ export const collectionRouter = createTRPCRouter({
     .input(z.object({ url: z.string() })) // Not enforcing .url() for memory: paths
     .mutation(async ({ ctx, input }) => {
       console.log(`[CollectionRouter] Registering collection for user ${ctx.session.user.id} at url: ${input.url}`);
-      await ctx.db.user.update({
-        where: { id: ctx.session.user.id },
-        data: { collectionPath: input.url }
-      });
+      
+      // Skip database update for mock dev user (doesn't exist in DB)
+      if (ctx.session.user.id !== 'dev-user-001') {
+        await ctx.db.user.update({
+          where: { id: ctx.session.user.id },
+          data: { collectionPath: input.url }
+        });
+      }
+      
       // Only invalidate for non-memory paths (memory paths are pre-loaded by upload route)
       if (!input.url.startsWith('memory:')) {
         collectionManager.invalidate(ctx.session.user.id);
@@ -279,5 +301,35 @@ export const collectionRouter = createTRPCRouter({
     .mutation(async ({ ctx, input }) => {
       const service = await getServiceForUser(ctx);
       return service.updateCommentsBatch(input.oldComments, input.newComment);
+    }),
+
+  // Apply Style Tags endpoints
+  playlistTags: protectedProcedure.query(async ({ ctx }) => {
+    const service = await getServiceForUser(ctx);
+    return service.getPlaylistsWithTags();
+  }),
+
+  writeStyleTag: protectedProcedure
+    .input(
+      z.object({
+        playlistPaths: z.array(z.string()),
+        tag: z.string().min(1),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      const service = await getServiceForUser(ctx);
+      return service.writeStyleTagToTracks(input.playlistPaths, input.tag);
+    }),
+
+  tagCountPreview: protectedProcedure
+    .input(
+      z.object({
+        playlistPaths: z.array(z.string()),
+        tag: z.string().min(1),
+      })
+    )
+    .query(async ({ ctx, input }) => {
+      const service = await getServiceForUser(ctx);
+      return service.getTagCountPreview(input.playlistPaths, input.tag);
     }),
 });

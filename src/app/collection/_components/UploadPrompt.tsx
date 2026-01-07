@@ -50,7 +50,12 @@ const UploadPrompt = ({ onUploadSuccess }: { onUploadSuccess: () => void }) => {
 
   const handleUpload = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!file || !session?.user?.id) return;
+    
+    // In dev mode, use a mock user ID if no session
+    const isDev = process.env.NODE_ENV === 'development';
+    const userId = session?.user?.id ?? (isDev ? 'dev-user-001' : null);
+    
+    if (!file || !userId) return;
 
     setIsUploading(true);
     setError(null);
@@ -59,7 +64,7 @@ const UploadPrompt = ({ onUploadSuccess }: { onUploadSuccess: () => void }) => {
       let collectionUrl: string;
 
       if (useCloud) {
-        const newBlob = await upload(`collections/${session.user.id}/collection.nml`, file, {
+        const newBlob = await upload(`collections/${userId}/collection.nml`, file, {
           access: 'public',
           handleUploadUrl: '/api/collection/upload/vercel-blob',
         });

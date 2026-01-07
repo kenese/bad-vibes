@@ -6,10 +6,14 @@ const { auth } = NextAuth(authConfig);
 export default auth((req) => {
   const isAuth = !!req.auth;
   const isHomePage = req.nextUrl.pathname === "/";
-  // const isApi = req.nextUrl.pathname.startsWith("/api");
+  const isDev = process.env.NODE_ENV === "development";
 
-  // If not authenticated and not on home page, and not attempting to log in via API
-  // Redirect to home page (which is the login page)
+  // In development mode, skip auth checks entirely
+  if (isDev) {
+    return;
+  }
+
+  // If not authenticated and not on home page, redirect to home (login page)
   if (!isAuth && !isHomePage) {
     return Response.redirect(new URL("/", req.nextUrl));
   }

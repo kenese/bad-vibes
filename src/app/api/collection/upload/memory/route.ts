@@ -8,7 +8,12 @@ const MAX_SIZE = 50 * 1024 * 1024;
 
 export async function POST(request: Request): Promise<NextResponse> {
   const session = await auth();
-  if (!session?.user?.id) {
+  
+  // In dev mode, use mock user ID if no session
+  const isDev = process.env.NODE_ENV === 'development';
+  const userId = session?.user?.id ?? (isDev ? 'dev-user-001' : null);
+  
+  if (!userId) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
@@ -24,19 +29,21 @@ export async function POST(request: Request): Promise<NextResponse> {
       return NextResponse.json({ error: 'File too large (max 50MB)' }, { status: 400 });
     }
 
-    console.log(`[MemoryUpload] Receiving ${file.size} bytes for user ${session.user.id}`);
+    console.log(`[MemoryUpload] Receiving ${file.size} bytes for user ${userId}`);
     const xmlContent = await file.text();
 
-    const memoryPath = `memory:${session.user.id}`;
+    const memoryPath = `memory:${userId}`;
 
-    // Update database to point to memory
-    await db.user.update({
-      where: { id: session.user.id },
-      data: { collectionPath: memoryPath }
-    });
+    // Update database to point to memory (skip in dev mode with mock user)
+    if (session?.user?.id) {
+      await db.user.update({
+        where: { id: userId },
+        data: { collectionPath: memoryPath }
+      });
+    }
 
     // Load into manager
-    await collectionManager.setFromMemory(session.user.id, xmlContent);
+    await collectionManager.setFromMemory(userId, xmlContent);
 
     return NextResponse.json({ 
       success: true,

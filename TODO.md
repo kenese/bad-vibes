@@ -1,29 +1,19 @@
 # High Level Tasks
 
-Do Next
+Priorities:
 
-- Tidy up traktor collection
-  - Properly tag files
-  - Remove orphans and look for any files only in bulk ALL type playlists
-  - Upgrade traktor
-  - Move all folders
-- Add plex integration to compare discogs to vinyl collection
-- Add create youtube playlist from playlist
-- Add all new vinyl to discogs collection
+1. All vinyl in traktor for easy vinyl djing
 
-- Add better Traktor collection search and filtering to app for when djing
-  Key, BPM, Title, Artist, Release searches
+- Add all vinyl to discogs
+- Tag all vinyl in traktor
+- Find any vinyl in traktor that is not in discogs
+- Find any vinyl in discogs that is not in traktor
+- DL any vinyl missing from traktor
+- Find and DL any vinyl missing from plex
 
-Today
+2. Update Collection Management to work on phone,
 
-- Confirm editing traktor collection works
-
-- DONE Add create playlist from discogs collection
-- WORKAROUND Add create playlist from shazam
-  DEFER - I dont seem to be able to find my tracks in shazam web. I have emailed for my data, lets see
-  DONE - Pragmatic answer - connect shazam to spotify, it syncs to a playlist. Gets me the tracks to now, but not once my spotify trial ends
-
-- DONE Add Google auth provider
+3. Tag all Traktor files with style and key
 
 SOURCE OF TRUTH FOR ALL VINYL - DISCOGS -> PLEX
 Process for keeping Vinyl up to date:
@@ -41,6 +31,34 @@ Noz process
 - Add all tracks to monthly playlists via shazam
 - Download all tracks in monthly playlist and add to PLex as compliations
   Could add details of any missing files to compilation meta data?
+
+Do Next
+
+- Tidy up traktor collection
+  - Properly tag files
+    - Tags from playlist name
+  - Remove orphans and look for any files only in bulk ALL type playlists
+    - Bulk removed, orphans seem to legitimately be gone
+  - Upgrade traktor
+    - Done and also symlinked to SSD location from default location
+  - ## Move all folders
+- Add plex integration to compare discogs to vinyl collection
+- Add create youtube playlist from playlist
+- Add all new vinyl to discogs collection
+
+- Add better Traktor collection search and filtering to app for when djing
+  Key, BPM, Title, Artist, Release searches
+
+Today
+
+- DONE Confirm editing traktor collection works
+
+- DONE Add create playlist from discogs collection
+- WORKAROUND Add create playlist from shazam
+  DEFER - I dont seem to be able to find my tracks in shazam web. I have emailed for my data, lets see
+  DONE - Pragmatic answer - connect shazam to spotify, it syncs to a playlist. Gets me the tracks to now, but not once my spotify trial ends
+
+- DONE Add Google auth provider
 
 - [x] **Add other auth providers** (google at least)
 

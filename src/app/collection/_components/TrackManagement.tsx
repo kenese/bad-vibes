@@ -1,9 +1,26 @@
 'use client';
 
-import { useState, useMemo, useCallback, useRef, useEffect } from 'react';
+import { useState, useMemo, useCallback, useRef } from 'react';
 import { api } from '~/trpc/react';
 import type { FullTrackRow } from '~/server/services/collectionService';
 import ManageCommentsModal from './ManageCommentsModal';
+import ApplyStyleTags from './ApplyStyleTags';
+import FindDuplicates from './FindDuplicates';
+
+// Format rating for display - Traktor uses "IS ON A PLAYLIST" for tracks in playlists
+const formatRating = (value: string | number | undefined): string => {
+  if (!value) return '';
+  const str = String(value);
+  if (str === 'IS ON A PLAYLIST') return '★';
+  // Could be a numeric rating (0-255 scale in Traktor)
+  const num = parseInt(str, 10);
+  if (!isNaN(num) && num > 0) {
+    // Convert 0-255 to 0-5 stars
+    const stars = Math.round((num / 255) * 5);
+    return '★'.repeat(stars) + '☆'.repeat(5 - stars);
+  }
+  return str;
+};
 
 const COLUMN_DEFS = [
   { key: 'title' as const, label: 'Title', width: 200, editable: true },
@@ -52,6 +69,8 @@ export default function TrackManagement() {
   const [editValue, setEditValue] = useState('');
   const [pendingChanges, setPendingChanges] = useState<PendingChanges>(new Map());
   const [showManageComments, setShowManageComments] = useState(false);
+  const [showApplyStyleTags, setShowApplyStyleTags] = useState(false);
+  const [showFindDuplicates, setShowFindDuplicates] = useState(false);
   const [resizingColumn, setResizingColumn] = useState<string | null>(null);
   const [dragColumn, setDragColumn] = useState<string | null>(null);
 
@@ -182,6 +201,18 @@ export default function TrackManagement() {
           >
             Manage Comments
           </button>
+          <button
+            className="utility-button"
+            onClick={() => setShowApplyStyleTags(true)}
+          >
+            Apply Style Tags
+          </button>
+          <button
+            className="utility-button"
+            onClick={() => setShowFindDuplicates(true)}
+          >
+            Find Duplicates
+          </button>
         </div>
         
         {pendingChanges.size > 0 && (
@@ -300,7 +331,7 @@ export default function TrackManagement() {
                         />
                       ) : (
                         <span className="cell-text" title={value?.toString()}>
-                          {value?.toString() ?? ''}
+                          {col.key === 'rating' ? formatRating(value) : (value?.toString() ?? '')}
                         </span>
                       )}
                     </div>
@@ -315,6 +346,16 @@ export default function TrackManagement() {
       {/* Manage Comments Modal */}
       {showManageComments && (
         <ManageCommentsModal onClose={() => setShowManageComments(false)} />
+      )}
+
+      {/* Apply Style Tags Modal */}
+      {showApplyStyleTags && (
+        <ApplyStyleTags onClose={() => setShowApplyStyleTags(false)} />
+      )}
+
+      {/* Find Duplicates Modal */}
+      {showFindDuplicates && (
+        <FindDuplicates onClose={() => setShowFindDuplicates(false)} />
       )}
     </div>
   );

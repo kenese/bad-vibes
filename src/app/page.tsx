@@ -4,6 +4,10 @@ import { HydrateClient } from "~/trpc/server";
 
 export default async function Home() {
   const session = await auth();
+  const isDev = process.env.NODE_ENV === "development";
+  
+  // In dev mode, show UI as if authenticated
+  const showAuthenticatedUI = !!session || isDev;
 
   return (
     <HydrateClient>
@@ -23,16 +27,19 @@ export default async function Home() {
             <div className="flex flex-col items-center justify-center gap-4">
               <p className="text-center text-lg text-[#c9d1d9]">
                 {session && <span>Logged in as <span className="text-[#58a6ff]">{session.user?.name}</span></span>}
+                {isDev && !session && <span className="text-[#f0883e]">[DEV MODE] Running without auth</span>}
               </p>
-              <Link
-                href={session ? "/api/auth/signout" : "/api/auth/signin"}
-                className="rounded-full bg-[#21262d] border border-[#30363d] px-10 py-3 font-semibold text-[#c9d1d9] no-underline transition hover:bg-[#30363d] hover:border-[#8b949e]"
-              >
-                {session ? "Sign out" : "Sign in"}
-              </Link>
+              {!isDev && (
+                <Link
+                  href={session ? "/api/auth/signout" : "/api/auth/signin"}
+                  className="rounded-full bg-[#21262d] border border-[#30363d] px-10 py-3 font-semibold text-[#c9d1d9] no-underline transition hover:bg-[#30363d] hover:border-[#8b949e]"
+                >
+                  {session ? "Sign out" : "Sign in"}
+                </Link>
+              )}
             </div>
 
-            {session && (
+            {showAuthenticatedUI && (
               <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:gap-8 max-w-4xl">
                 <Link
                   className="flex max-w-xs flex-col gap-4 rounded-2xl bg-[#161b22] border border-[#30363d] p-6 hover:bg-[#1c2128] hover:border-[#388bfd] transition-all"

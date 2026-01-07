@@ -116,11 +116,31 @@ export const publicProcedure = t.procedure.use(timingMiddleware);
  * If you want a query or mutation to ONLY be accessible to logged in users, use this. It verifies
  * the session is valid and guarantees `ctx.session.user` is not null.
  *
+ * In development mode, if no session exists, a mock DEVELOPER user is created to allow
+ * testing without authentication.
+ *
  * @see https://trpc.io/docs/procedures
  */
 export const protectedProcedure = t.procedure
   .use(timingMiddleware)
   .use(({ ctx, next }) => {
+    // In development mode, create a mock session if none exists
+    if (!ctx.session?.user && process.env.NODE_ENV === 'development') {
+      console.log('[DEV MODE] Using mock DEVELOPER user - no auth required');
+      return next({
+        ctx: {
+          session: {
+            user: {
+              id: 'dev-user-001',
+              name: 'DEVELOPER',
+              email: 'dev@localhost',
+            },
+            expires: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
+          },
+        },
+      });
+    }
+
     if (!ctx.session?.user) {
       throw new TRPCError({ code: "UNAUTHORIZED" });
     }
