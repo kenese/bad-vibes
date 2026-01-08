@@ -56,7 +56,9 @@ function TagConfigRow({
   isApplying: boolean;
 }) {
   const selectedPaths = useMemo(() => Array.from(tag.selectedPlaylists), [tag.selectedPlaylists]);
-  const counts = useTagCounts(tag.tagToWrite, selectedPaths, tag.status === 'pending');
+  // Use original source tag (tag.tag) for counting, not the tagToWrite
+  // This ensures count reflects source genre matches, not destination tag
+  const counts = useTagCounts(tag.tag, selectedPaths, tag.status === 'pending');
   
   const displayCount = isExpanded ? tag.playlists.length : 3;
   const hasMore = tag.playlists.length > 3;
