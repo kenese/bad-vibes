@@ -143,6 +143,12 @@ export default function TrackManagement() {
           return selectedStyles.some(style => trackStyles.includes(style));
         }
 
+        // Vinyl filter: no input needed, just checks for [Vinyl] in comment
+        if (filter.column === 'vinyl') {
+          const comment = track.comment ?? '';
+          return comment.includes('[Vinyl]');
+        }
+
         if (!filter.value) return true;
         
         const term = filter.value.toLowerCase();
@@ -373,10 +379,15 @@ export default function TrackManagement() {
               className="search-select"
             >
               <option value="all">All</option>
-              {COLUMN_DEFS.map(col => (
+              {COLUMN_DEFS.filter(col => col.key !== 'comment').map(col => (
                 <Fragment key={col.key}>
                   <option value={col.key}>{col.label}</option>
-                  {col.key === 'musicalKey' && <option value="style">Style</option>}
+                  {col.key === 'musicalKey' && (
+                    <>
+                      <option value="style">Style</option>
+                      <option value="vinyl">Vinyl</option>
+                    </>
+                  )}
                 </Fragment>
               ))}
             </select>
@@ -451,6 +462,8 @@ export default function TrackManagement() {
                   </div>
                 </details>
               </div>
+            ) : filter.column === 'vinyl' ? (
+              <span className="vinyl-filter-label">Vinyl Only</span>
             ) : (
               <input
                 type="text"

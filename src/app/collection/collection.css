@@ -1949,3 +1949,11 @@
   max-height: 200px;
   overflow-y: auto;
 }
+
+/* Vinyl Filter Label */
+.vinyl-filter-label {
+  padding: 0.35rem 0.5rem;
+  color: rgba(240, 246, 252, 0.7);
+  font-size: 0.85rem;
+  font-style: italic;
+}
