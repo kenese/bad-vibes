@@ -44,7 +44,6 @@ type EditingCell = { trackKey: string; column: ColumnKey } | null;
 type PendingChanges = Map<string, Partial<FullTrackRow>>;
 
 const ROW_HEIGHT = 32;
-const CONTAINER_HEIGHT = 600;
 const OVERSCAN = 10;
 
 export default function TrackManagement() {
@@ -104,6 +103,16 @@ export default function TrackManagement() {
           });
         }
         
+        // Special handling for BPM: +/- 4 range
+        if (filter.column === 'bpm') {
+          const searchVal = parseFloat(filter.value);
+          if (!isNaN(searchVal)) {
+            const trackVal = Number(track.bpm);
+            return !isNaN(trackVal) && Math.abs(trackVal - searchVal) <= 4;
+          }
+          return true; // Ignore filter if not a number
+        }
+
         const val = track[filter.column as ColumnKey];
         return val && String(val).toLowerCase().includes(term);
       });
