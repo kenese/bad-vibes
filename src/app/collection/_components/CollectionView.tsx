@@ -39,6 +39,7 @@ const CollectionView = ({ initialActivePath }: { initialActivePath?: string }) =
   const [isResizing, setIsResizing] = useState(false);
   const [showUtilities, setShowUtilities] = useState(false);
   const [activeTab, setActiveTab] = useState<TabType>('playlist');
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
 
   const handleMouseMove = useCallback((event: MouseEvent) => {
     setSidebarWidth(() => {
@@ -104,18 +105,21 @@ const CollectionView = ({ initialActivePath }: { initialActivePath?: string }) =
       setActivePath(null);
     }
   });
+  const movePlaylists = movePlaylistBatch; // alias for consistency
   const createOrphans = api.collection.createOrphansPlaylist.useMutation({
     onSuccess: () => void utils.collection.sidebar.invalidate()
   });
   const duplicatePlaylist = api.collection.duplicatePlaylist.useMutation({
     onSuccess: () => void utils.collection.sidebar.invalidate()
   });
+  const duplicatePlaylists = duplicatePlaylist; // alias
   const deleteNodes = api.collection.deleteNodes.useMutation({
     onSuccess: () => {
       void utils.collection.sidebar.invalidate();
       setSelectedPaths([]);
     }
   });
+  const deletePlaylists = deleteNodes; // alias
 
   const deleteCollection = api.collection.deleteCollection.useMutation({
     onSuccess: () => {
@@ -162,62 +166,41 @@ const CollectionView = ({ initialActivePath }: { initialActivePath?: string }) =
       ? activeNode.path
       : activeNode?.parentPath ?? DEFAULT_FOLDER_PATH;
 
-  const handleCreateFolder = (evt: React.FormEvent) => {
-    evt.preventDefault();
-    if (!folderName.trim()) return;
-    createFolder.mutate({
-      parentPath: selectedFolderPath ?? DEFAULT_FOLDER_PATH,
-      name: folderName.trim()
-    });
-    setFolderName('');
-  };
-
-  const handleCreatePlaylist = (evt: React.FormEvent) => {
-    evt.preventDefault();
-    if (!playlistName.trim()) return;
-    createPlaylist.mutate({
-      folderPath: selectedFolderPath ?? DEFAULT_FOLDER_PATH,
-      name: playlistName.trim()
-    });
-    setPlaylistName('');
-  };
-
-  const handleMovePlaylists = async (evt: React.FormEvent) => {
-    evt.preventDefault();
+  const handleDeleteSelected = async () => {
     if (!selectedPaths.length) return;
-    // Use batch move to process all moves in a single request
+    if (!confirm(`Are you sure you want to delete ${selectedPaths.length} items?`)) return;
+    await deleteNodes.mutateAsync({ paths: selectedPaths });
+  };
+
+  const handleDuplicateSelected = () => {
+    if (!selectedPaths.length) return;
+    // Duplicate each selected playlist
+    selectedPaths.forEach(path => {
+      duplicatePlaylist.mutate({
+        sourcePath: path,
+        targetFolderPath: selectedFolderPath ?? DEFAULT_FOLDER_PATH,
+        name: duplicateName.trim() || undefined
+      });
+    });
+    setDuplicateName('');
+  };
+
+  const handleMoveSelected = async () => {
+    if (!selectedPaths.length) return;
     const moves = selectedPaths.map(sourcePath => ({
       sourcePath,
       targetFolderPath: moveTargetPath
     }));
     try {
-      const result = await movePlaylistBatch.mutateAsync({ moves });
-      console.log(`Moved ${result.movedCount} of ${moves.length} playlists`);
+      await movePlaylistBatch.mutateAsync({ moves });
     } catch (err) {
-      console.error('Batch move failed:', err);
+      console.error('Move failed:', err);
     }
     setSelectedPaths([]);
   };
 
-  const handleCreateOrphans = () => {
-    createOrphans.mutate({
-      targetFolderPath: selectedFolderPath ?? DEFAULT_FOLDER_PATH
-    });
-  };
-
-  const handleDuplicatePlaylist = () => {
-    if (activeNode?.type !== 'PLAYLIST') return;
-    duplicatePlaylist.mutate({
-      sourcePath: activeNode.path,
-      targetFolderPath: selectedFolderPath ?? DEFAULT_FOLDER_PATH,
-      name: duplicateName.trim() || undefined
-    });
-    setDuplicateName('');
-  };
-  const handleDeleteSelected = async () => {
-    if (!selectedPaths.length) return;
-    if (!confirm(`Are you sure you want to delete ${selectedPaths.length} items?`)) return;
-    await deleteNodes.mutateAsync({ paths: selectedPaths });
+  const clearSelection = () => {
+    setSelectedPaths([]);
   };
 
   const toggleSelection = (path: string) => {
@@ -225,8 +208,6 @@ const CollectionView = ({ initialActivePath }: { initialActivePath?: string }) =
       prev.includes(path) ? prev.filter((p) => p !== path) : [...prev, path]
     );
   };
-
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   // Calculate loading state based on relevant queries only
   const isLoading = 
@@ -242,100 +223,111 @@ const CollectionView = ({ initialActivePath }: { initialActivePath?: string }) =
   }
 
   return (
-    <div
-      className={`app-shell ${isResizing ? 'resizing' : ''}`}
-      style={{ '--sidebar-width': `${sidebarWidth}px` } as React.CSSProperties}
-    >
-      <aside className={`sidebar-panel ${isSidebarOpen ? 'open' : ''}`}>
-        <header>
-          <div className="flex-stack">
-            <div className="flex items-center gap-3">
-              <button 
-                className="mobile-menu-toggle"
-                onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-                aria-label="Toggle Menu"
-              >
-                ☰
-              </button>
-              <h1 
-                onClick={() => setActivePath('root')} 
-                style={{ cursor: 'pointer' }}
-                title="Go to Root"
-              >
-                Traktor Collection
-              </h1>
-            </div>
-            <div className="flex items-center gap-2">
-              {isLoading && (
-                <div 
-                  className="animate-spin h-5 w-5 border-2 border-[#8b949e] border-t-[#f0f6fc] rounded-full mr-2" 
-                  title="Loading..."
-                />
-              )}
-              <a 
-                href="/api/collection/download" 
-                className="download-link"
-                title="Download collection.nml"
-              >
-                ↓
-              </a>
-              <button
-                onClick={handleDeleteCollection}
-                disabled={deleteCollection.isPending}
-                className="text-[#f85149] hover:bg-[#30363d] p-2 rounded transition-colors"
-                title="Delete Collection"
-              >
-                🗑️
-              </button>
-            </div>
-          </div>
-          <p className="meta">
-            {sidebarQuery.isLoading
-              ? 'Loading...'
-              : `${sidebarQuery.data?.stats.playlistCount ?? 0} playlists · ${
-                  sidebarQuery.data?.stats.trackCount ?? 0
-                } tracks`}
-          </p>
-        </header>
-        <div className={`sidebar-content ${isSidebarOpen ? 'visible' : ''}`}>
-          <Sidebar
-            tree={sidebarQuery.data?.tree ?? null}
-            activePath={activePath}
-            selectedPaths={selectedPaths}
-            onActiveChange={(path) => {
-              setActivePath(path);
-              setIsSidebarOpen(false); // Close on selection (mobile)
-            }}
-            onToggleSelection={toggleSelection}
-          />
-        </div>
-      </aside>
-      <div
-        className="sidebar-resizer"
-        onMouseDown={() => setIsResizing(true)}
-        role="separator"
-        aria-orientation="vertical"
-        aria-label="Resize sidebar"
-      />
-      <section className="main-panel">
-        {/* Tab Navigation */}
-        <div className="tab-navigation">
-          <button
-            className={`tab-button ${activeTab === 'playlist' ? 'active' : ''}`}
-            onClick={() => setActiveTab('playlist')}
-          >
-            Playlist Management
-          </button>
-          <button
-            className={`tab-button ${activeTab === 'tracks' ? 'active' : ''}`}
-            onClick={() => setActiveTab('tracks')}
-          >
-            Track Management
-          </button>
-        </div>
+    <div className="collection-page">
+      {/* Tab Navigation - Top Level */}
+      <div className="tab-navigation">
+        <button
+          className={`tab-button ${activeTab === 'playlist' ? 'active' : ''}`}
+          onClick={() => setActiveTab('playlist')}
+        >
+          Playlist Management
+        </button>
+        <button
+          className={`tab-button ${activeTab === 'tracks' ? 'active' : ''}`}
+          onClick={() => setActiveTab('tracks')}
+        >
+          Track Management
+        </button>
+      </div>
 
-        {activeTab === 'playlist' ? (
-          <>
+      {activeTab === 'playlist' ? (
+        /* Playlist Management - includes sidebar */
+        <div
+          className={`app-shell ${isResizing ? 'resizing' : ''}`}
+          style={{ '--sidebar-width': `${isSidebarOpen ? sidebarWidth : 48}px` } as React.CSSProperties}
+        >
+          <aside className={`sidebar-panel ${isSidebarOpen ? 'open' : 'collapsed'}`}>
+            <header>
+              <div className="flex-stack">
+                <div className="flex items-center gap-3">
+                  <button 
+                    className="sidebar-toggle-btn"
+                    onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+                    aria-label="Toggle Sidebar"
+                    title={isSidebarOpen ? 'Collapse Sidebar' : 'Expand Sidebar'}
+                  >
+                    {isSidebarOpen ? '◀' : '▶'}
+                  </button>
+                  {isSidebarOpen && (
+                    <h1 
+                      onClick={() => setActivePath('root')} 
+                      style={{ cursor: 'pointer' }}
+                      title="Go to Root"
+                    >
+                      Traktor Collection
+                    </h1>
+                  )}
+                </div>
+                {isSidebarOpen && (
+                  <div className="flex items-center gap-2">
+                    {isLoading && (
+                      <div 
+                        className="animate-spin h-5 w-5 border-2 border-[#8b949e] border-t-[#f0f6fc] rounded-full mr-2" 
+                        title="Loading..."
+                      />
+                    )}
+                    <a 
+                      href="/api/collection/download" 
+                      className="download-link"
+                      title="Download collection.nml"
+                    >
+                      ↓
+                    </a>
+                    <button
+                      onClick={handleDeleteCollection}
+                      disabled={deleteCollection.isPending}
+                      className="text-[#f85149] hover:bg-[#30363d] p-2 rounded transition-colors"
+                      title="Delete Collection"
+                    >
+                      🗑️
+                    </button>
+                  </div>
+                )}
+              </div>
+              {isSidebarOpen && (
+                <p className="meta">
+                  {sidebarQuery.isLoading
+                    ? 'Loading...'
+                    : `${sidebarQuery.data?.stats.playlistCount ?? 0} playlists · ${
+                        sidebarQuery.data?.stats.trackCount ?? 0
+                      } tracks`}
+                </p>
+              )}
+            </header>
+            {isSidebarOpen && (
+              <div className="sidebar-content visible">
+                <Sidebar
+                  tree={sidebarQuery.data?.tree ?? null}
+                  activePath={activePath}
+                  selectedPaths={selectedPaths}
+                  onActiveChange={(path) => {
+                    setActivePath(path);
+                  }}
+                  onToggleSelection={toggleSelection}
+                />
+              </div>
+            )}
+          </aside>
+          {isSidebarOpen && (
+            <div
+              className="sidebar-resizer"
+              onMouseDown={() => setIsResizing(true)}
+              role="separator"
+              aria-orientation="vertical"
+              aria-label="Resize sidebar"
+            />
+          )}
+          <section className="main-panel">
             <div className="utilities-container">
               <button
                 className="utilities-toggle"
@@ -348,85 +340,100 @@ const CollectionView = ({ initialActivePath }: { initialActivePath?: string }) =
 
               {showUtilities && (
                 <div className="actions">
-                  <form onSubmit={handleCreateFolder}>
-                    <label>Create folder under current selection</label>
-                    <div className="row">
-                      <input
-                        value={folderName}
-                        onChange={(e) => setFolderName(e.target.value)}
-                        placeholder="Folder name"
-                      />
-                      <button type="submit" disabled={createFolder.isPending}>
-                        {createFolder.isPending ? 'Creating…' : 'Create'}
-                      </button>
-                    </div>
-                  </form>
-
-                  <form onSubmit={handleCreatePlaylist}>
-                    <label>Create empty playlist in current folder</label>
-                    <div className="row">
-                      <input
-                        value={playlistName}
-                        onChange={(e) => setPlaylistName(e.target.value)}
-                        placeholder="Playlist name"
-                      />
-                      <button type="submit" disabled={createPlaylist.isPending}>
-                        {createPlaylist.isPending ? 'Creating…' : 'Create'}
-                      </button>
-                    </div>
-                  </form>
-
-                  <form onSubmit={handleMovePlaylists}>
-                    <label>
-                      Move selected playlists
-                      {selectedPaths.length > 0 && ` (${selectedPaths.length})`}
-                    </label>
-                    <div className="row">
-                      <select
-                        value={moveTargetPath}
-                        onChange={(e) => setMoveTargetPath(e.target.value)}
+                  {/* Selected Items Actions */}
+                  {selectedPaths.length > 0 && (
+                    <div className="action-group">
+                      <span className="action-label">{selectedPaths.length} selected</span>
+                      <button
+                        className="sidebar-action-button delete-button"
+                        onClick={handleDeleteSelected}
+                        disabled={deletePlaylists.isPending}
                       >
-                        {folderOptions.map((folder) => (
-                          <option key={folder.path} value={folder.path}>
-                            {folder.label}
-                          </option>
-                        ))}
-                      </select>
-                      <button type="submit" disabled={!selectedPaths.length || movePlaylistBatch.isPending}>
-                        {movePlaylistBatch.isPending ? 'Moving…' : 'Move'}
+                        🗑️ Delete
                       </button>
-                    </div>
-                  </form>
-
-                  <div className="row stack">
-                    <button onClick={handleCreateOrphans} disabled={createOrphans.isPending}>
-                      {createOrphans.isPending ? 'Working…' : 'Create Orphans Playlist'}
-                    </button>
-                    <div className="duplicate">
+                      <button
+                        className="sidebar-action-button"
+                        onClick={handleDuplicateSelected}
+                        disabled={duplicatePlaylists.isPending}
+                      >
+                        📋 Duplicate
+                      </button>
                       <input
                         value={duplicateName}
                         onChange={(e) => setDuplicateName(e.target.value)}
-                        placeholder="Duplicate name (optional)"
+                        placeholder="New name (optional)"
+                        className="action-input"
                       />
+                      <div className="move-container">
+                        <select
+                          className="folder-select"
+                          value={moveTargetPath}
+                          onChange={(e) => setMoveTargetPath(e.target.value)}
+                        >
+                          {folderOptions.map((opt) => (
+                            <option key={opt.path} value={opt.path}>
+                              {opt.label}
+                            </option>
+                          ))}
+                        </select>
+                        <button
+                          className="sidebar-action-button"
+                          onClick={handleMoveSelected}
+                          disabled={movePlaylists.isPending}
+                        >
+                          📁 Move
+                        </button>
+                      </div>
                       <button
-                        onClick={handleDuplicatePlaylist}
-                        disabled={activeNode?.type !== 'PLAYLIST' || duplicatePlaylist.isPending}
+                        className="sidebar-action-button"
+                        onClick={clearSelection}
                       >
-                        {duplicatePlaylist.isPending ? 'Working…' : 'Duplicate Playlist'}
+                        ✕ Clear
                       </button>
                     </div>
-                  </div>
-                  <div className="row stack">
-                    <label>Dangerous Actions</label>
-                    <button
-                      className="delete-button"
-                      onClick={handleDeleteSelected}
-                      disabled={!selectedPaths.length || deleteNodes.isPending}
-                    >
-                      {deleteNodes.isPending
-                        ? 'Deleting…'
-                        : `Delete Selected (${selectedPaths.length})`}
-                    </button>
+                  )}
+
+                  {/* Create New */}
+                  <div className="action-group">
+                    <span className="action-label">Create New</span>
+                    <div className="create-row">
+                      <input
+                        value={folderName}
+                        onChange={(e) => setFolderName(e.target.value)}
+                        placeholder="New folder name"
+                        className="action-input"
+                      />
+                      <button
+                        className="sidebar-action-button"
+                        onClick={() => {
+                          if (!folderName) return;
+                          createFolder.mutate({ name: folderName, parentPath: activePath ?? DEFAULT_FOLDER_PATH });
+                          setFolderName('');
+                        }}
+                        disabled={createFolder.isPending}
+                      >
+                        📂 New Folder
+                      </button>
+                    </div>
+                    <div className="create-row">
+                      <input
+                        value={playlistName}
+                        onChange={(e) => setPlaylistName(e.target.value)}
+                        placeholder="New playlist name"
+                        className="action-input"
+                      />
+                      <button
+                        className="sidebar-action-button"
+                        onClick={() => {
+                          if (!playlistName) return;
+                          createPlaylist.mutate({ name: playlistName, folderPath: activePath ?? DEFAULT_FOLDER_PATH });
+                          setPlaylistName('');
+                        }}
+                        disabled={createPlaylist.isPending}
+                      >
+                        📝 New Playlist
+                      </button>
+                    </div>
                   </div>
                 </div>
               )}
@@ -439,11 +446,14 @@ const CollectionView = ({ initialActivePath }: { initialActivePath?: string }) =
                 tracks={playlistQuery.data?.tracks ?? []}
               />)}
             </div>
-          </>
-        ) : (
+          </section>
+        </div>
+      ) : (
+        /* Track Management - no sidebar, full width */
+        <div className="track-management-page">
           <TrackManagement />
-        )}
-      </section>
+        </div>
+      )}
     </div>
   );
 };

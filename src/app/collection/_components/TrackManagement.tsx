@@ -34,9 +34,7 @@ const COLUMN_DEFS = [
   { key: 'label' as const, label: 'Label', width: 120, editable: true },
   { key: 'playcount' as const, label: 'Plays', width: 60, editable: false },
   { key: 'playtime' as const, label: 'Duration', width: 80, editable: false },
-  { key: 'importDate' as const, label: 'Imported', width: 100, editable: false },
-  { key: 'lastPlayed' as const, label: 'Last Played', width: 100, editable: false },
-  { key: 'filepath' as const, label: 'File Path', width: 300, editable: false },
+  { key: 'filepath' as const, label: 'Path', width: 300, editable: false },
 ];
 
 type ColumnKey = (typeof COLUMN_DEFS)[number]['key'];
@@ -57,6 +55,7 @@ export default function TrackManagement() {
   });
 
   const containerRef = useRef<HTMLDivElement>(null);
+  const headerRef = useRef<HTMLDivElement>(null);
   const [scrollTop, setScrollTop] = useState(0);
   const [columnWidths, setColumnWidths] = useState<Record<string, number>>(() =>
     Object.fromEntries(COLUMN_DEFS.map((c) => [c.key, c.width]))
@@ -72,6 +71,7 @@ export default function TrackManagement() {
   const [showFindDuplicates, setShowFindDuplicates] = useState(false);
   const [resizingColumn, setResizingColumn] = useState<string | null>(null);
   const [dragColumn, setDragColumn] = useState<string | null>(null);
+  const [isUtilitiesExpanded, setIsUtilitiesExpanded] = useState(false);
 
   // Merge pending changes with original data
   const [sort, setSort] = useState<{ key: ColumnKey; direction: 'asc' | 'desc' } | null>(null);
@@ -207,6 +207,9 @@ export default function TrackManagement() {
 
   const handleScroll = useCallback((e: React.UIEvent<HTMLDivElement>) => {
     setScrollTop(e.currentTarget.scrollTop);
+    if (headerRef.current) {
+      headerRef.current.scrollLeft = e.currentTarget.scrollLeft;
+    }
   }, []);
 
   const handleCellClick = useCallback((trackKey: string, column: ColumnKey) => {
@@ -298,49 +301,6 @@ export default function TrackManagement() {
 
   return (
     <div className="track-management">
-      {/* Utilities */}
-      <div className="track-utilities">
-        <div className="utility-buttons">
-          <button
-            className="utility-button"
-            onClick={() => setShowManageComments(true)}
-          >
-            Manage Comments
-          </button>
-          <button
-            className="utility-button"
-            onClick={() => setShowApplyStyleTags(true)}
-          >
-            Apply Style Tags
-          </button>
-          <button
-            className="utility-button"
-            onClick={() => setShowFindDuplicates(true)}
-          >
-            Find Duplicates
-          </button>
-        </div>
-        
-        {pendingChanges.size > 0 && (
-          <div className="pending-changes">
-            <span>{pendingChanges.size} track(s) modified</span>
-            <button
-              className="save-button"
-              onClick={handleSave}
-              disabled={updateBatchMutation.isPending}
-            >
-              {updateBatchMutation.isPending ? 'Saving...' : 'Save Changes'}
-            </button>
-            <button
-              className="discard-button"
-              onClick={() => setPendingChanges(new Map())}
-            >
-              Discard
-            </button>
-          </div>
-        )}
-      </div>
-
       {/* Advanced Search Builder */}
       <div className="search-builder">
         {searchFilters.map((filter, index) => (
@@ -350,7 +310,7 @@ export default function TrackManagement() {
               onChange={(e) => updateSearchRow(filter.id, 'column', e.target.value)}
               className="search-select"
             >
-              <option value="all">All Columns</option>
+              <option value="all">All</option>
               {COLUMN_DEFS.map(col => (
                 <option key={col.key} value={col.key}>{col.label}</option>
               ))}
@@ -383,11 +343,67 @@ export default function TrackManagement() {
         ))}
       </div>
 
-      {/* Track Count */}
-      <div className="track-count">{tracks.length.toLocaleString()} tracks</div>
+      {/* Track Count + Utilities Toggle (inline) */}
+      <div className="track-info-bar">
+        <span className="track-count">{tracks.length.toLocaleString()} tracks</span>
+        <button
+          className="utilities-toggle-inline"
+          onClick={() => setIsUtilitiesExpanded(!isUtilitiesExpanded)}
+          aria-expanded={isUtilitiesExpanded}
+        >
+          <span className="toggle-icon">{isUtilitiesExpanded ? '▾' : '▸'}</span>
+          Utilities
+        </button>
+        {pendingChanges.size > 0 && (
+          <div className="pending-changes-inline">
+            <span>{pendingChanges.size} modified</span>
+            <button
+              className="save-button"
+              onClick={handleSave}
+              disabled={updateBatchMutation.isPending}
+            >
+              {updateBatchMutation.isPending ? 'Saving...' : 'Save'}
+            </button>
+            <button
+              className="discard-button"
+              onClick={() => setPendingChanges(new Map())}
+            >
+              Discard
+            </button>
+          </div>
+        )}
+      </div>
+
+      {/* Expanded Utilities (between track count and table header) */}
+      {isUtilitiesExpanded && (
+        <div className="utility-buttons-expanded">
+          <button
+            className="utility-button"
+            onClick={() => setShowManageComments(true)}
+          >
+            Manage Comments
+          </button>
+          <button
+            className="utility-button"
+            onClick={() => setShowApplyStyleTags(true)}
+          >
+            Apply Style Tags
+          </button>
+          <button
+            className="utility-button"
+            onClick={() => setShowFindDuplicates(true)}
+          >
+            Find Duplicates
+          </button>
+        </div>
+      )}
 
       {/* Table Header */}
-      <div className="track-table-header" style={{ width: totalWidth }}>
+      <div 
+        ref={headerRef} 
+        style={{ width: '100%', overflow: 'hidden' }}
+      >
+        <div className="track-table-header" style={{ width: totalWidth, display: 'flex' }}>
         {orderedColumns.map((col) => {
           const width = columnWidths[col.key] ?? col.width;
           return (
@@ -440,13 +456,14 @@ export default function TrackManagement() {
             </div>
           );
         })}
+        </div>
       </div>
 
       {/* Virtual Scroll Table Body */}
       <div
         className="track-table-container"
         ref={containerRef}
-        style={{ overflowY: 'auto', width: totalWidth + 20 }}
+        style={{ overflow: 'auto', width: '100%' }}
         onScroll={handleScroll}
       >
         <div style={{ height: totalHeight, position: 'relative' }}>

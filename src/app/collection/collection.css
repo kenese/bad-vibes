@@ -431,7 +431,6 @@
   display: flex;
   gap: 0;
   border-bottom: 1px solid rgba(240, 246, 252, 0.1);
-  margin-bottom: 1rem;
 }
 
 .tab-button {
@@ -460,7 +459,6 @@
 .track-management {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
   height: 100%;
   overflow: hidden;
 }
@@ -1601,8 +1599,7 @@
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
-  margin-bottom: 1rem;
-  padding: 0.75rem;
+  padding-bottom: 1rem;
   background: rgba(240, 246, 252, 0.02);
   border: 1px solid rgba(240, 246, 252, 0.1);
   border-radius: 0.5rem;
@@ -1625,7 +1622,7 @@
 }
 
 .search-select {
-  min-width: 120px;
+  min-width: 0.25rem;
 }
 
 .search-input {
@@ -1737,4 +1734,104 @@
 /* ensure the container fills vertical space */
 .track-table-container {
   height: 100%;
+}
+
+/* Collection Page Restructure */
+.collection-page {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  background: #0d1117;
+}
+
+.collection-page > .tab-navigation {
+  flex-shrink: 0;
+  padding: 0.5rem 1rem;
+  border-bottom: 1px solid rgba(240, 246, 252, 0.1);
+}
+
+.track-management-page {
+  flex: 1;
+  overflow: hidden;
+  padding: 1rem;
+}
+
+/* Sidebar Toggle Button */
+.sidebar-toggle-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(56, 139, 253, 0.1);
+  border: 1px solid rgba(56, 139, 253, 0.3);
+  border-radius: 4px;
+  color: #58a6ff;
+  cursor: pointer;
+  padding: 0.25rem 0.5rem;
+  font-size: 0.8rem;
+  transition: all 0.2s ease;
+}
+
+.sidebar-toggle-btn:hover {
+  background: rgba(56, 139, 253, 0.2);
+  border-color: #58a6ff;
+}
+
+/* Collapsed Sidebar */
+.sidebar-panel.collapsed {
+  width: 48px !important;
+  min-width: 48px !important;
+  padding: 0.5rem !important;
+}
+
+.sidebar-panel.collapsed header {
+  padding: 0;
+}
+
+.sidebar-panel.collapsed .flex-stack {
+  justify-content: center;
+}
+
+/* Inline Utilities Toggle with Track Count */
+.track-info-bar {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.5rem 0;
+  font-size: 0.85rem;
+  color: rgba(240, 246, 252, 0.7);
+}
+
+.track-info-bar .track-count {
+  margin: 0;
+  padding: 0;
+}
+
+.utilities-toggle-inline {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  background: none;
+  border: none;
+  color: #58a6ff;
+  cursor: pointer;
+  font-size: 0.85rem;
+  padding: 0;
+}
+
+.utilities-toggle-inline:hover {
+  text-decoration: underline;
+}
+
+.pending-changes-inline {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-left: auto;
+}
+
+.utility-buttons-expanded {
+  display: flex;
+  gap: 0.5rem;
+  padding: 0.5rem 0;
+  flex-wrap: wrap;
 }
