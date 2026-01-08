@@ -1,19 +1,22 @@
 # High Level Tasks
 
 Priorities:
-
+DONE
 1. All vinyl in traktor for easy vinyl djing
-
-- Add all vinyl to discogs
-- Tag all vinyl in traktor
-- Find any vinyl in traktor that is not in discogs
-- Find any vinyl in discogs that is not in traktor
-- DL any vinyl missing from traktor
-- Find and DL any vinyl missing from plex
+   - Add all vinyl to discogs
+   - Tag all vinyl in traktor 
+   - DL any vinyl missing from traktor
 
 2. Update Collection Management to work on phone,
+   - Supports Mobile View port
+   - Adds filtering
 
-3. Tag all Traktor files with style and key
+TODO:
+- Find any vinyl in traktor that is not in discogs
+- Find any vinyl in discogs that is not in traktor
+- Find and DL any vinyl missing from plex
+- Tag all Traktor files with style and key
+
 
 SOURCE OF TRUTH FOR ALL VINYL - DISCOGS -> PLEX
 Process for keeping Vinyl up to date:
