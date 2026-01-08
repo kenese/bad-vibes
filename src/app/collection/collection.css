@@ -1835,3 +1835,117 @@
   padding: 0.5rem 0;
   flex-wrap: wrap;
 }
+
+/* BPM Range Input Styles */
+.bpm-input {
+  width: 70px;
+}
+
+.bpm-range-label {
+  color: rgba(240, 246, 252, 0.6);
+  font-size: 0.85rem;
+}
+
+.bpm-range-input {
+  width: 50px;
+}
+
+/* Key Select Styles */
+.key-select {
+  width: 100px;
+}
+
+/* Style Multiselect */
+.style-multiselect {
+  display: flex;
+  align-items: center;
+  flex: 1;
+}
+
+.style-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  max-height: 100px;
+  overflow-y: auto;
+  padding: 0.25rem;
+  background: rgba(240, 246, 252, 0.02);
+  border-radius: 4px;
+}
+
+.style-option {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.2rem 0.5rem;
+  background: rgba(240, 246, 252, 0.05);
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.8rem;
+  color: rgba(240, 246, 252, 0.8);
+  user-select: none;
+}
+
+.style-option:hover {
+  background: rgba(56, 139, 253, 0.2);
+}
+
+.style-option input[type="checkbox"] {
+  accent-color: #58a6ff;
+}
+
+.no-styles {
+  color: rgba(240, 246, 252, 0.5);
+  font-size: 0.85rem;
+  font-style: italic;
+}
+
+/* Collapsible Style Dropdown */
+.style-multiselect-container {
+  flex: 1;
+  min-width: 150px;
+}
+
+.style-details {
+  position: relative;
+}
+
+.style-summary {
+  padding: 0.35rem 0.5rem;
+  background: #0d1117;
+  border: 1px solid rgba(240, 246, 252, 0.2);
+  border-radius: 4px;
+  color: rgba(240, 246, 252, 0.7);
+  font-size: 0.85rem;
+  cursor: pointer;
+  list-style: none;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 250px;
+}
+
+.style-summary::-webkit-details-marker {
+  display: none;
+}
+
+.style-summary::after {
+  content: '▾';
+  position: absolute;
+  right: 8px;
+  color: rgba(240, 246, 252, 0.5);
+}
+
+.style-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  background: #161b22;
+  border: 1px solid rgba(240, 246, 252, 0.2);
+  border-radius: 4px;
+  margin-top: 4px;
+  max-height: 200px;
+  overflow-y: auto;
+}

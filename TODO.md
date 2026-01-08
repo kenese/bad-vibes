@@ -12,6 +12,10 @@ DONE
    - Adds filtering
 
 TODO:
+- Track collection:
+  - Comments -> Style and allow for OR 
+  - Include Camelot "next" when searching key 
+
 - Find any vinyl in traktor that is not in discogs
 - Find any vinyl in discogs that is not in traktor
 - Find and DL any vinyl missing from plex

@@ -1,26 +1,12 @@
 'use client';
 
-import { useState, useMemo, useCallback, useRef, useEffect } from 'react';
+import { useState, useMemo, useCallback, useRef, useEffect, Fragment } from 'react';
 import { api } from '~/trpc/react';
 import type { FullTrackRow } from '~/server/services/collectionService';
 import ManageCommentsModal from './ManageCommentsModal';
 import ApplyStyleTags from './ApplyStyleTags';
 import FindDuplicates from './FindDuplicates';
 
-// Format rating for display - Traktor uses "IS ON A PLAYLIST" for tracks in playlists
-const formatRating = (value: string | number | undefined): string => {
-  if (!value) return '';
-  const str = String(value);
-  if (str === 'IS ON A PLAYLIST') return '★';
-  // Could be a numeric rating (0-255 scale in Traktor)
-  const num = parseInt(str, 10);
-  if (!isNaN(num) && num > 0) {
-    // Convert 0-255 to 0-5 stars
-    const stars = Math.round((num / 255) * 5);
-    return '★'.repeat(stars) + '☆'.repeat(5 - stars);
-  }
-  return str;
-};
 
 const COLUMN_DEFS = [
   { key: 'title' as const, label: 'Title', width: 200, editable: true },
@@ -28,7 +14,6 @@ const COLUMN_DEFS = [
   { key: 'album' as const, label: 'Album', width: 150, editable: true },
   { key: 'bpm' as const, label: 'BPM', width: 60, editable: true },
   { key: 'musicalKey' as const, label: 'Key', width: 60, editable: true },
-  { key: 'rating' as const, label: 'Rating', width: 100, editable: true },
   { key: 'comment' as const, label: 'Comment', width: 200, editable: true },
   { key: 'genre' as const, label: 'Genre', width: 120, editable: true },
   { key: 'label' as const, label: 'Label', width: 120, editable: true },
@@ -36,6 +21,52 @@ const COLUMN_DEFS = [
   { key: 'playtime' as const, label: 'Duration', width: 80, editable: false },
   { key: 'filepath' as const, label: 'Path', width: 300, editable: false },
 ];
+
+// Open Key Notation keys (1-12 with m/d suffix)
+const OPEN_KEYS = [
+  '1m', '2m', '3m', '4m', '5m', '6m', '7m', '8m', '9m', '10m', '11m', '12m',
+  '1d', '2d', '3d', '4d', '5d', '6d', '7d', '8d', '9d', '10d', '11d', '12d',
+];
+
+// Get harmonically adjacent keys for a given Open Key
+function getAdjacentKeys(key: string): string[] {
+  const regex = /^(\d{1,2})([md])$/i;
+  const match = regex.exec(key);
+  if (!match) return [key];
+  
+  const numStr = match[1];
+  const modeStr = match[2];
+  if (!numStr || !modeStr) return [key];
+  
+  const num = parseInt(numStr);
+  const mode = modeStr.toLowerCase();
+  if (num < 1 || num > 12) return [key];
+  
+  const adjacent: string[] = [key]; // Always include the exact key
+  
+  // Same key number, opposite mode (relative major/minor)
+  adjacent.push(`${num}${mode === 'm' ? 'd' : 'm'}`);
+  
+  // Adjacent numbers within same mode (clockwise/counter-clockwise on wheel)
+  const prev = num === 1 ? 12 : num - 1;
+  const next = num === 12 ? 1 : num + 1;
+  adjacent.push(`${prev}${mode}`);
+  adjacent.push(`${next}${mode}`);
+  
+  return adjacent;
+}
+
+// Extract style tags from comment in format [Style1] [Style2]
+function extractStyles(comment: string | null | undefined): string[] {
+  if (!comment) return [];
+  const regex = /\[([^\]]+)\]/g;
+  const styles: string[] = [];
+  let match;
+  while ((match = regex.exec(comment)) !== null) {
+    if (match[1]) styles.push(match[1].trim());
+  }
+  return styles;
+}
 
 type ColumnKey = (typeof COLUMN_DEFS)[number]['key'];
 type EditingCell = { trackKey: string; column: ColumnKey } | null;
@@ -75,9 +106,19 @@ export default function TrackManagement() {
 
   // Merge pending changes with original data
   const [sort, setSort] = useState<{ key: ColumnKey; direction: 'asc' | 'desc' } | null>(null);
-  const [searchFilters, setSearchFilters] = useState<Array<{ id: string; column: string; value: string }>>([
-    { id: '1', column: 'all', value: '' }
+  const [searchFilters, setSearchFilters] = useState<Array<{ id: string; column: string; value: string; bpmRange?: number; selectedStyles?: string[] }>>([
+    { id: '1', column: 'all', value: '', bpmRange: 4, selectedStyles: [] }
   ]);
+
+  // Extract all unique styles from all tracks
+  const allUniqueStyles = useMemo(() => {
+    if (!tracksQuery.data) return [];
+    const styleSet = new Set<string>();
+    tracksQuery.data.forEach(track => {
+      extractStyles(track.comment).forEach(style => styleSet.add(style));
+    });
+    return Array.from(styleSet).sort();
+  }, [tracksQuery.data]);
 
   // Merge pending changes with original data, then filter and sort
   const tracks = useMemo(() => {
@@ -92,6 +133,16 @@ export default function TrackManagement() {
     // 2. Filter
     data = data.filter(track => {
       return searchFilters.every(filter => {
+        // Special handling for Style: match if track has ANY of the selected styles (OR)
+        // Check this BEFORE the empty value check since style uses selectedStyles, not value
+        if (filter.column === 'style') {
+          const selectedStyles = filter.selectedStyles ?? [];
+          if (selectedStyles.length === 0) return true;
+          const trackStyles = extractStyles(track.comment);
+          // OR logic: track matches if it has at least one of the selected styles
+          return selectedStyles.some(style => trackStyles.includes(style));
+        }
+
         if (!filter.value) return true;
         
         const term = filter.value.toLowerCase();
@@ -103,14 +154,25 @@ export default function TrackManagement() {
           });
         }
         
-        // Special handling for BPM: +/- 4 range
+        // Special handling for BPM: configurable +/- range
         if (filter.column === 'bpm') {
           const searchVal = parseFloat(filter.value);
           if (!isNaN(searchVal)) {
             const trackVal = Number(track.bpm);
-            return !isNaN(trackVal) && Math.abs(trackVal - searchVal) <= 4;
+            const range = filter.bpmRange ?? 4;
+            return !isNaN(trackVal) && Math.abs(trackVal - searchVal) <= range;
           }
           return true; // Ignore filter if not a number
+        }
+
+        // Special handling for Key: match adjacent harmonically compatible keys
+        if (filter.column === 'musicalKey') {
+          if (!filter.value) return true;
+          const trackKey = String(track.musicalKey ?? '').toLowerCase().trim();
+          const searchKey = filter.value.toLowerCase().trim();
+          const adjacentKeys = getAdjacentKeys(searchKey).map(k => k.toLowerCase());
+          // Use exact match, not includes, to avoid "12m" matching "2m"
+          return adjacentKeys.some(adjKey => trackKey === adjKey);
         }
 
         const val = track[filter.column as ColumnKey];
@@ -312,16 +374,92 @@ export default function TrackManagement() {
             >
               <option value="all">All</option>
               {COLUMN_DEFS.map(col => (
-                <option key={col.key} value={col.key}>{col.label}</option>
+                <Fragment key={col.key}>
+                  <option value={col.key}>{col.label}</option>
+                  {col.key === 'musicalKey' && <option value="style">Style</option>}
+                </Fragment>
               ))}
             </select>
-            <input
-              type="text"
-              value={filter.value}
-              onChange={(e) => updateSearchRow(filter.id, 'value', e.target.value)}
-              placeholder="Search term..."
-              className="search-input"
-            />
+            {filter.column === 'bpm' ? (
+              <>
+                <input
+                  type="number"
+                  value={filter.value}
+                  onChange={(e) => updateSearchRow(filter.id, 'value', e.target.value)}
+                  placeholder="BPM..."
+                  className="search-input bpm-input"
+                />
+                <span className="bpm-range-label">±</span>
+                <input
+                  type="number"
+                  value={filter.bpmRange ?? 4}
+                  onChange={(e) => {
+                    const range = parseInt(e.target.value) || 0;
+                    setSearchFilters(prev => prev.map(f => 
+                      f.id === filter.id ? { ...f, bpmRange: range } : f
+                    ));
+                  }}
+                  className="search-input bpm-range-input"
+                  min="0"
+                  max="50"
+                />
+              </>
+            ) : filter.column === 'musicalKey' ? (
+              <select
+                value={filter.value}
+                onChange={(e) => updateSearchRow(filter.id, 'value', e.target.value)}
+                className="search-select key-select"
+              >
+                <option value="">Select key...</option>
+                {OPEN_KEYS.map(key => (
+                  <option key={key} value={key}>{key}</option>
+                ))}
+              </select>
+            ) : filter.column === 'style' ? (
+              <div className="style-multiselect-container">
+                <details className="style-details">
+                  <summary className="style-summary">
+                    {(filter.selectedStyles ?? []).length > 0 
+                      ? (filter.selectedStyles ?? []).join(', ')
+                      : 'Select styles...'}
+                  </summary>
+                  <div className="style-dropdown">
+                    {allUniqueStyles.length === 0 ? (
+                      <span className="no-styles">No styles found</span>
+                    ) : (
+                      <div className="style-options">
+                        {allUniqueStyles.map(style => (
+                          <label key={style} className="style-option">
+                            <input
+                              type="checkbox"
+                              checked={(filter.selectedStyles ?? []).includes(style)}
+                              onChange={(e) => {
+                                const currentStyles = filter.selectedStyles ?? [];
+                                const newStyles = e.target.checked
+                                  ? [...currentStyles, style]
+                                  : currentStyles.filter(s => s !== style);
+                                setSearchFilters(prev => prev.map(f =>
+                                  f.id === filter.id ? { ...f, selectedStyles: newStyles } : f
+                                ));
+                              }}
+                            />
+                            <span>{style}</span>
+                          </label>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </details>
+              </div>
+            ) : (
+              <input
+                type="text"
+                value={filter.value}
+                onChange={(e) => updateSearchRow(filter.id, 'value', e.target.value)}
+                placeholder="Search term..."
+                className="search-input"
+              />
+            )}
             {index === searchFilters.length - 1 ? (
               <button 
                 onClick={addSearchRow} 
@@ -506,11 +644,9 @@ export default function TrackManagement() {
                         />
                       ) : (
                         <span className="cell-text" title={value?.toString()}>
-                          {col.key === 'rating' 
-                            ? formatRating(value) 
-                            : col.key === 'bpm' && typeof value === 'number'
-                              ? value.toFixed(2)
-                              : (value?.toString() ?? '')
+                          {col.key === 'bpm' && typeof value === 'number'
+                            ? value.toFixed(2)
+                            : (value?.toString() ?? '')
                           }
                         </span>
                       )}
