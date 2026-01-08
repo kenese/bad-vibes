@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo, useCallback, useRef } from 'react';
+import { useState, useMemo, useCallback, useRef, useEffect } from 'react';
 import { api } from '~/trpc/react';
 import type { FullTrackRow } from '~/server/services/collectionService';
 import ManageCommentsModal from './ManageCommentsModal';
@@ -75,13 +75,110 @@ export default function TrackManagement() {
   const [dragColumn, setDragColumn] = useState<string | null>(null);
 
   // Merge pending changes with original data
+  const [sort, setSort] = useState<{ key: ColumnKey; direction: 'asc' | 'desc' } | null>(null);
+  const [searchFilters, setSearchFilters] = useState<Array<{ id: string; column: string; value: string }>>([
+    { id: '1', column: 'all', value: '' }
+  ]);
+
+  // Merge pending changes with original data, then filter and sort
   const tracks = useMemo(() => {
     if (!tracksQuery.data) return [];
-    return tracksQuery.data.map((track) => {
+    
+    // 1. Merge changes
+    let data = tracksQuery.data.map((track) => {
       const changes = pendingChanges.get(track.trackKey);
       return changes ? { ...track, ...changes } : track;
     });
-  }, [tracksQuery.data, pendingChanges]);
+
+    // 2. Filter
+    data = data.filter(track => {
+      return searchFilters.every(filter => {
+        if (!filter.value) return true;
+        
+        const term = filter.value.toLowerCase();
+        
+        if (filter.column === 'all') {
+          return COLUMN_DEFS.some(col => {
+            const val = track[col.key];
+            return val && String(val).toLowerCase().includes(term);
+          });
+        }
+        
+        const val = track[filter.column as ColumnKey];
+        return val && String(val).toLowerCase().includes(term);
+      });
+    });
+
+    // 3. Sort
+    if (sort) {
+      data.sort((a, b) => {
+        const valA = a[sort.key];
+        const valB = b[sort.key];
+        
+        if (valA === valB) return 0;
+        
+        // Handle undefined/null (push to bottom)
+        if (valA === undefined || valA === null) return 1;
+        if (valB === undefined || valB === null) return -1;
+        
+        // Handle numbers
+        if (typeof valA === 'number' && typeof valB === 'number') {
+          return sort.direction === 'asc' ? valA - valB : valB - valA;
+        }
+
+        // Handle generic strings
+        const strA = String(valA).toLowerCase();
+        const strB = String(valB).toLowerCase();
+        return sort.direction === 'asc' 
+          ? strA.localeCompare(strB) 
+          : strB.localeCompare(strA);
+      });
+    }
+
+    return data;
+  }, [tracksQuery.data, pendingChanges, searchFilters, sort]);
+
+  // Helper functions for Search & Sort
+  const handleSort = (key: ColumnKey) => {
+    setSort(prev => {
+      if (prev?.key === key) {
+        return prev.direction === 'asc' 
+          ? { key, direction: 'desc' }
+          : null; 
+      }
+      return { key, direction: 'asc' };
+    });
+  };
+
+  const addSearchRow = () => {
+    setSearchFilters(prev => [
+      ...prev,
+      { id: Math.random().toString(36).substr(2, 9), column: 'all', value: '' }
+    ]);
+  };
+
+  const removeSearchRow = (id: string) => {
+    setSearchFilters(prev => prev.filter(f => f.id !== id));
+  };
+
+  const updateSearchRow = (id: string, field: 'column' | 'value', newValue: string) => {
+    setSearchFilters(prev => prev.map(f => 
+      f.id === id ? { ...f, [field]: newValue } : f
+    ));
+  };
+
+  /* DYNAMIC HEIGHT LOGIC */
+  const [containerHeight, setContainerHeight] = useState(600);
+  useEffect(() => {
+    if (!containerRef.current) return;
+    const observer = new ResizeObserver((entries) => {
+      for (const entry of entries) {
+        setContainerHeight(entry.contentRect.height);
+      }
+    });
+    observer.observe(containerRef.current);
+    return () => observer.disconnect();
+  }, []);
 
   const orderedColumns = useMemo(() =>
     columnOrder.map((key) => COLUMN_DEFS.find((c) => c.key === key)!),
@@ -95,7 +192,7 @@ export default function TrackManagement() {
 
   // Virtual scroll calculations
   const startIndex = Math.max(0, Math.floor(scrollTop / ROW_HEIGHT) - OVERSCAN);
-  const endIndex = Math.min(tracks.length, Math.ceil((scrollTop + CONTAINER_HEIGHT) / ROW_HEIGHT) + OVERSCAN);
+  const endIndex = Math.min(tracks.length, Math.ceil((scrollTop + containerHeight) / ROW_HEIGHT) + OVERSCAN);
   const visibleTracks = tracks.slice(startIndex, endIndex);
   const totalHeight = tracks.length * ROW_HEIGHT;
 
@@ -235,6 +332,48 @@ export default function TrackManagement() {
         )}
       </div>
 
+      {/* Advanced Search Builder */}
+      <div className="search-builder">
+        {searchFilters.map((filter, index) => (
+          <div key={filter.id} className="search-row">
+            <select
+              value={filter.column}
+              onChange={(e) => updateSearchRow(filter.id, 'column', e.target.value)}
+              className="search-select"
+            >
+              <option value="all">All Columns</option>
+              {COLUMN_DEFS.map(col => (
+                <option key={col.key} value={col.key}>{col.label}</option>
+              ))}
+            </select>
+            <input
+              type="text"
+              value={filter.value}
+              onChange={(e) => updateSearchRow(filter.id, 'value', e.target.value)}
+              placeholder="Search term..."
+              className="search-input"
+            />
+            {index === searchFilters.length - 1 ? (
+              <button 
+                onClick={addSearchRow} 
+                className="search-action-btn add"
+                title="Add search criteria (AND)"
+              >
+                +
+              </button>
+            ) : (
+             <button 
+                onClick={() => removeSearchRow(filter.id)} 
+                className="search-action-btn remove"
+                title="Remove criteria"
+              >
+                −
+              </button>
+            )}
+          </div>
+        ))}
+      </div>
+
       {/* Track Count */}
       <div className="track-count">{tracks.length.toLocaleString()} tracks</div>
 
@@ -252,7 +391,17 @@ export default function TrackManagement() {
               onDragOver={(e) => e.preventDefault()}
               onDrop={() => handleColumnDrop(col.key)}
             >
-              <span className="header-text">{col.label}</span>
+              <div 
+                className="header-text clickable"
+                onClick={() => handleSort(col.key)}
+              >
+                {col.label}
+                {sort?.key === col.key && (
+                  <span className="sort-indicator">
+                    {sort.direction === 'asc' ? ' ▲' : ' ▼'}
+                  </span>
+                )}
+              </div>
               <div
                 className={`column-resizer ${resizingColumn === col.key ? 'active' : ''}`}
                 onMouseDown={(e) => {
@@ -286,9 +435,9 @@ export default function TrackManagement() {
 
       {/* Virtual Scroll Table Body */}
       <div
-        ref={containerRef}
         className="track-table-container"
-        style={{ height: CONTAINER_HEIGHT, overflowY: 'auto', width: totalWidth + 20 }}
+        ref={containerRef}
+        style={{ overflowY: 'auto', width: totalWidth + 20 }}
         onScroll={handleScroll}
       >
         <div style={{ height: totalHeight, position: 'relative' }}>
@@ -331,7 +480,12 @@ export default function TrackManagement() {
                         />
                       ) : (
                         <span className="cell-text" title={value?.toString()}>
-                          {col.key === 'rating' ? formatRating(value) : (value?.toString() ?? '')}
+                          {col.key === 'rating' 
+                            ? formatRating(value) 
+                            : col.key === 'bpm' && typeof value === 'number'
+                              ? value.toFixed(2)
+                              : (value?.toString() ?? '')
+                          }
                         </span>
                       )}
                     </div>

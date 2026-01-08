@@ -226,6 +226,8 @@ const CollectionView = ({ initialActivePath }: { initialActivePath?: string }) =
     );
   };
 
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+
   // Calculate loading state based on relevant queries only
   const isLoading = 
     hasCollectionQuery.isFetching || 
@@ -244,10 +246,25 @@ const CollectionView = ({ initialActivePath }: { initialActivePath?: string }) =
       className={`app-shell ${isResizing ? 'resizing' : ''}`}
       style={{ '--sidebar-width': `${sidebarWidth}px` } as React.CSSProperties}
     >
-      <aside className="sidebar-panel">
+      <aside className={`sidebar-panel ${isSidebarOpen ? 'open' : ''}`}>
         <header>
           <div className="flex-stack">
-            <h1>Traktor Collection</h1>
+            <div className="flex items-center gap-3">
+              <button 
+                className="mobile-menu-toggle"
+                onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+                aria-label="Toggle Menu"
+              >
+                ☰
+              </button>
+              <h1 
+                onClick={() => setActivePath('root')} 
+                style={{ cursor: 'pointer' }}
+                title="Go to Root"
+              >
+                Traktor Collection
+              </h1>
+            </div>
             <div className="flex items-center gap-2">
               {isLoading && (
                 <div 
@@ -280,13 +297,18 @@ const CollectionView = ({ initialActivePath }: { initialActivePath?: string }) =
                 } tracks`}
           </p>
         </header>
-        <Sidebar
-          tree={sidebarQuery.data?.tree ?? null}
-          activePath={activePath}
-          selectedPaths={selectedPaths}
-          onActiveChange={setActivePath}
-          onToggleSelection={toggleSelection}
-        />
+        <div className={`sidebar-content ${isSidebarOpen ? 'visible' : ''}`}>
+          <Sidebar
+            tree={sidebarQuery.data?.tree ?? null}
+            activePath={activePath}
+            selectedPaths={selectedPaths}
+            onActiveChange={(path) => {
+              setActivePath(path);
+              setIsSidebarOpen(false); // Close on selection (mobile)
+            }}
+            onToggleSelection={toggleSelection}
+          />
+        </div>
       </aside>
       <div
         className="sidebar-resizer"

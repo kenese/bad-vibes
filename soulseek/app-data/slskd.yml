@@ -1,5 +1,5 @@
 soulseek:
-  username: knse
+  username: knse1
   password: P@rrot123sou
 feature:
   swagger: true
@@ -12,6 +12,15 @@ web:
         key: "tVm5pksWCakKHKEJh3E98AdDJsQbHXCRkdRRt2YKavE="
         role: administrator
         cidr: 0.0.0.0/0
+directories:
+  incomplete: ~
+  downloads: ~
+shares:
+  directories: 
+    - ~
+    - /app/downloads
+    - /app/incomplete
+    - /app/Vinyl
 # debug: false
 # headless: false
 # remote_configuration: false
