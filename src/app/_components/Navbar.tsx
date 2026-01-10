@@ -31,6 +31,14 @@ const Navbar = () => {
           Soulseek
         </Link>
       </div>
+      <button 
+        className="refresh-btn"
+        onClick={() => window.location.reload()}
+        title="Refresh"
+        aria-label="Refresh page"
+      >
+        ↻
+      </button>
     </nav>
   );
 };

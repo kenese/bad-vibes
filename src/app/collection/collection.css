@@ -1957,3 +1957,23 @@
   font-size: 0.85rem;
   font-style: italic;
 }
+
+/* Editing Toggle */
+.editing-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.8rem;
+  color: rgba(240, 246, 252, 0.6);
+  cursor: pointer;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+}
+
+.editing-toggle:hover {
+  background: rgba(240, 246, 252, 0.05);
+}
+
+.editing-toggle input[type="checkbox"] {
+  accent-color: #58a6ff;
+}

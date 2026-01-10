@@ -11,6 +11,13 @@ export const metadata: Metadata = {
   icons: [{ rel: "icon", url: "/favicon.ico" }],
 };
 
+export const viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+};
+
 const geist = Geist({
   subsets: ["latin"],
   variable: "--font-geist-sans",

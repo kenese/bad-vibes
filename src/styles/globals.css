@@ -16,6 +16,27 @@ body {
   padding: 0;
   background: var(--bg-dark);
   color: #f0f6fc;
+  /* Mobile app-like: prevent rubber-banding */
+  overscroll-behavior: none;
+}
+
+/* Mobile app-like UX */
+@media (max-width: 768px) {
+  body {
+    /* Disable text selection on mobile for app-like feel */
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    user-select: none;
+    /* Prevent pull-to-refresh */
+    overscroll-behavior-y: contain;
+  }
+  
+  /* Allow text selection in inputs and editable areas */
+  input, textarea, [contenteditable="true"] {
+    -webkit-user-select: text;
+    -moz-user-select: text;
+    user-select: text;
+  }
 }
 
 .app-container {
@@ -63,4 +84,30 @@ body {
   flex: 1;
   overflow-y: auto;
   position: relative;
+}
+
+/* Refresh Button in Navbar */
+.main-nav {
+  justify-content: space-between;
+}
+
+.refresh-btn {
+  background: none;
+  border: none;
+  color: rgba(240, 246, 252, 0.7);
+  font-size: 1.4rem;
+  cursor: pointer;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+}
+
+.refresh-btn:hover {
+  color: #f0f6fc;
+  background: rgba(240, 246, 252, 0.1);
+}
+
+.refresh-btn:active {
+  transform: rotate(-180deg);
+  transition: transform 0.3s ease;
 }

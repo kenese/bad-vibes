@@ -103,6 +103,7 @@ export default function TrackManagement() {
   const [resizingColumn, setResizingColumn] = useState<string | null>(null);
   const [dragColumn, setDragColumn] = useState<string | null>(null);
   const [isUtilitiesExpanded, setIsUtilitiesExpanded] = useState(false);
+  const [isEditingEnabled, setIsEditingEnabled] = useState(false);
 
   // Merge pending changes with original data
   const [sort, setSort] = useState<{ key: ColumnKey; direction: 'asc' | 'desc' } | null>(null);
@@ -281,6 +282,9 @@ export default function TrackManagement() {
   }, []);
 
   const handleCellClick = useCallback((trackKey: string, column: ColumnKey) => {
+    // Gate editing on the toggle
+    if (!isEditingEnabled) return;
+    
     const colDef = COLUMN_DEFS.find((c) => c.key === column);
     if (!colDef?.editable) return;
 
@@ -290,7 +294,7 @@ export default function TrackManagement() {
     const value = track[column];
     setEditingCell({ trackKey, column });
     setEditValue(value?.toString() ?? '');
-  }, [tracks]);
+  }, [tracks, isEditingEnabled]);
 
   const handleCellBlur = useCallback(() => {
     if (!editingCell) return;
@@ -505,6 +509,14 @@ export default function TrackManagement() {
           <span className="toggle-icon">{isUtilitiesExpanded ? '▾' : '▸'}</span>
           Utilities
         </button>
+        <label className="editing-toggle">
+          <input
+            type="checkbox"
+            checked={isEditingEnabled}
+            onChange={(e) => setIsEditingEnabled(e.target.checked)}
+          />
+          <span>Edit Mode</span>
+        </label>
         {pendingChanges.size > 0 && (
           <div className="pending-changes-inline">
             <span>{pendingChanges.size} modified</span>
