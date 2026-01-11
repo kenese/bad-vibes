@@ -85,7 +85,7 @@ async function testGeminiAPI() {
         // Extract retry time
         const retryMatch = /retry.*?(\d+\.?\d*)/i.exec(errorMsg);
         if (retryMatch) {
-          console.log('\n  Suggested retry: in', parseFloat(retryMatch[1]).toFixed(0), 'seconds');
+          console.log('\n  Suggested retry: in', parseFloat(retryMatch[1] ?? '0').toFixed(0), 'seconds');
         }
       } else if (errorMsg.includes('404')) {
         console.log('  Model not found - check model name');
