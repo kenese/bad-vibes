@@ -6,6 +6,7 @@ import Sidebar, { type FlattenedFolder } from './Sidebar';
 import PlaylistTable from './PlaylistTable';
 import UploadPrompt from './UploadPrompt';
 import TrackManagement from './TrackManagement';
+import AddTagsModal from './AddTagsModal';
 import type { AppRouter } from '~/server/api/root';
 import type { inferRouterOutputs } from '@trpc/server';
 
@@ -40,6 +41,7 @@ const CollectionView = ({ initialActivePath }: { initialActivePath?: string }) =
   const [showUtilities, setShowUtilities] = useState(false);
   const [activeTab, setActiveTab] = useState<TabType>('playlist');
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [showAddTags, setShowAddTags] = useState(false);
 
   const handleMouseMove = useCallback((event: MouseEvent) => {
     setSidebarWidth(() => {
@@ -434,6 +436,17 @@ const CollectionView = ({ initialActivePath }: { initialActivePath?: string }) =
                         📝 New Playlist
                       </button>
                     </div>
+                    {/* Add Tags Button */}
+                    <div className="create-row">
+                      <button
+                        className="sidebar-action-button"
+                        onClick={() => setShowAddTags(true)}
+                        disabled={!playlistQuery.data?.tracks?.length}
+                        title={playlistQuery.data?.tracks?.length ? `Tag ${playlistQuery.data.tracks.length} tracks with AI` : 'Select a playlist first'}
+                      >
+                        🏷️ Add Tags (AI)
+                      </button>
+                    </div>
                   </div>
                 </div>
               )}
@@ -453,6 +466,14 @@ const CollectionView = ({ initialActivePath }: { initialActivePath?: string }) =
         <div className="track-management-page">
           <TrackManagement />
         </div>
+      )}
+
+      {/* Add Tags Modal */}
+      {showAddTags && playlistQuery.data?.tracks && (
+        <AddTagsModal
+          tracks={playlistQuery.data.tracks}
+          onClose={() => setShowAddTags(false)}
+        />
       )}
     </div>
   );

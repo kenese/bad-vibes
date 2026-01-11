@@ -161,6 +161,19 @@ export const collectionRouter = createTRPCRouter({
       return service.createPlaylist(input);
     }),
 
+  createPlaylistWithTracks: protectedProcedure
+    .input(
+      z.object({
+        folderPath: z.string().min(1),
+        name: z.string().min(1),
+        trackKeys: z.array(z.string().min(1))
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      const service = await getServiceForUser(ctx);
+      return service.createPlaylistWithTracks(input);
+    }),
+
   movePlaylist: protectedProcedure
     .input(
       z.object({
@@ -345,5 +358,19 @@ export const collectionRouter = createTRPCRouter({
     .mutation(async ({ ctx, input }) => {
       const service = await getServiceForUser(ctx);
       return service.mergeDuplicateTracks(input.ops);
+    }),
+
+  addTagsToTracks: protectedProcedure
+    .input(
+      z.object({
+        updates: z.array(z.object({
+          trackKey: z.string().min(1),
+          tags: z.array(z.string().min(1))
+        }))
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      const service = await getServiceForUser(ctx);
+      return service.addTagsToTracks(input.updates);
     }),
 });

@@ -20,6 +20,7 @@ export type PlaylistTrackRow = {
   album?: string;
   bpm?: number;
   rating?: number;
+  comment?: string;
 };
 
 type NodeKind = 'FOLDER' | 'PLAYLIST' | 'SMARTLIST';
@@ -366,6 +367,37 @@ export class CollectionService {
     folderNode.SUBNODES!.COUNT = String(children.length);
     await this.persist();
     return { success: true };
+  }
+
+  async createPlaylistWithTracks(input: { folderPath: string; name: string; trackKeys: string[] }) {
+    await this.ensureLoaded();
+    const parentRef = this.getNodeRef(input.folderPath);
+    const folderNode = this.assertFolder(parentRef);
+    const children = this.getChildrenArray(folderNode);
+    const uuid = randomUUID().replace(/-/g, '');
+    
+    // Build ENTRY array from track keys
+    const entries: RawPlaylistEntry[] = input.trackKeys.map(key => ({
+      PRIMARYKEY: {
+        TYPE: 'TRACK',
+        KEY: key
+      }
+    }));
+
+    const newPlaylist: RawPlaylistNode = {
+      TYPE: 'PLAYLIST',
+      NAME: input.name,
+      PLAYLIST: {
+        UUID: uuid,
+        TYPE: 'LIST',
+        ENTRIES: String(entries.length),
+        ENTRY: entries
+      }
+    };
+    children.unshift(newPlaylist);
+    folderNode.SUBNODES!.COUNT = String(children.length);
+    await this.persist();
+    return { success: true, trackCount: entries.length };
   }
 
   async movePlaylist(input: { sourcePath: string; targetFolderPath: string }) {
@@ -784,7 +816,8 @@ export class CollectionService {
       artist: entry.ARTIST ?? undefined,
       album: entry.ALBUM?.TITLE ?? undefined,
       bpm,
-      rating
+      rating,
+      comment: entry.INFO?.COMMENT ?? undefined
     };
   }
 
@@ -985,6 +1018,7 @@ export class CollectionService {
       'latin', 'salsa', 'cumbia', 'brazilian', 'bossa', 'downtempo', 'chillout',
       'lounge', 'ambient', 'trap', 'drill', 'boom bap', 'breaks', 'breakbeat',
       'booty', 'bass', 'nudisco', 'nu-disco', 'italo', 'boogie', 'pop', 'rock',
+      'juke', 'footwork', 'jersey club', 'philly club', 
       'indie', 'alternative', 'world', 'afro', 'tribal', 'minimal', 'progressive',
       'trance', 'acid', 'dub', 'deep', 'soulful', 'classic', 'vocal', 'instrumental',
       'remix', 'edit', 'bootleg', 'mashup',
@@ -1232,6 +1266,64 @@ export class CollectionService {
     }
 
     return { updatedCount };
+  }
+
+  async addTagsToTracks(updates: { trackKey: string; tags: string[] }[]): Promise<{ 
+    updatedCount: number; 
+    skippedCount: number;
+    tagsAdded: { trackKey: string; artist: string; title: string; newTags: string[] }[];
+  }> {
+    await this.ensureLoaded();
+    
+    let updatedCount = 0;
+    let skippedCount = 0;
+    const tagsAdded: { trackKey: string; artist: string; title: string; newTags: string[] }[] = [];
+
+    for (const { trackKey, tags } of updates) {
+      const entry = this.trackIndex.get(trackKey);
+      if (!entry) {
+        skippedCount++;
+        continue;
+      }
+
+      const currentComment = entry.INFO?.COMMENT ?? '';
+      const currentCommentLower = currentComment.toLowerCase();
+      
+      // Filter out tags that already exist (case-insensitive)
+      const newTags = tags.filter(tag => {
+        const bracketTag = `[${tag}]`.toLowerCase();
+        return !currentCommentLower.includes(bracketTag);
+      });
+
+      if (newTags.length === 0) {
+        skippedCount++;
+        continue;
+      }
+
+      // Build the tags string
+      const tagsString = newTags.map(tag => `[${tag}]`).join(' ');
+      
+      // Update the comment
+      entry.INFO ??= {};
+      entry.INFO.COMMENT = currentComment 
+        ? `${currentComment} ${tagsString}` 
+        : tagsString;
+      
+      updatedCount++;
+      tagsAdded.push({
+        trackKey,
+        artist: entry.ARTIST ?? 'Unknown',
+        title: entry.TITLE ?? 'Unknown',
+        newTags
+      });
+    }
+
+    if (updatedCount > 0) {
+      this.modified = true;
+      await this.persist();
+    }
+
+    return { updatedCount, skippedCount, tagsAdded };
   }
 
   async getTagCountPreview(playlistPaths: string[], tag: string): Promise<{

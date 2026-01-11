@@ -6,7 +6,7 @@ import type { AppRouter } from '~/server/api/root';
 import type { inferRouterOutputs } from '@trpc/server';
 
 type TrackRow = inferRouterOutputs<AppRouter>['collection']['playlistTracks']['tracks'][number];
-type SortKey = keyof Pick<TrackRow, 'title' | 'artist' | 'album' | 'bpm' | 'rating'> | 'originalIndex';
+type SortKey = keyof Pick<TrackRow, 'title' | 'artist' | 'album' | 'bpm' | 'rating' | 'comment'> | 'originalIndex';
 type SortState = { key: SortKey; direction: 'asc' | 'desc' };
 
 const TABLE_NAME = 'playlist_tracks';
@@ -16,7 +16,8 @@ const columns: { key: SortKey; label: string; minWidth: number }[] = [
   { key: 'artist', label: 'Artist', minWidth: 150 },
   { key: 'album', label: 'Release', minWidth: 150 },
   { key: 'bpm', label: 'BPM', minWidth: 80 },
-  { key: 'rating', label: 'Rating', minWidth: 80 }
+  { key: 'rating', label: 'Rating', minWidth: 80 },
+  { key: 'comment', label: 'Comments', minWidth: 200 }
 ];
 
 const PlaylistTable = ({
@@ -172,6 +173,7 @@ const PlaylistTable = ({
             <td>{track.album ?? '—'}</td>
             <td>{track.bpm ?? '—'}</td>
             <td>{track.rating ?? '—'}</td>
+            <td className="text-[#8b949e]">{track.comment ?? '—'}</td>
           </tr>
         ))}
       </tbody>

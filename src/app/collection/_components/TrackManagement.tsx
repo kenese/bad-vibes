@@ -84,6 +84,8 @@ export default function TrackManagement() {
       setPendingChanges(new Map());
     },
   });
+  
+  const createPlaylistMutation = api.collection.createPlaylistWithTracks.useMutation();
 
   const containerRef = useRef<HTMLDivElement>(null);
   const headerRef = useRef<HTMLDivElement>(null);
@@ -104,6 +106,7 @@ export default function TrackManagement() {
   const [dragColumn, setDragColumn] = useState<string | null>(null);
   const [isUtilitiesExpanded, setIsUtilitiesExpanded] = useState(false);
   const [isEditingEnabled, setIsEditingEnabled] = useState(false);
+  const [newPlaylistName, setNewPlaylistName] = useState('');
 
   // Merge pending changes with original data
   const [sort, setSort] = useState<{ key: ColumnKey; direction: 'asc' | 'desc' } | null>(null);
@@ -558,6 +561,34 @@ export default function TrackManagement() {
           >
             Find Duplicates
           </button>
+          <div className="create-playlist-inline">
+            <input
+              type="text"
+              value={newPlaylistName}
+              onChange={(e) => setNewPlaylistName(e.target.value)}
+              placeholder="Playlist name..."
+              className="create-playlist-input"
+            />
+            <button
+              className="utility-button"
+              disabled={!newPlaylistName.trim() || tracks.length === 0 || createPlaylistMutation.isPending}
+              onClick={() => {
+                if (!newPlaylistName.trim() || tracks.length === 0) return;
+                createPlaylistMutation.mutate({
+                  folderPath: 'root',
+                  name: newPlaylistName.trim(),
+                  trackKeys: tracks.map(t => t.trackKey)
+                }, {
+                  onSuccess: () => {
+                    setNewPlaylistName('');
+                    void utils.collection.sidebar.invalidate();
+                  }
+                });
+              }}
+            >
+              {createPlaylistMutation.isPending ? 'Creating...' : `Create Playlist (${tracks.length})`}
+            </button>
+          </div>
         </div>
       )}
 

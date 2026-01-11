@@ -1,5 +1,21 @@
 import { z } from "zod";
 import { createTRPCRouter, protectedProcedure, publicProcedure } from "~/server/api/trpc";
+import type { db } from "~/server/db";
+
+// Ensure the dev user exists in the database (required for foreign key constraints)
+async function ensureDevUserExists(prisma: typeof db, userId: string) {
+  if (userId === 'dev-user-001' && process.env.NODE_ENV === 'development') {
+    await prisma.user.upsert({
+      where: { id: userId },
+      update: {},
+      create: {
+        id: userId,
+        name: 'DEVELOPER',
+        email: 'dev@localhost',
+      },
+    });
+  }
+}
 
 export const preferencesRouter = createTRPCRouter({
   getTableConfig: publicProcedure
@@ -34,6 +50,10 @@ export const preferencesRouter = createTRPCRouter({
       if (!ctx.db.tablePreference) {
         throw new Error('Prisma client is out of date. Please restart your dev server (yarn dev).');
       }
+
+      // Ensure dev user exists in database before creating preferences
+      await ensureDevUserExists(ctx.db, ctx.session.user.id);
+
       return ctx.db.tablePreference.upsert({
         where: {
           userId_tableName: {
