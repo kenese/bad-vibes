@@ -44,3 +44,7 @@ yarn-error.log*
 
 # idea files
 .idea
+# Soulseek Data
+soulseek/app-data/downloads
+soulseek/app-data/incomplete
+soulseek/app-data/library

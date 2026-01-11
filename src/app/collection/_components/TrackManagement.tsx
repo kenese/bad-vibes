@@ -6,6 +6,7 @@ import type { FullTrackRow } from '~/server/services/collectionService';
 import ManageCommentsModal from './ManageCommentsModal';
 import ApplyStyleTags from './ApplyStyleTags';
 import FindDuplicates from './FindDuplicates';
+import PlexConnect from './PlexConnect';
 
 
 const COLUMN_DEFS = [
@@ -14,6 +15,7 @@ const COLUMN_DEFS = [
   { key: 'album' as const, label: 'Album', width: 150, editable: true },
   { key: 'bpm' as const, label: 'BPM', width: 60, editable: true },
   { key: 'musicalKey' as const, label: 'Key', width: 60, editable: true },
+  { key: 'rating' as const, label: 'Rating', width: 60, editable: false },
   { key: 'comment' as const, label: 'Comment', width: 200, editable: true },
   { key: 'genre' as const, label: 'Genre', width: 120, editable: true },
   { key: 'label' as const, label: 'Label', width: 120, editable: true },
@@ -21,6 +23,28 @@ const COLUMN_DEFS = [
   { key: 'playtime' as const, label: 'Duration', width: 80, editable: false },
   { key: 'filepath' as const, label: 'Path', width: 300, editable: false },
 ];
+
+// Convert Traktor rating (0-255) to star display (1-5 or empty)
+function formatRating(rating: number | string | undefined | null): string {
+  if (!rating) return '';
+  const num = typeof rating === 'string' ? parseInt(rating) : rating;
+  if (num <= 0 || isNaN(num)) return '';
+  if (num <= 51) return '★';
+  if (num <= 102) return '★★';
+  if (num <= 153) return '★★★';
+  if (num <= 204) return '★★★★';
+  return '★★★★★';
+}
+
+// Convert playtime (seconds) to mm:ss format
+function formatDuration(seconds: number | string | undefined | null): string {
+  if (!seconds) return '';
+  const num = typeof seconds === 'string' ? parseFloat(seconds) : seconds;
+  if (isNaN(num) || num <= 0) return '';
+  const mins = Math.floor(num / 60);
+  const secs = Math.floor(num % 60);
+  return `${mins}:${secs.toString().padStart(2, '0')}`;
+}
 
 // Open Key Notation keys (1-12 with m/d suffix)
 const OPEN_KEYS = [
@@ -110,8 +134,8 @@ export default function TrackManagement() {
 
   // Merge pending changes with original data
   const [sort, setSort] = useState<{ key: ColumnKey; direction: 'asc' | 'desc' } | null>(null);
-  const [searchFilters, setSearchFilters] = useState<Array<{ id: string; column: string; value: string; bpmRange?: number; selectedStyles?: string[] }>>([
-    { id: '1', column: 'all', value: '', bpmRange: 4, selectedStyles: [] }
+  const [searchFilters, setSearchFilters] = useState<Array<{ id: string; column: string; value: string; bpmRange?: number; selectedStyles?: string[]; selectedRatings?: number[] }>>([
+    { id: '1', column: 'all', value: '', bpmRange: 4, selectedStyles: [], selectedRatings: [] }
   ]);
 
   // Extract all unique styles from all tracks
@@ -151,6 +175,16 @@ export default function TrackManagement() {
         if (filter.column === 'vinyl') {
           const comment = track.comment ?? '';
           return comment.includes('[Vinyl]');
+        }
+
+        // Rating filter: multi-select
+        if (filter.column === 'rating') {
+          const selected = filter.selectedRatings ?? [];
+          if (selected.length === 0) return true;
+          // Normalize 0-255 to 1-5
+          const r = Number(track.rating ?? 0);
+          const stars = r <= 5 ? r : Math.round(r / 51);
+          return selected.includes(stars);
         }
 
         if (!filter.value) return true;
@@ -469,6 +503,36 @@ export default function TrackManagement() {
                   </div>
                 </details>
               </div>
+            ) : filter.column === 'rating' ? (
+              <div className="style-multiselect-container">
+                <details className="style-details">
+                  <summary className="style-summary">
+                    {(filter.selectedRatings ?? []).length > 0 
+                      ? (filter.selectedRatings ?? []).map(r => '★'.repeat(r)).join(', ')
+                      : 'Select ratings...'}
+                  </summary>
+                  <div className="style-dropdown">
+                    {[5, 4, 3, 2, 1].map(stars => (
+                      <label key={stars} className="style-option">
+                        <input
+                          type="checkbox"
+                          checked={(filter.selectedRatings ?? []).includes(stars)}
+                          onChange={(e) => {
+                            const current = filter.selectedRatings ?? [];
+                            const newRatings = e.target.checked
+                              ? [...current, stars]
+                              : current.filter(s => s !== stars);
+                            setSearchFilters(prev => prev.map(f =>
+                              f.id === filter.id ? { ...f, selectedRatings: newRatings } : f
+                            ));
+                          }}
+                        />
+                        <span className="text-[#e5a00d]">{'★'.repeat(stars)}</span>
+                      </label>
+                    ))}
+                  </div>
+                </details>
+              </div>
             ) : filter.column === 'vinyl' ? (
               <span className="vinyl-filter-label">Vinyl Only</span>
             ) : (
@@ -589,6 +653,11 @@ export default function TrackManagement() {
               {createPlaylistMutation.isPending ? 'Creating...' : `Create Playlist (${tracks.length})`}
             </button>
           </div>
+          
+          {/* Plex Integration */}
+          <div className="plex-section">
+            <PlexConnect />
+          </div>
         </div>
       )}
 
@@ -702,6 +771,10 @@ export default function TrackManagement() {
                         <span className="cell-text" title={value?.toString()}>
                           {col.key === 'bpm' && typeof value === 'number'
                             ? value.toFixed(2)
+                            : col.key === 'rating'
+                            ? formatRating(value)
+                            : col.key === 'playtime'
+                            ? formatDuration(value)
                             : (value?.toString() ?? '')
                           }
                         </span>

@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server";
+import { type NextRequest, NextResponse } from "next/server";
 import OAuth from "oauth-1.0a";
 import crypto from "crypto";
 import { env } from "~/env";
@@ -98,7 +98,21 @@ export async function GET(req: NextRequest) {
     const identityData = await identityRes.json() as { id: number, username: string, resource_url: string };
     
     // Now LINK to the current user
-    const session = await auth();
+    let session = await auth();
+    
+    // In dev mode, use mock user if no session confirms
+    if (!session?.user && process.env.NODE_ENV === 'development') {
+        console.log('[DEV MODE] Using mock DEVELOPER user for Discogs linking');
+        session = {
+            user: {
+                id: 'dev-user-001',
+                name: 'DEVELOPER',
+                email: 'dev@localhost',
+            },
+            expires: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
+        };
+    }
+
     if (!session?.user?.id) {
          return NextResponse.json({ error: "You must be logged in to link Discogs" }, { status: 401 });
     }
@@ -120,6 +134,8 @@ export async function GET(req: NextRequest) {
             data: {
                 access_token: access_token,
                 refresh_token: access_token_secret, // Store secret in refresh_token field as per convention/necessity
+                // Ensure userId matches current session (especially for dev mode switching or fixes)
+                userId: session.user.id,
             }
         });
     } else {

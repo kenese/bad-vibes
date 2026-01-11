@@ -11,13 +11,24 @@ DONE
    - Supports Mobile View port
    - Adds filtering
 
-TODO:
-- Track collection:
+3. Track collection:
   - Comments -> Style and allow for OR 
   - Include Camelot "next" when searching key 
+  - Add ratings from plex
+
+TODO:
+- Find any vinyl in discogs that is not in traktor
+  - Find discogs releases not in plex
+  - Find all tracks from missing releases in plex 
+
+Merge Track and Playlist views
+Improve design
+
+
+
+
 
 - Find any vinyl in traktor that is not in discogs
-- Find any vinyl in discogs that is not in traktor
 - Find and DL any vinyl missing from plex
 - Tag all Traktor files with style and key
 

@@ -13,6 +13,7 @@ interface DiscogsRelease {
   basic_information: {
     title: string;
     artists: { name: string }[];
+    formats: { name: string; descriptions?: string[] }[];
   };
 }
 
@@ -35,12 +36,14 @@ export const discogsRouter = createTRPCRouter({
     }))
     .query(async ({ ctx, input }) => {
       // 1. Get User's Discogs Account
+      console.log(`[DiscogsRouter] Finding account for user: ${ctx.session.user.id}`);
       const account = await ctx.db.account.findFirst({
         where: {
           userId: ctx.session.user.id,
           provider: "discogs",
         },
       });
+      console.log(`[DiscogsRouter] Found account:`, account ? 'YES' : 'NO');
 
       if (!account?.access_token || !account.refresh_token) {
         throw new TRPCError({
@@ -144,44 +147,96 @@ export const discogsRouter = createTRPCRouter({
       }
 
       // Map to simple track format
-      // Note: A release has multiple tracks. We usually want to import ALL tracks from the release?
-      // Or just the release info?
-      // User request: "create playlists from my discogs collection"
-      // Usually users want the tracks.
-      // fetching releases returns `basic_information`. it might NOT include tracklist.
-      // We might need to fetch individual release details if tracklist is missing.
-      // Let's check Discogs API docs (memory).
-      // Collection response `basic_information` usually includes artists and title, but NOT tracklist.
-      // This means for EACH release, I might need to fetch tracks. This will hit rate limits fast.
-      // OR, maybe I just list the releases and let user "Search on Soulseek" by "Artist - Title"?
-      // The `parsedItems` in `page.tsx` expects `track` and `artist`.
-      // If I import a Release "Album Title - Artist", it's treated as one item?
-      // No, that would search for the Album.
-      // Soulseek smart search is "Artist - Track".
-      // If I want *tracks*, I need tracklists.
-      
-      // OPTION: For the first version, let's just return the Release Title and Artist. 
-      // The user can then perhaps "expand" it or we leave it as "Album" which might not work well for *track* playlists.
-      // BUT, querying tracks for 50 releases = 50 API calls. Discogs rate limit is 60/min.
-      // Providing just the Album - Artist is safest.
-      // Wait, "create playlists". A playlist is a list of tracks.
-      // If I add "Dark Side of the Moon - Pink Floyd", is that a playlist item?
-      // In the current UI it's "Track" and "Artist".
-      // If I put "Whole Album" as track name, it might be fine for user manual handling.
-      // But ideally we want tracks.
-      // Let's start by returning the Releases as items. (Track = Title, Artist = Artist).
-      // The user can choose to keep or remove.
-
       const items = releases.map(r => ({
         track: r.basic_information.title,
         artist: r.basic_information.artists[0]?.name ?? "Unknown Artist",
         added_at: r.date_added,
         id: r.id,
+        formats: r.basic_information.formats ?? [],
       }));
 
       return {
         items,
         pagination: data.pagination,
+      };
+    }),
+
+    
+  getRelease: protectedProcedure
+    .input(z.object({
+      release_id: z.number(),
+    }))
+    .mutation(async ({ ctx, input }) => {
+      // 1. Get User's Discogs Account
+      const account = await ctx.db.account.findFirst({
+        where: {
+          userId: ctx.session.user.id,
+          provider: "discogs",
+        },
+      });
+
+      if (!account?.access_token || !account.refresh_token) {
+        throw new TRPCError({
+          code: "UNAUTHORIZED",
+          message: "Discogs account not linked or missing tokens.",
+        });
+      }
+
+      const oauth = new OAuth({
+        consumer: {
+          key: env.DISCOGS_CLIENT_ID,
+          secret: env.DISCOGS_CLIENT_SECRET,
+        },
+        signature_method: "HMAC-SHA1",
+        hash_function(base_string, key) {
+          return crypto
+            .createHmac("sha1", key)
+            .update(base_string)
+            .digest("base64");
+        },
+      });
+
+      const token = {
+        key: account.access_token,
+        secret: account.refresh_token,
+      };
+
+      // 2. Fetch Release
+      const url = `https://api.discogs.com/releases/${input.release_id}`;
+      
+      const requestData = {
+        url,
+        method: "GET",
+      };
+
+      const headers = oauth.toHeader(oauth.authorize(requestData, token));
+
+      const res = await fetch(url, {
+        headers: {
+          ...headers,
+          "User-Agent": "BadVibesApp/1.0",
+        },
+      });
+
+      if (!res.ok) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: `Discogs API Error: ${res.statusText}`,
+        });
+      }
+
+      const data = await res.json() as {
+        id: number;
+        title: string;
+        artists: { name: string }[];
+        tracklist?: { position: string; title: string; duration?: string }[];
+      };
+
+      return {
+        id: data.id,
+        title: data.title,
+        artists: data.artists,
+        tracklist: data.tracklist ?? [],
       };
     }),
 });

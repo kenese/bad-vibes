@@ -172,7 +172,11 @@ const PlaylistTable = ({
             <td>{track.artist ?? '—'}</td>
             <td>{track.album ?? '—'}</td>
             <td>{track.bpm ?? '—'}</td>
-            <td>{track.rating ?? '—'}</td>
+            <td className="text-[#e5a00d]">{(() => {
+              if (!track.rating) return '—';
+              const stars = track.rating <= 5 ? track.rating : Math.round(track.rating / 51);
+              return '★'.repeat(Math.max(0, Math.min(5, stars)));
+            })()}</td>
             <td className="text-[#8b949e]">{track.comment ?? '—'}</td>
           </tr>
         ))}

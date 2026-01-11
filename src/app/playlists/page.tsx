@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { api } from '~/trpc/react';
 import { DiscogsImport } from './DiscogsImport';
+import { PlexImport } from './PlexImport';
 
 export default function PlaylistToolsPage() {
     const utils = api.useUtils();
@@ -13,7 +14,15 @@ export default function PlaylistToolsPage() {
     const [history, setHistory] = useState<{ track: string; artist: string }[] | null>(null);
     const [isInputFocused, setIsInputFocused] = useState(false);
     const [showDiscogsModal, setShowDiscogsModal] = useState(false);
+    const [showPlexModal, setShowPlexModal] = useState(false);
+    const [selectedIndices, setSelectedIndices] = useState<Set<number>>(new Set());
     
+    // Keep selection in sync with items
+    useEffect(() => {
+        // Select all new items by default
+        setSelectedIndices(new Set(parsedItems.map((_, i) => i)));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [parsedItems.length]);
     const playlistsQuery = api.playlistTools.getPlaylists.useQuery();
     
     const loadPlaylistMutation = api.playlistTools.getPlaylist.useMutation({
@@ -187,13 +196,20 @@ export default function PlaylistToolsPage() {
                         <p className="mt-2 text-xs text-[#f85149]">{fetchExternal.error.message}</p>
                     )}
                     
-                    <div className="mt-4 pt-4 border-t border-[#30363d]">
+                    <div className="mt-4 pt-4 border-t border-[#30363d] space-y-2">
                         <button
                             onClick={() => setShowDiscogsModal(true)}
                             className="w-full bg-[#1f6feb]/10 hover:bg-[#1f6feb]/20 text-[#58a6ff] border border-[#1f6feb]/30 hover:border-[#58a6ff] font-bold py-2.5 px-6 rounded-lg transition-all flex items-center justify-center gap-2"
                         >
                             <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 24C5.373 24 0 18.627 0 12S5.373 0 12 0s12 5.373 12 12-5.373 12-12 12zm0-2c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10zm0-3a7 7 0 1 1 0-14 7 7 0 0 1 0 14zm0-2a5 5 0 1 0 0-10 5 5 0 0 0 0 10zm3.5-5a3.5 3.5 0 1 1-7 0 3.5 3.5 0 0 1 7 0z"/></svg>
                             Import from Discogs Collection
+                        </button>
+                        <button
+                            onClick={() => setShowPlexModal(true)}
+                            className="w-full bg-[#e5a00d]/10 hover:bg-[#e5a00d]/20 text-[#e5a00d] border border-[#e5a00d]/30 hover:border-[#e5a00d] font-bold py-2.5 px-6 rounded-lg transition-all flex items-center justify-center gap-2"
+                        >
+                            <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+                            Import from Plex Playlist
                         </button>
                     </div>
                 </div>
@@ -206,6 +222,18 @@ export default function PlaylistToolsPage() {
                         setHistory(parsedItems);
                         setParsedItems(current => [...current, ...items]);
                         setShowDiscogsModal(false);
+                    }}
+                />
+            )}
+
+            {showPlexModal && (
+                <PlexImport 
+                    onClose={() => setShowPlexModal(false)}
+                    onImport={(items, name) => {
+                        setHistory(parsedItems);
+                        setParsedItems(current => [...current, ...items]);
+                        setPlaylistName(name);
+                        setShowPlexModal(false);
                     }}
                 />
             )}
@@ -259,7 +287,10 @@ export default function PlaylistToolsPage() {
                         <div className="flex justify-between items-center mb-6">
                             <h2 className="text-xl font-bold text-[#c9d1d9]">Playlist Preview</h2>
                             {parsedItems.length > 0 && (
-                                <div className="flex gap-3">
+                                <div className="flex gap-3 items-center">
+                                    <span className="text-sm text-[#8b949e]">
+                                        {selectedIndices.size}/{parsedItems.length} selected
+                                    </span>
                                     <input 
                                         className="bg-[#0d1117] border border-[#30363d] rounded px-3 py-1 text-sm outline-none w-40"
                                         value={playlistName}
@@ -267,11 +298,14 @@ export default function PlaylistToolsPage() {
                                         placeholder="Playlist Name"
                                     />
                                     <button 
-                                        onClick={() => savePlaylist.mutate({ name: playlistName, items: parsedItems })}
-                                        disabled={savePlaylist.isPending}
-                                        className="bg-[#21262d] hover:bg-[#30363d] text-[#c9d1d9] border border-[#30363d] px-4 py-1 rounded text-sm transition-all"
+                                        onClick={() => {
+                                            const selectedItems = parsedItems.filter((_, i) => selectedIndices.has(i));
+                                            savePlaylist.mutate({ name: playlistName, items: selectedItems });
+                                        }}
+                                        disabled={savePlaylist.isPending || selectedIndices.size === 0}
+                                        className="bg-[#21262d] hover:bg-[#30363d] text-[#c9d1d9] border border-[#30363d] px-4 py-1 rounded text-sm transition-all disabled:opacity-50"
                                     >
-                                        {savePlaylist.isPending ? 'Saving...' : 'Save Playlist'}
+                                        {savePlaylist.isPending ? 'Saving...' : `Save ${selectedIndices.size} Tracks`}
                                     </button>
                                 </div>
                             )}
@@ -286,6 +320,20 @@ export default function PlaylistToolsPage() {
                                 <table className="w-full text-left border-collapse">
                                     <thead>
                                         <tr className="border-b border-[#30363d] text-[#8b949e] text-xs font-semibold uppercase tracking-wider">
+                                            <th className="py-3 px-2 w-10">
+                                                <input
+                                                    type="checkbox"
+                                                    checked={selectedIndices.size === parsedItems.length && parsedItems.length > 0}
+                                                    onChange={(e) => {
+                                                        if (e.target.checked) {
+                                                            setSelectedIndices(new Set(parsedItems.map((_, i) => i)));
+                                                        } else {
+                                                            setSelectedIndices(new Set());
+                                                        }
+                                                    }}
+                                                    className="w-4 h-4 accent-[#58a6ff]"
+                                                />
+                                            </th>
                                             <th className="py-3 px-4">Track</th>
                                             <th className="py-3 px-4">Artist</th>
                                             <th className="py-3 px-4 text-right">Actions</th>
@@ -293,7 +341,23 @@ export default function PlaylistToolsPage() {
                                     </thead>
                                     <tbody>
                                         {parsedItems.map((item, idx) => (
-                                            <tr key={idx} className="border-b border-[#21262d] hover:bg-[#1c2128] transition-colors group">
+                                            <tr key={idx} className={`border-b border-[#21262d] hover:bg-[#1c2128] transition-colors group ${selectedIndices.has(idx) ? 'bg-[#1c2128]/50' : ''}`}>
+                                                <td className="py-1 px-2 w-10">
+                                                    <input
+                                                        type="checkbox"
+                                                        checked={selectedIndices.has(idx)}
+                                                        onChange={(e) => {
+                                                            const newSet = new Set(selectedIndices);
+                                                            if (e.target.checked) {
+                                                                newSet.add(idx);
+                                                            } else {
+                                                                newSet.delete(idx);
+                                                            }
+                                                            setSelectedIndices(newSet);
+                                                        }}
+                                                        className="w-4 h-4 accent-[#58a6ff]"
+                                                    />
+                                                </td>
                                                 <td className="py-1 px-2">
                                                     <input
                                                         className="w-full bg-transparent border-none outline-none text-[#c9d1d9] focus:bg-[#0d1117] px-2 py-1 rounded text-sm"
