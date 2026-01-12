@@ -131,8 +131,8 @@ const UploadPrompt = ({ onUploadSuccess }: { onUploadSuccess: () => void }) => {
           });
 
           if (!res.ok) {
-            const errData = await res.json().catch(() => ({}));
-            throw new Error(errData.error || 'Memory upload failed');
+            const errData = (await res.json().catch(() => ({}))) as { error?: string };
+            throw new Error(errData.error ?? 'Memory upload failed');
           }
           
           const data = (await res.json()) as { url: string };
