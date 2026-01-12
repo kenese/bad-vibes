@@ -5,6 +5,15 @@ import { upload } from '@vercel/blob/client';
 import { useSession } from 'next-auth/react';
 import { api } from '~/trpc/react';
 
+// Helper to gzip a file using the browser's CompressionStream API
+async function gzipFile(file: File): Promise<Blob> {
+  const stream = file.stream();
+  const compressedStream = stream.pipeThrough(new CompressionStream('gzip'));
+  const response = new Response(compressedStream);
+  const blob = await response.blob();
+  return blob;
+}
+
 const UploadPrompt = ({ onUploadSuccess }: { onUploadSuccess: () => void }) => {
   const { data: session } = useSession();
   const [file, setFile] = useState<File | null>(null);
@@ -48,6 +57,17 @@ const UploadPrompt = ({ onUploadSuccess }: { onUploadSuccess: () => void }) => {
     }
   });
 
+  const loadFromTempUrl = api.collection.loadFromTempUrl.useMutation({
+    onSuccess: () => {
+      onUploadSuccess();
+    },
+    onError: (err) => {
+      console.error('Temp load failed:', err);
+      setError('Failed to load collection from temporary storage.');
+      setIsUploading(false);
+    }
+  });
+
   const handleUpload = async (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -61,36 +81,86 @@ const UploadPrompt = ({ onUploadSuccess }: { onUploadSuccess: () => void }) => {
     setError(null);
 
     try {
+      // 1. Compress the file
+      console.log(`Original size: ${(file.size / 1024 / 1024).toFixed(2)} MB`);
+      const compressedBlob = await gzipFile(file);
+      console.log(`Compressed size: ${(compressedBlob.size / 1024 / 1024).toFixed(2)} MB`);
+
       let collectionUrl: string;
 
       if (useCloud) {
-        const newBlob = await upload(`collections/${userId}/collection.nml`, file, {
+        // Persistent Mode: Upload compressed file to Blob storage
+        const newBlob = await upload(`collections/${userId}/collection.nml.gz`, compressedBlob, {
           access: 'public',
           handleUploadUrl: '/api/collection/upload/vercel-blob',
+          contentType: 'application/gzip',
         });
-        console.log('Blob uploaded:', newBlob.url);
+        console.log('Blob uploaded (Persistent):', newBlob.url);
         collectionUrl = newBlob.url;
-      } else {
-        const formData = new FormData();
-        formData.append('file', file);
-        
-        const res = await fetch('/api/collection/upload/memory', {
-          method: 'POST',
-          body: formData
-        });
 
-        if (!res.ok) {
-          throw new Error('Memory upload failed');
+        // Register the compressed blob URL
+        registerCollection.mutate({ url: collectionUrl });
+
+      } else {
+        // Memory Mode
+        // Check if compressed file fits in Vercel function limit (4.5MB safe margin)
+        const ONE_MB = 1024 * 1024;
+        const LIMIT = 4.4 * ONE_MB; // Leave a tiny bit of headroom
+
+        if (compressedBlob.size < LIMIT) {
+          // Path A: Direct Memory Upload (Compressed)
+          console.log('Size OK for direct upload. Sending to memory route...');
+          
+          // We can't put a Blob directly into FormData in a way that preserves 'Content-Encoding' header easily 
+          // for the *part*. But we can send the blob directly as body if we want, or just rely on manual handling.
+          // Actually, standard FormData upload works, we just need to tell the server it's gzipped.
+          // Alternatively, send as raw body. Let's stick to FormData but add a flag or header.
+          
+          const formData = new FormData();
+          // Create a file from blob to preserve name but with .gz extension
+          const gzipFileObj = new File([compressedBlob], 'collection.nml.gz', { type: 'application/gzip' });
+          formData.append('file', gzipFileObj);
+          
+          const res = await fetch('/api/collection/upload/memory', {
+            method: 'POST',
+            body: formData,
+            headers: {
+              // Custom header to hint server to decompress
+              'X-Content-Encoding': 'gzip' 
+            }
+          });
+
+          if (!res.ok) {
+            const errData = await res.json().catch(() => ({}));
+            throw new Error(errData.error || 'Memory upload failed');
+          }
+          
+          const data = (await res.json()) as { url: string };
+          collectionUrl = data.url;
+          
+          registerCollection.mutate({ url: collectionUrl });
+
+        } else {
+          // Path B: Fallback to Temporary Blob Upload
+          console.log('File too large for direct upload. Using temporary blob...');
+          
+          const newBlob = await upload(`temp/${userId}-${Date.now()}.nml.gz`, compressedBlob, {
+            access: 'public',
+            handleUploadUrl: '/api/collection/upload/vercel-blob?temp=true', // Add temp flag
+            contentType: 'application/gzip',
+          });
+          
+          console.log('Temp Blob uploaded:', newBlob.url);
+          
+          // Trigger server to fetch, load, and delete the blob
+          loadFromTempUrl.mutate({ url: newBlob.url });
+          return; // mutation handles success/error
         }
-        
-        const data = (await res.json()) as { url: string };
-        collectionUrl = data.url;
       }
 
-      registerCollection.mutate({ url: collectionUrl });
     } catch (err) {
       console.error('Upload error:', err);
-      setError('Failed to upload collection. Please try again.');
+      setError(err instanceof Error ? err.message : 'Failed to upload collection. Please try again.');
       setIsUploading(false);
     }
   };

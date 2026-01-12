@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { auth } from "~/server/auth";
 import { db } from "~/server/db";
 import { collectionManager } from '~/server/services/collectionManager';
+import { gunzipSync } from 'node:zlib';
 
 // Maximum file size (50MB)
 const MAX_SIZE = 50 * 1024 * 1024;
@@ -30,7 +31,28 @@ export async function POST(request: Request): Promise<NextResponse> {
     }
 
     console.log(`[MemoryUpload] Receiving ${file.size} bytes for user ${userId}`);
-    const xmlContent = await file.text();
+    
+    let xmlContent: string;
+
+    // Check for Gzip compression
+    // 1. Custom header from our client
+    // 2. File extension
+    // 3. Content-Type
+    const isGzipped = 
+      request.headers.get('X-Content-Encoding') === 'gzip' ||
+      file.name.endsWith('.gz') ||
+      file.type === 'application/gzip';
+
+    if (isGzipped) {
+      console.log('[MemoryUpload] Decompressing Gzip content...');
+      const arrayBuffer = await file.arrayBuffer();
+      const buffer = Buffer.from(arrayBuffer);
+      const decompressed = gunzipSync(buffer);
+      xmlContent = decompressed.toString('utf-8');
+      console.log(`[MemoryUpload] Decompressed size: ${xmlContent.length} bytes`);
+    } else {
+      xmlContent = await file.text();
+    }
 
     const memoryPath = `memory:${userId}`;
 

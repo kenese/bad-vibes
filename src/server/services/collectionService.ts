@@ -2,9 +2,10 @@ import { randomUUID } from 'node:crypto';
 import { put } from '@vercel/blob';
 import { XMLBuilder, XMLParser } from 'fast-xml-parser';
 import { db } from '../db';
+import { gunzipSync } from 'node:zlib';
 
-export type SidebarTreeNode = {
-  name: string;
+
+export type SidebarTreeNode = {  name: string;
   type: NodeKind;
   path: string;
   parentPath: string | null;
@@ -581,6 +582,8 @@ export class CollectionService {
     }
 
     try {
+      let buffer: Buffer;
+
       if (this.collectionPath.startsWith('http')) {
         console.log(`[CollectionService] Fetching remote collection from: ${this.collectionPath}`);
         const response = await fetch(this.collectionPath);
@@ -590,13 +593,32 @@ export class CollectionService {
           console.error(`Collection file missing or error at ${this.collectionPath}. Status: ${response.status}`);
           return;
         }
-        xml = await response.text();
-        console.log(`[CollectionService] Fetched ${xml.length} bytes`);
+        const arrayBuffer = await response.arrayBuffer();
+        buffer = Buffer.from(arrayBuffer);
+        console.log(`[CollectionService] Fetched ${buffer.length} bytes`);
       } else {
         // Local file path - use Node.js fs
         const fs = await import('node:fs/promises');
-        xml = await fs.readFile(this.collectionPath, 'utf-8');
+        buffer = await fs.readFile(this.collectionPath);
       }
+
+      // Check for Gzip (Magic bytes: 1F 8B)
+      const isGzip = buffer.length > 2 && buffer[0] === 0x1f && buffer[1] === 0x8b;
+      
+      if (isGzip) {
+        console.log('[CollectionService] Detected Gzip compression. Decompressing...');
+        try {
+          const decompressed = gunzipSync(buffer);
+          xml = decompressed.toString('utf-8');
+          console.log(`[CollectionService] Decompressed to ${xml.length} bytes`);
+        } catch (err) {
+          console.warn('[CollectionService] Decompression failed, falling back to raw text:', err);
+          xml = buffer.toString('utf-8');
+        }
+      } else {
+        xml = buffer.toString('utf-8');
+      }
+
     } catch (error) {
       console.error('[CollectionService] Error reading document:', error);
       if ((error as NodeJS.ErrnoException)?.code === 'ENOENT') {

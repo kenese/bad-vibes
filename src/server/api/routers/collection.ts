@@ -4,6 +4,7 @@ import { createTRPCRouter, protectedProcedure } from '~/server/api/trpc';
 import { collectionManager } from '~/server/services/collectionManager';
 import { type db } from '~/server/db';
 import { del } from '@vercel/blob';
+import { gunzipSync } from 'node:zlib';
 
 
 interface TRPCContext {
@@ -100,6 +101,66 @@ export const collectionRouter = createTRPCRouter({
     }
     return { success: true };
   }),
+
+  loadFromTempUrl: protectedProcedure
+    .input(z.object({ url: z.string().url() }))
+    .mutation(async ({ ctx, input }) => {
+      const userId = ctx.session.user.id;
+      console.log(`[CollectionRouter] Loading from temp URL for user ${userId}: ${input.url}`);
+
+      try {
+        // 1. Fetch the blob content
+        const response = await fetch(input.url);
+        if (!response.ok) {
+          throw new Error(`Failed to fetch temp file: ${response.statusText}`);
+        }
+
+        const arrayBuffer = await response.arrayBuffer();
+        const buffer = Buffer.from(arrayBuffer);
+        
+        // 2. Decompress (we assume it's gzipped because that's our protocol for temp uploads)
+        // But let's be safe and check/try
+        let xmlContent: string;
+        try {
+          // Check for gzip magic numbers (1f 8b)
+          if (buffer.length > 2 && buffer[0] === 0x1f && buffer[1] === 0x8b) {
+            console.log('[CollectionRouter] Decompressing temp blob...');
+            const decompressed = gunzipSync(buffer);
+            xmlContent = decompressed.toString('utf-8');
+          } else {
+            console.log('[CollectionRouter] Temp blob appears uncompressed, using as-is.');
+            xmlContent = buffer.toString('utf-8');
+          }
+        } catch (err) {
+          console.warn('[CollectionRouter] Decompression failed, assuming plain text:', err);
+          xmlContent = buffer.toString('utf-8');
+        }
+
+        // 3. Load into memory manager
+        await collectionManager.setFromMemory(userId, xmlContent);
+
+        // 4. Update DB to point to 'memory:...'
+        if (userId !== 'dev-user-001') {
+          await ctx.db.user.update({
+            where: { id: userId },
+            data: { collectionPath: `memory:${userId}` }
+          });
+        }
+
+        // 5. Delete the temporary blob
+        console.log('[CollectionRouter] Deleting temp blob...', input.url);
+        // Fire and forget delete to speed up response, or await? Await is safer to ensuring cleanup.
+        await del(input.url);
+
+        return { success: true };
+      } catch (error) {
+        console.error('[CollectionRouter] Failed to load from temp URL:', error);
+        throw new TRPCError({
+          code: 'INTERNAL_SERVER_ERROR',
+          message: 'Failed to process temporary upload'
+        });
+      }
+    }),
 
   registerCollection: protectedProcedure
     .input(z.object({ url: z.string() })) // Not enforcing .url() for memory: paths
