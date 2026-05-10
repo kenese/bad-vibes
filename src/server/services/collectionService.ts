@@ -5,7 +5,8 @@ import { db } from '../db';
 import { gunzipSync } from 'node:zlib';
 
 
-export type SidebarTreeNode = {  name: string;
+export type SidebarTreeNode = {
+  name: string;
   type: NodeKind;
   path: string;
   parentPath: string | null;
@@ -67,8 +68,8 @@ type TrackEntry = {
   LOCATION?: TrackLocation;
   TITLE?: string;
   ARTIST?: string;
-  ALBUM?: { 
-    TITLE?: string; 
+  ALBUM?: {
+    TITLE?: string;
     TRACK?: string;
     OF_TRACKS?: string;
   };
@@ -91,14 +92,14 @@ type TrackEntry = {
     PRODUCER?: string;
     KEY_LYRICS?: string;
   };
-  TEMPO?: { 
-    BPM?: string | number; 
+  TEMPO?: {
+    BPM?: string | number;
     BPM_QUALITY?: string;
   };
   MUSICAL_KEY?: { VALUE?: string };
-  LOUDNESS?: { 
-    PEAK_DB?: string; 
-    PERCEIVED_DB?: string; 
+  LOUDNESS?: {
+    PEAK_DB?: string;
+    PERCEIVED_DB?: string;
     ANALYZED_DB?: string;
   };
   CUE_V2?: {
@@ -243,10 +244,10 @@ const slugify = (value: string) => {
   try {
     return typeof value === 'string'
       ? value
-          .toLowerCase()
-          .replace(/[^a-z0-9]+/g, '-')
-          .replace(/^-+|-+$/g, '')
-          .slice(0, 40) || 'node'
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/^-+|-+$/g, '')
+        .slice(0, 40) || 'node'
       : value;
   } catch {
     return '';
@@ -376,7 +377,7 @@ export class CollectionService {
     const folderNode = this.assertFolder(parentRef);
     const children = this.getChildrenArray(folderNode);
     const uuid = randomUUID().replace(/-/g, '');
-    
+
     // Build ENTRY array from track keys
     const entries: RawPlaylistEntry[] = input.trackKeys.map(key => ({
       PRIMARYKEY: {
@@ -429,9 +430,9 @@ export class CollectionService {
 
   async movePlaylistBatch(moves: Array<{ sourcePath: string; targetFolderPath: string }>) {
     await this.ensureLoaded();
-    
+
     const results: Array<{ sourcePath: string; success: boolean; error?: string }> = [];
-    
+
     for (const move of moves) {
       try {
         const sourceRef = this.getNodeRef(move.sourcePath);
@@ -449,7 +450,7 @@ export class CollectionService {
           results.push({ sourcePath: move.sourcePath, success: false, error: 'Playlist missing from its parent' });
           continue;
         }
-        
+
         // Move the node
         sourceSiblings.splice(sourceIndex, 1);
         const parentNode = this.assertFolder(this.getNodeRef(move.targetFolderPath));
@@ -459,20 +460,20 @@ export class CollectionService {
         if (sourceRef.parentNode && (sourceRef.parentNode as RawFolderNode).SUBNODES) {
           (sourceRef.parentNode as RawFolderNode).SUBNODES!.COUNT = String(sourceSiblings.length);
         }
-        
+
         results.push({ sourcePath: move.sourcePath, success: true });
       } catch (err) {
-        results.push({ 
-          sourcePath: move.sourcePath, 
-          success: false, 
-          error: err instanceof Error ? err.message : 'Unknown error' 
+        results.push({
+          sourcePath: move.sourcePath,
+          success: false,
+          error: err instanceof Error ? err.message : 'Unknown error'
         });
       }
     }
-    
+
     // Only persist once after all moves
     await this.persist();
-    
+
     return { results, movedCount: results.filter(r => r.success).length };
   }
 
@@ -588,7 +589,7 @@ export class CollectionService {
         console.log(`[CollectionService] Fetching remote collection from: ${this.collectionPath}`);
         const response = await fetch(this.collectionPath);
         console.log(`[CollectionService] Fetch status: ${response.status} ${response.statusText}`);
-        
+
         if (!response.ok) {
           console.error(`Collection file missing or error at ${this.collectionPath}. Status: ${response.status}`);
           return;
@@ -604,7 +605,7 @@ export class CollectionService {
 
       // Check for Gzip (Magic bytes: 1F 8B)
       const isGzip = buffer.length > 2 && buffer[0] === 0x1f && buffer[1] === 0x8b;
-      
+
       if (isGzip) {
         console.log('[CollectionService] Detected Gzip compression. Decompressing...');
         try {
@@ -885,11 +886,11 @@ export class CollectionService {
   async getAllTracks(): Promise<FullTrackRow[]> {
     await this.ensureLoaded();
     const tracks: FullTrackRow[] = [];
-    
+
     this.trackIndex.forEach((entry, key) => {
       tracks.push(this.buildFullTrackRow(key, entry));
     });
-    
+
     return tracks;
   }
 
@@ -899,14 +900,14 @@ export class CollectionService {
     if (!entry) {
       throw new Error(`Track not found: ${key}`);
     }
-    
+
     this.applyTrackUpdates(entry, updates);
     await this.persist();
     return { success: true };
   }
 
-  async updateTracksBatch(updates: Array<{ key: string; updates: TrackFieldUpdates }>): Promise<{ 
-    success: boolean; 
+  async updateTracksBatch(updates: Array<{ key: string; updates: TrackFieldUpdates }>): Promise<{
+    success: boolean;
     updatedCount: number;
     errors: Array<{ key: string; error: string }>;
   }> {
@@ -920,7 +921,7 @@ export class CollectionService {
         errors.push({ key, error: 'Track not found' });
         continue;
       }
-      
+
       this.applyTrackUpdates(entry, trackUpdates);
       updatedCount++;
     }
@@ -928,13 +929,13 @@ export class CollectionService {
     if (updatedCount > 0) {
       await this.persist();
     }
-    
+
     return { success: errors.length === 0, updatedCount, errors };
   }
 
   async getUniqueComments(): Promise<CategorizedComments> {
     await this.ensureLoaded();
-    
+
     const comments = new Set<string>();
     this.trackIndex.forEach((entry) => {
       const comment = entry.INFO?.COMMENT;
@@ -947,7 +948,7 @@ export class CollectionService {
   }
 
   async updateCommentsBatch(
-    oldComments: string[], 
+    oldComments: string[],
     newComment: string
   ): Promise<{ success: boolean; updatedCount: number }> {
     await this.ensureLoaded();
@@ -1000,15 +1001,15 @@ export class CollectionService {
   private applyTrackUpdates(entry: TrackEntry, updates: TrackFieldUpdates): void {
     if (updates.title !== undefined) entry.TITLE = updates.title || undefined;
     if (updates.artist !== undefined) entry.ARTIST = updates.artist || undefined;
-    
+
     if (updates.album !== undefined) {
       entry.ALBUM ??= {};
       entry.ALBUM.TITLE = updates.album || undefined;
     }
-    
-    if (updates.comment !== undefined || updates.genre !== undefined || 
-        updates.label !== undefined || updates.rating !== undefined ||
-        updates.key !== undefined) {
+
+    if (updates.comment !== undefined || updates.genre !== undefined ||
+      updates.label !== undefined || updates.rating !== undefined ||
+      updates.key !== undefined) {
       entry.INFO ??= {};
       if (updates.comment !== undefined) entry.INFO.COMMENT = updates.comment || undefined;
       if (updates.genre !== undefined) entry.INFO.GENRE = updates.genre || undefined;
@@ -1016,7 +1017,7 @@ export class CollectionService {
       if (updates.rating !== undefined) entry.INFO.RATING = updates.rating || undefined;
       if (updates.key !== undefined) entry.INFO.KEY = updates.key || undefined;
     }
-    
+
     if (updates.bpm !== undefined) {
       entry.TEMPO ??= {};
       entry.TEMPO.BPM = updates.bpm?.toString() ?? undefined;
@@ -1040,7 +1041,7 @@ export class CollectionService {
       'latin', 'salsa', 'cumbia', 'brazilian', 'bossa', 'downtempo', 'chillout',
       'lounge', 'ambient', 'trap', 'drill', 'boom bap', 'breaks', 'breakbeat',
       'booty', 'bass', 'nudisco', 'nu-disco', 'italo', 'boogie', 'pop', 'rock',
-      'juke', 'footwork', 'jersey club', 'philly club', 
+      'juke', 'footwork', 'jersey club', 'philly club',
       'indie', 'alternative', 'world', 'afro', 'tribal', 'minimal', 'progressive',
       'trance', 'acid', 'dub', 'deep', 'soulful', 'classic', 'vocal', 'instrumental',
       'remix', 'edit', 'bootleg', 'mashup',
@@ -1057,7 +1058,7 @@ export class CollectionService {
       if (!c) continue;
 
       const categories: string[] = [];
-      
+
       if (keyBpmPattern.test(c)) categories.push('keyBpm');
       if (urlPattern.test(c)) categories.push('url');
       if (hexPattern.test(c)) categories.push('hex');
@@ -1131,11 +1132,11 @@ export class CollectionService {
 
     // Update local reference to the new URL
     this.collectionPath = url;
-    
+
     // After saving, the "output" becomes our new original
     this.originalXml = output;
     this.modified = false;
-    
+
     this.invalidateTree();
   }
 
@@ -1144,16 +1145,16 @@ export class CollectionService {
   async getPlaylistsWithTags(): Promise<ExtractedTags> {
     await this.ensureLoaded();
     this.ensureTree();
-    
+
     // Helper to get all folder names in path to a playlist
     const getPathNames = (path: string): string[] => {
       const names: string[] = [];
       let currentPath: string | null = path;
-      
+
       while (currentPath) {
         const ref = this.pathIndex.get(currentPath);
         if (!ref) break;
-        
+
         const name = ref.rawNode.NAME;
         // Skip ROOT and add the name
         if (name && name !== 'ROOT' && name !== '$ROOT') {
@@ -1161,10 +1162,10 @@ export class CollectionService {
         }
         currentPath = ref.parentPath;
       }
-      
+
       return names;
     };
-    
+
     // Collect all playlists with their names and path names
     const playlists: PlaylistTagInfo[] = [];
     this.pathIndex.forEach((ref, path) => {
@@ -1178,7 +1179,7 @@ export class CollectionService {
 
     // Extract words from playlist AND folder names, count occurrences
     const wordToPlaylists = new Map<string, PlaylistTagInfo[]>();
-    
+
     // Common words to exclude
     const stopWords = new Set([
       'the', 'a', 'an', 'and', 'or', 'of', 'to', 'in', 'for', 'on', 'at', 'by',
@@ -1192,7 +1193,7 @@ export class CollectionService {
     for (const playlist of playlists) {
       // Get all names in the path (playlist + all parent folders)
       const allNames = getPathNames(playlist.path);
-      
+
       // Extract words from all names
       const allWords = new Set<string>();
       for (const name of allNames) {
@@ -1201,7 +1202,7 @@ export class CollectionService {
           .split(/[\s\-_/\\|,;:()[\]{}]+/)
           .map(w => w.trim())
           .filter(w => w.length >= 2 && !stopWords.has(w) && !/^\d+$/.test(w));
-        
+
         words.forEach(w => allWords.add(w));
       }
 
@@ -1234,24 +1235,24 @@ export class CollectionService {
 
   async writeStyleTagToTracks(playlistPaths: string[], tag: string): Promise<{ updatedCount: number }> {
     await this.ensureLoaded();
-    
+
     // Title case: capitalize first letter of each word
-    const toTitleCase = (str: string) => 
+    const toTitleCase = (str: string) =>
       str.replace(/\b\w/g, char => char.toUpperCase());
-    
+
     const formattedTag = toTitleCase(tag.startsWith('[') ? tag.slice(1, -1) : tag);
     const bracketTag = `[${formattedTag}]`;
-    
+
     // Collect all track keys from specified playlists
     const trackKeys = new Set<string>();
-    
+
     for (const path of playlistPaths) {
       const ref = this.pathIndex.get(path);
       if (ref?.type !== 'PLAYLIST') continue;
-      
+
       const playlist = (ref.rawNode as RawPlaylistNode).PLAYLIST;
       const entries = toArray(playlist?.ENTRY);
-      
+
       for (const entry of entries) {
         const key = entry.PRIMARYKEY?.KEY;
         if (key) trackKeys.add(key);
@@ -1267,7 +1268,7 @@ export class CollectionService {
       if (!entry) return;
 
       const currentComment = entry.INFO?.COMMENT ?? '';
-      
+
       // Check if tag already exists in comment (case-insensitive)
       if (currentComment.toLowerCase().includes(tagLower)) {
         return; // Skip - already has this tag
@@ -1275,10 +1276,10 @@ export class CollectionService {
 
       // Add the tag
       entry.INFO ??= {};
-      entry.INFO.COMMENT = currentComment 
-        ? `${currentComment} ${bracketTag}` 
+      entry.INFO.COMMENT = currentComment
+        ? `${currentComment} ${bracketTag}`
         : bracketTag;
-      
+
       updatedCount++;
     });
 
@@ -1290,13 +1291,13 @@ export class CollectionService {
     return { updatedCount };
   }
 
-  async addTagsToTracks(updates: { trackKey: string; tags: string[] }[]): Promise<{ 
-    updatedCount: number; 
+  async addTagsToTracks(updates: { trackKey: string; tags: string[] }[]): Promise<{
+    updatedCount: number;
     skippedCount: number;
     tagsAdded: { trackKey: string; artist: string; title: string; newTags: string[] }[];
   }> {
     await this.ensureLoaded();
-    
+
     let updatedCount = 0;
     let skippedCount = 0;
     const tagsAdded: { trackKey: string; artist: string; title: string; newTags: string[] }[] = [];
@@ -1310,7 +1311,7 @@ export class CollectionService {
 
       const currentComment = entry.INFO?.COMMENT ?? '';
       const currentCommentLower = currentComment.toLowerCase();
-      
+
       // Filter out tags that already exist (case-insensitive)
       const newTags = tags.filter(tag => {
         const bracketTag = `[${tag}]`.toLowerCase();
@@ -1322,15 +1323,16 @@ export class CollectionService {
         continue;
       }
 
-      // Build the tags string
-      const tagsString = newTags.map(tag => `[${tag}]`).join(' ');
-      
+      // Build the tags string with the AITagged marker
+      const AI_TAGGED_MARKER = 'AITagged';
+      const tagsString = [...newTags, AI_TAGGED_MARKER].map(tag => `[${tag}]`).join(' ');
+
       // Update the comment
       entry.INFO ??= {};
-      entry.INFO.COMMENT = currentComment 
-        ? `${currentComment} ${tagsString}` 
+      entry.INFO.COMMENT = currentComment
+        ? `${currentComment} ${tagsString}`
         : tagsString;
-      
+
       updatedCount++;
       tagsAdded.push({
         trackKey,
@@ -1354,20 +1356,20 @@ export class CollectionService {
     totalInCollection: number;
   }> {
     await this.ensureLoaded();
-    
+
     const bracketTag = tag.startsWith('[') ? tag : `[${tag}]`;
     const tagLower = bracketTag.toLowerCase();
-    
+
     // Collect track keys from specified playlists
     const trackKeysInSelection = new Set<string>();
-    
+
     for (const path of playlistPaths) {
       const ref = this.pathIndex.get(path);
       if (ref?.type !== 'PLAYLIST') continue;
-      
+
       const playlist = (ref.rawNode as RawPlaylistNode).PLAYLIST;
       const entries = toArray(playlist?.ENTRY);
-      
+
       for (const entry of entries) {
         const key = entry.PRIMARYKEY?.KEY;
         if (key) trackKeysInSelection.add(key);
@@ -1467,7 +1469,7 @@ export class CollectionService {
     // Ensure tree is built so that root node is properly initialized in the document
     this.ensureTree();
     const root = this.ensureRootNode();
-    
+
     // Check if playlist exists in root children
     let playlistNode: RawPlaylistNode | undefined;
     const subnodes = root.SUBNODES ?? { NODE: [] };
@@ -1495,7 +1497,7 @@ export class CollectionService {
 
       // Add to root
       children.unshift(playlistNode);
-      
+
       // Update root SUBNODES
       subnodes.NODE = children;
       // Also update count
@@ -1506,7 +1508,7 @@ export class CollectionService {
     // Add entries to the playlist
     if (playlistNode?.PLAYLIST) {
       const currentEntries = toArray(playlistNode.PLAYLIST.ENTRY);
-      
+
       const newEntries = trackKeys.map(key => ({
         PRIMARYKEY: {
           TYPE: 'TRACK',
@@ -1517,7 +1519,7 @@ export class CollectionService {
       playlistNode.PLAYLIST.ENTRY = [...currentEntries, ...newEntries];
       playlistNode.PLAYLIST.ENTRIES = String(playlistNode.PLAYLIST.ENTRY.length);
     }
-    
+
     // Force a tree invalidation to ensure UI updates next time
     this.invalidateTree();
   }

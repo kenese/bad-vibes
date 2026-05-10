@@ -49,6 +49,7 @@ const UploadPrompt = ({ onUploadSuccess }: { onUploadSuccess: () => void }) => {
 
   const registerCollection = api.collection.registerCollection.useMutation({
     onSuccess: () => {
+      setIsUploading(false);
       onUploadSuccess();
     },
     onError: () => {
@@ -59,6 +60,7 @@ const UploadPrompt = ({ onUploadSuccess }: { onUploadSuccess: () => void }) => {
 
   const loadFromTempUrl = api.collection.loadFromTempUrl.useMutation({
     onSuccess: () => {
+      setIsUploading(false);
       onUploadSuccess();
     },
     onError: (err) => {
@@ -70,11 +72,11 @@ const UploadPrompt = ({ onUploadSuccess }: { onUploadSuccess: () => void }) => {
 
   const handleUpload = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     // In dev mode, use a mock user ID if no session
     const isDev = process.env.NODE_ENV === 'development';
     const userId = session?.user?.id ?? (isDev ? 'dev-user-001' : null);
-    
+
     if (!file || !userId) return;
 
     setIsUploading(true);
@@ -104,29 +106,30 @@ const UploadPrompt = ({ onUploadSuccess }: { onUploadSuccess: () => void }) => {
       } else {
         // Memory Mode
         // Check if compressed file fits in Vercel function limit (4.5MB safe margin)
+        // In dev mode, we don't have Vercel's limit, so allow up to 50MB
         const ONE_MB = 1024 * 1024;
-        const LIMIT = 4.4 * ONE_MB; // Leave a tiny bit of headroom
+        const LIMIT = isDev ? 50 * ONE_MB : 4.4 * ONE_MB;
 
         if (compressedBlob.size < LIMIT) {
           // Path A: Direct Memory Upload (Compressed)
           console.log('Size OK for direct upload. Sending to memory route...');
-          
+
           // We can't put a Blob directly into FormData in a way that preserves 'Content-Encoding' header easily 
           // for the *part*. But we can send the blob directly as body if we want, or just rely on manual handling.
           // Actually, standard FormData upload works, we just need to tell the server it's gzipped.
           // Alternatively, send as raw body. Let's stick to FormData but add a flag or header.
-          
+
           const formData = new FormData();
           // Create a file from blob to preserve name but with .gz extension
           const gzipFileObj = new File([compressedBlob], 'collection.nml.gz', { type: 'application/gzip' });
           formData.append('file', gzipFileObj);
-          
+
           const res = await fetch('/api/collection/upload/memory', {
             method: 'POST',
             body: formData,
             headers: {
               // Custom header to hint server to decompress
-              'X-Content-Encoding': 'gzip' 
+              'X-Content-Encoding': 'gzip'
             }
           });
 
@@ -134,24 +137,24 @@ const UploadPrompt = ({ onUploadSuccess }: { onUploadSuccess: () => void }) => {
             const errData = (await res.json().catch(() => ({}))) as { error?: string };
             throw new Error(errData.error ?? 'Memory upload failed');
           }
-          
+
           const data = (await res.json()) as { url: string };
           collectionUrl = data.url;
-          
+
           registerCollection.mutate({ url: collectionUrl });
 
         } else {
           // Path B: Fallback to Temporary Blob Upload
           console.log('File too large for direct upload. Using temporary blob...');
-          
+
           const newBlob = await upload(`temp/${userId}-${Date.now()}.nml.gz`, compressedBlob, {
             access: 'public',
             handleUploadUrl: '/api/collection/upload/vercel-blob?temp=true', // Add temp flag
             contentType: 'application/gzip',
           });
-          
+
           console.log('Temp Blob uploaded:', newBlob.url);
-          
+
           // Trigger server to fetch, load, and delete the blob
           loadFromTempUrl.mutate({ url: newBlob.url });
           return; // mutation handles success/error
@@ -171,7 +174,7 @@ const UploadPrompt = ({ onUploadSuccess }: { onUploadSuccess: () => void }) => {
         <div className="text-5xl mb-6">📂</div>
         <h2 className="text-2xl font-bold mb-4 text-[#f0f6fc]">Upload Traktor Collection</h2>
         <p className="text-[#8b949e] mb-8 leading-relaxed">
-          Welcome! To get started, please upload your <code>collection.nml</code> file. 
+          Welcome! To get started, please upload your <code>collection.nml</code> file.
           This is typically found in your Documents folder under Native Instruments.
         </p>
 

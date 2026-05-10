@@ -9,8 +9,16 @@ Traktor Collection is quite shit so this add a bunch of features i'd like to see
 - **Playlists** — Create standalone tracklists via text parsing or Spotify/YouTube links.
 Scrape playlists from spotify plex, youtube and your discogs collection
 - **Soulseek Integration** — Bulk download tracks from Soulseek.
-Download tracks from the playlists created. BYO Soulseek server.
-It does some AI shit to improve the soulseek search results.
+  Download tracks from the playlists created. It does some AI shit to improve the soulseek search results.
+  **How it works:** The Soulseek client (`slskd`) runs locally on my Mac Mini via a Docker container. I have set up a Cloudflare tunnel to securely expose the container's interface to the internet so this application can communicate with the Soulseek daemon. Downloaded tracks are saved directly to an attached external drive.
+  
+  **Running the Soulseek Container:**
+  To start the container, navigate to the `soulseek` directory and run it in detached mode:
+  ```bash
+  cd soulseek
+  docker compose up -d
+  ```
+  Because the `docker-compose.yml` uses `restart: unless-stopped`, the container will automatically start up whenever the Mac Mini reboots (provided Docker Desktop is set to "Start on login").
 
 ## Prerequisites
 
