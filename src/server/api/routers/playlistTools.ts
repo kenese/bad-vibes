@@ -549,7 +549,7 @@ export const playlistToolsRouter = createTRPCRouter({
       }
 
       return {
-        playlistUrl: `https://music.youtube.com/playlist?list=${ytPlaylistId}`,
+        url: `https://music.youtube.com/playlist?list=${ytPlaylistId}`,
         added,
         total: playlist.items.length,
       };
