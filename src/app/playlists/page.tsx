@@ -1,12 +1,12 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { Suspense, useState, useEffect, useCallback } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { api } from '~/trpc/react';
 import { DiscogsImport } from './DiscogsImport';
 import { PlexImport } from './PlexImport';
 
-export default function PlaylistToolsPage() {
+function PlaylistToolsPage() {
     const utils = api.useUtils();
     const searchParams = useSearchParams();
     const [rawText, setRawText] = useState('');
@@ -465,5 +465,13 @@ export default function PlaylistToolsPage() {
                 </div>
             </div>
         </main>
+    );
+}
+
+export default function Page() {
+    return (
+        <Suspense>
+            <PlaylistToolsPage />
+        </Suspense>
     );
 }
