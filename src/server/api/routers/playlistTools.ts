@@ -432,11 +432,11 @@ export const playlistToolsRouter = createTRPCRouter({
       if (!account) {
         throw new TRPCError({
           code: "UNAUTHORIZED",
-          message: "YouTube not connected. Click 'Connect YouTube Music' to link your account.",
+          message: "YouTube not connected [v2] — click 'Connect YouTube Music' on the playlists page.",
         });
       }
 
-      const reAuthMessage = "YouTube access requires re-authentication. Please sign out and sign back in — you'll be prompted to grant YouTube permissions.";
+      const reAuthMessage = "YouTube not authorised — click 'Connect YouTube Music' on the playlists page to link your account [v2].";
 
       let accessToken = account.access_token;
       const now = Math.floor(Date.now() / 1000);
