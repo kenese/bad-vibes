@@ -428,15 +428,15 @@ export const playlistToolsRouter = createTRPCRouter({
         });
       }
 
+      const reAuthMessage = "YouTube access requires re-authentication. Please sign out and sign back in — you'll be prompted to grant YouTube permissions.";
+
       let accessToken = account.access_token;
       const now = Math.floor(Date.now() / 1000);
+      const isExpired = !accessToken || (account.expires_at ? account.expires_at < now - 60 : false);
 
-      if (account.expires_at && account.expires_at < now) {
+      if (isExpired) {
         if (!account.refresh_token) {
-          throw new TRPCError({
-            code: "UNAUTHORIZED",
-            message: "Google token expired. Please sign out and sign back in to re-authorize.",
-          });
+          throw new TRPCError({ code: "UNAUTHORIZED", message: reAuthMessage });
         }
 
         const refreshRes = await fetch("https://oauth2.googleapis.com/token", {
@@ -451,10 +451,7 @@ export const playlistToolsRouter = createTRPCRouter({
         });
 
         if (!refreshRes.ok) {
-          throw new TRPCError({
-            code: "UNAUTHORIZED",
-            message: "Failed to refresh Google token. Please sign out and sign back in.",
-          });
+          throw new TRPCError({ code: "UNAUTHORIZED", message: reAuthMessage });
         }
 
         const refreshData = await refreshRes.json() as { access_token: string; expires_in: number };
@@ -463,13 +460,6 @@ export const playlistToolsRouter = createTRPCRouter({
         await ctx.db.account.update({
           where: { id: account.id },
           data: { access_token: accessToken, expires_at: now + refreshData.expires_in },
-        });
-      }
-
-      if (!accessToken) {
-        throw new TRPCError({
-          code: "UNAUTHORIZED",
-          message: "No Google access token. Please sign out and sign back in with YouTube permissions.",
         });
       }
 
@@ -499,10 +489,7 @@ export const playlistToolsRouter = createTRPCRouter({
 
       if (!createRes.ok) {
         if (createRes.status === 401 || createRes.status === 403) {
-          throw new TRPCError({
-            code: "UNAUTHORIZED",
-            message: "YouTube access denied. Sign out and sign in again to grant YouTube permissions.",
-          });
+          throw new TRPCError({ code: "UNAUTHORIZED", message: reAuthMessage });
         }
         const errText = await createRes.text();
         throw new TRPCError({
