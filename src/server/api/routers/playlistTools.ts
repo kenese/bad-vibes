@@ -418,13 +418,13 @@ export const playlistToolsRouter = createTRPCRouter({
     .input(z.object({ playlistId: z.string() }))
     .mutation(async ({ ctx, input }) => {
       const account = await ctx.db.account.findFirst({
-        where: { userId: ctx.session.user.id, provider: "google" },
+        where: { userId: ctx.session.user.id, provider: "youtube" },
       });
 
       if (!account) {
         throw new TRPCError({
           code: "UNAUTHORIZED",
-          message: "Google account not connected. Please sign in with Google.",
+          message: "YouTube not connected. Click 'Connect YouTube Music' to link your account.",
         });
       }
 

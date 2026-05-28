@@ -1,12 +1,14 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { api } from '~/trpc/react';
 import { DiscogsImport } from './DiscogsImport';
 import { PlexImport } from './PlexImport';
 
 export default function PlaylistToolsPage() {
     const utils = api.useUtils();
+    const searchParams = useSearchParams();
     const [rawText, setRawText] = useState('');
     const [externalUrl, setExternalUrl] = useState('');
     const [playlistName, setPlaylistName] = useState('My New Playlist');
@@ -17,6 +19,8 @@ export default function PlaylistToolsPage() {
     const [showPlexModal, setShowPlexModal] = useState(false);
     const [selectedIndices, setSelectedIndices] = useState<Set<number>>(new Set());
     const [ytResults, setYtResults] = useState<Record<string, { url: string; added: number; total: number }>>({});
+
+    const youtubeStatus = searchParams.get('youtube');
     
     // Keep selection in sync with items
     useEffect(() => {
@@ -218,6 +222,16 @@ export default function PlaylistToolsPage() {
                             <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
                             Import from Plex Playlist
                         </button>
+                        <a
+                            href="/api/youtube/auth"
+                            className="w-full bg-[#ff0000]/10 hover:bg-[#ff0000]/20 text-[#ff4444] border border-[#ff0000]/30 hover:border-[#ff4444] font-bold py-2.5 px-6 rounded-lg transition-all flex items-center justify-center gap-2"
+                        >
+                            <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+                            {youtubeStatus === 'connected' ? '✓ YouTube Music Connected' : 'Connect YouTube Music'}
+                        </a>
+                        {youtubeStatus === 'error' && (
+                            <p className="text-xs text-[#f85149] text-center">YouTube connection failed. Try again.</p>
+                        )}
                     </div>
                 </div>
             </div>
