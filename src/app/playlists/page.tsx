@@ -1,12 +1,14 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { Suspense, useState, useEffect, useCallback } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { api } from '~/trpc/react';
 import { DiscogsImport } from './DiscogsImport';
 import { PlexImport } from './PlexImport';
 
-export default function PlaylistToolsPage() {
+function PlaylistToolsPage() {
     const utils = api.useUtils();
+    const searchParams = useSearchParams();
     const [rawText, setRawText] = useState('');
     const [externalUrl, setExternalUrl] = useState('');
     const [playlistName, setPlaylistName] = useState('My New Playlist');
@@ -16,7 +18,15 @@ export default function PlaylistToolsPage() {
     const [showDiscogsModal, setShowDiscogsModal] = useState(false);
     const [showPlexModal, setShowPlexModal] = useState(false);
     const [selectedIndices, setSelectedIndices] = useState<Set<number>>(new Set());
-    
+    const [ytResults, setYtResults] = useState<Record<string, { url: string; added: number; total: number }>>({});
+
+    const youtubeStatus = searchParams.get('youtube');
+    const youtubeConnectedQuery = api.playlistTools.youtubeConnected.useQuery(undefined, {
+        // refetch after OAuth redirect so button updates immediately
+        refetchOnWindowFocus: true,
+    });
+    const isYoutubeConnected = youtubeConnectedQuery.data?.connected ?? false;
+
     // Keep selection in sync with items
     useEffect(() => {
         // Select all new items by default
@@ -52,6 +62,12 @@ export default function PlaylistToolsPage() {
 
     const deletePlaylist = api.playlistTools.deletePlaylist.useMutation({
         onSuccess: () => void utils.playlistTools.getPlaylists.invalidate()
+    });
+
+    const createYouTubePlaylist = api.playlistTools.createYouTubePlaylist.useMutation({
+        onSuccess: (data, variables) => {
+            setYtResults(prev => ({ ...prev, [variables.playlistId]: data }));
+        }
     });
 
     const handleParse = () => {
@@ -211,6 +227,16 @@ export default function PlaylistToolsPage() {
                             <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
                             Import from Plex Playlist
                         </button>
+                        <a
+                            href="/api/youtube/auth"
+                            className={`w-full font-bold py-2.5 px-6 rounded-lg transition-all flex items-center justify-center gap-2 border ${isYoutubeConnected ? 'bg-[#3fb950]/10 text-[#3fb950] border-[#3fb950]/30' : 'bg-[#ff0000]/10 hover:bg-[#ff0000]/20 text-[#ff4444] border-[#ff0000]/30 hover:border-[#ff4444]'}`}
+                        >
+                            <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+                            {isYoutubeConnected ? '✓ YouTube Music Connected (click to reconnect)' : 'Connect YouTube Music'}
+                        </a>
+                        {youtubeStatus === 'error' && (
+                            <p className="text-xs text-[#f85149] text-center">YouTube connection failed — check Vercel logs for details.</p>
+                        )}
                     </div>
                 </div>
             </div>
@@ -244,35 +270,72 @@ export default function PlaylistToolsPage() {
                     <h2 className="text-sm font-semibold text-[#8b949e] uppercase tracking-wider mb-2">Saved Playlists</h2>
                     <div className="space-y-2 max-h-[70vh] overflow-y-auto pr-2 custom-scrollbar">
                         {playlistsQuery.data?.map(pl => (
-                            <div 
-                                key={pl.id} 
-                                onClick={() => loadPlaylistMutation.mutate({ id: pl.id })}
-                                className="group flex justify-between items-center p-3 bg-[#161b22] border border-[#30363d] rounded-lg hover:border-[#388bfd] transition-colors cursor-pointer"
-                            >
-                                <div className="overflow-hidden">
-                                    <div className="text-sm font-medium text-[#c9d1d9] truncate group-hover:text-[#58a6ff]">
-                                        {loadPlaylistMutation.isPending && loadPlaylistMutation.variables?.id === pl.id ? '⌛ ' : ''}
-                                        {pl.name}
+                            <div key={pl.id} className="flex flex-col">
+                                <div
+                                    onClick={() => loadPlaylistMutation.mutate({ id: pl.id })}
+                                    className="group flex justify-between items-center p-3 bg-[#161b22] border border-[#30363d] rounded-lg hover:border-[#388bfd] transition-colors cursor-pointer"
+                                >
+                                    <div className="overflow-hidden min-w-0 flex-1">
+                                        <div className="text-sm font-medium text-[#c9d1d9] truncate group-hover:text-[#58a6ff]">
+                                            {loadPlaylistMutation.isPending && loadPlaylistMutation.variables?.id === pl.id ? '⌛ ' : ''}
+                                            {pl.name}
+                                        </div>
+                                        <div className="text-xs text-[#8b949e]">{pl._count.items} tracks</div>
                                     </div>
-                                    <div className="text-xs text-[#8b949e]">{pl._count.items} tracks</div>
+                                    <div className="flex items-center gap-1 shrink-0 ml-2">
+                                        <button
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                if (confirm('Delete this playlist?')) deletePlaylist.mutate({ id: pl.id });
+                                            }}
+                                            title="Delete playlist"
+                                            className="p-1 text-[#f85149] hover:bg-[#30363d] rounded transition-all"
+                                        >
+                                            🗑️
+                                        </button>
+                                        <a
+                                            href={`/soulseek?playlistId=${pl.id}`}
+                                            onClick={(e) => e.stopPropagation()}
+                                            title="Search on Soulseek"
+                                            className="p-1 text-[#58a6ff] hover:bg-[#30363d] rounded transition-all"
+                                        >
+                                            🔍
+                                        </a>
+                                        <button
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                createYouTubePlaylist.mutate({ playlistId: pl.id });
+                                            }}
+                                            disabled={createYouTubePlaylist.isPending && createYouTubePlaylist.variables?.playlistId === pl.id}
+                                            title="Add to YouTube Music"
+                                            className="p-1 text-[#ff0000] hover:bg-[#30363d] rounded transition-all disabled:opacity-50"
+                                        >
+                                            {createYouTubePlaylist.isPending && createYouTubePlaylist.variables?.playlistId === pl.id ? '⌛' : (
+                                                <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
+                                                    <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+                                                </svg>
+                                            )}
+                                        </button>
+                                    </div>
                                 </div>
-                                <button 
-                                    onClick={(e) => {
-                                        e.stopPropagation();
-                                        if (confirm('Delete this playlist?')) deletePlaylist.mutate({ id: pl.id });
-                                    }}
-                                    className="opacity-0 group-hover:opacity-100 p-1 text-[#f85149] hover:bg-[#30363d] rounded transition-all"
-                                >
-                                    🗑️
-                                </button>
-                                <a
-                                    href={`/soulseek?playlistId=${pl.id}`}
-                                    onClick={(e) => e.stopPropagation()}
-                                    title="Search on Soulseek"
-                                    className="opacity-0 group-hover:opacity-100 p-1 text-[#58a6ff] hover:bg-[#30363d] rounded transition-all ml-1"
-                                >
-                                    🔍
-                                </a>
+                                {ytResults[pl.id] && (
+                                    <div className="mt-1 px-3 py-2 bg-[#0d1117] border border-[#30363d] rounded-lg text-xs">
+                                        <span className="text-[#3fb950]">✓ Added {ytResults[pl.id]!.added}/{ytResults[pl.id]!.total} tracks. </span>
+                                        <a
+                                            href={ytResults[pl.id]!.url}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="text-[#58a6ff] hover:underline"
+                                        >
+                                            Open in YouTube Music →
+                                        </a>
+                                    </div>
+                                )}
+                                {createYouTubePlaylist.isError && createYouTubePlaylist.variables?.playlistId === pl.id && (
+                                    <div className="mt-1 px-3 py-2 bg-[#0d1117] border border-[#f85149]/30 rounded-lg text-xs text-[#f85149]">
+                                        {createYouTubePlaylist.error.message}
+                                    </div>
+                                )}
                             </div>
                         ))}
                         {playlistsQuery.data?.length === 0 && (
@@ -373,7 +436,7 @@ export default function PlaylistToolsPage() {
                                                     />
                                                 </td>
                                                 <td className="py-1 px-4 text-right">
-                                                    <div className="flex justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                    <div className="flex justify-end gap-1">
                                                         <button 
                                                             onClick={() => handleSplit(idx)}
                                                             title="Split Track into Artist - Track"
@@ -407,5 +470,13 @@ export default function PlaylistToolsPage() {
                 </div>
             </div>
         </main>
+    );
+}
+
+export default function Page() {
+    return (
+        <Suspense>
+            <PlaylistToolsPage />
+        </Suspense>
     );
 }

@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
 import { TRPCError } from "@trpc/server";
+import { env } from "~/env";
 
 interface SpotifyTrack {
   title?: string;
@@ -411,5 +412,141 @@ export const playlistToolsRouter = createTRPCRouter({
             throw new TRPCError({ code: "NOT_FOUND" });
         }
         return ctx.db.standalonePlaylist.delete({ where: { id: input.id } });
-    })
+    }),
+
+  youtubeConnected: protectedProcedure.query(async ({ ctx }) => {
+    const account = await ctx.db.account.findFirst({
+      where: { userId: ctx.session.user.id, provider: "youtube" },
+      select: { id: true, scope: true },
+    });
+    return { connected: !!account };
+  }),
+
+  createYouTubePlaylist: protectedProcedure
+    .input(z.object({ playlistId: z.string() }))
+    .mutation(async ({ ctx, input }) => {
+      const account = await ctx.db.account.findFirst({
+        where: { userId: ctx.session.user.id, provider: "youtube" },
+      });
+
+      if (!account) {
+        throw new TRPCError({
+          code: "UNAUTHORIZED",
+          message: "YouTube not connected [v2] — click 'Connect YouTube Music' on the playlists page.",
+        });
+      }
+
+      const reAuthMessage = "YouTube not authorised — click 'Connect YouTube Music' on the playlists page to link your account [v2].";
+
+      let accessToken = account.access_token;
+      const now = Math.floor(Date.now() / 1000);
+      const isExpired = !accessToken || (account.expires_at ? account.expires_at < now - 60 : false);
+
+      if (isExpired) {
+        if (!account.refresh_token) {
+          throw new TRPCError({ code: "UNAUTHORIZED", message: reAuthMessage });
+        }
+
+        const refreshRes = await fetch("https://oauth2.googleapis.com/token", {
+          method: "POST",
+          headers: { "Content-Type": "application/x-www-form-urlencoded" },
+          body: new URLSearchParams({
+            client_id: env.AUTH_GOOGLE_ID,
+            client_secret: env.AUTH_GOOGLE_SECRET,
+            refresh_token: account.refresh_token,
+            grant_type: "refresh_token",
+          }),
+        });
+
+        if (!refreshRes.ok) {
+          throw new TRPCError({ code: "UNAUTHORIZED", message: reAuthMessage });
+        }
+
+        const refreshData = await refreshRes.json() as { access_token: string; expires_in: number };
+        accessToken = refreshData.access_token;
+
+        await ctx.db.account.update({
+          where: { id: account.id },
+          data: { access_token: accessToken, expires_at: now + refreshData.expires_in },
+        });
+      }
+
+      const playlist = await ctx.db.standalonePlaylist.findUnique({
+        where: { id: input.playlistId },
+        include: { items: { orderBy: { order: "asc" } } },
+      });
+
+      if (!playlist || playlist.userId !== ctx.session.user.id) {
+        throw new TRPCError({ code: "NOT_FOUND" });
+      }
+
+      const createRes = await fetch(
+        "https://www.googleapis.com/youtube/v3/playlists?part=snippet,status",
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            snippet: { title: playlist.name, description: "Imported from Bad Vibes" },
+            status: { privacyStatus: "private" },
+          }),
+        }
+      );
+
+      if (!createRes.ok) {
+        if (createRes.status === 401 || createRes.status === 403) {
+          throw new TRPCError({ code: "UNAUTHORIZED", message: reAuthMessage });
+        }
+        const errText = await createRes.text();
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: `YouTube API error: ${errText}`,
+        });
+      }
+
+      const ytPlaylist = await createRes.json() as { id: string };
+      const ytPlaylistId = ytPlaylist.id;
+
+      let added = 0;
+      for (const item of playlist.items) {
+        const query = `${item.track} ${item.artist}`;
+        const searchRes = await fetch(
+          `https://www.googleapis.com/youtube/v3/search?part=snippet&type=video&maxResults=1&q=${encodeURIComponent(query)}`,
+          { headers: { Authorization: `Bearer ${accessToken}` } }
+        );
+
+        if (!searchRes.ok) continue;
+
+        const searchData = await searchRes.json() as { items?: Array<{ id?: { videoId?: string } }> };
+        const videoId = searchData.items?.[0]?.id?.videoId;
+        if (!videoId) continue;
+
+        const addRes = await fetch(
+          "https://www.googleapis.com/youtube/v3/playlistItems?part=snippet",
+          {
+            method: "POST",
+            headers: {
+              Authorization: `Bearer ${accessToken}`,
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              snippet: {
+                playlistId: ytPlaylistId,
+                resourceId: { kind: "youtube#video", videoId },
+              },
+            }),
+          }
+        );
+
+        if (addRes.ok) added++;
+      }
+
+      return {
+        url: `https://music.youtube.com/playlist?list=${ytPlaylistId}`,
+        added,
+        total: playlist.items.length,
+      };
+    }),
 });
