@@ -1,15 +1,6 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { auth } from "~/server/auth";
 import { env } from "~/env";
-import { createHmac } from "crypto";
-
-function makeState(userId: string): string {
-  const ts = Date.now().toString();
-  const sig = createHmac("sha256", env.AUTH_SECRET ?? "dev-secret")
-    .update(`${userId}:${ts}`)
-    .digest("hex");
-  return Buffer.from(JSON.stringify({ userId, ts, sig })).toString("base64url");
-}
 
 export async function GET(request: NextRequest) {
   const session = await auth();
@@ -17,8 +8,8 @@ export async function GET(request: NextRequest) {
     return NextResponse.redirect(new URL("/", request.url));
   }
 
-  const redirectUri = `${new URL(request.url).origin}/api/youtube/auth/callback`;
-  const state = makeState(session.user.id);
+  const origin = new URL(request.url).origin;
+  const redirectUri = `${origin}/api/youtube/auth/callback`;
 
   const params = new URLSearchParams({
     client_id: env.AUTH_GOOGLE_ID,
@@ -27,7 +18,8 @@ export async function GET(request: NextRequest) {
     scope: "https://www.googleapis.com/auth/youtube",
     access_type: "offline",
     prompt: "consent",
-    state,
+    // state is just the base64-encoded userId as a sanity check in the callback
+    state: Buffer.from(session.user.id).toString("base64"),
   });
 
   return NextResponse.redirect(

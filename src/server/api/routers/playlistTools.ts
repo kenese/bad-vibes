@@ -414,6 +414,14 @@ export const playlistToolsRouter = createTRPCRouter({
         return ctx.db.standalonePlaylist.delete({ where: { id: input.id } });
     }),
 
+  youtubeConnected: protectedProcedure.query(async ({ ctx }) => {
+    const account = await ctx.db.account.findFirst({
+      where: { userId: ctx.session.user.id, provider: "youtube" },
+      select: { id: true, scope: true },
+    });
+    return { connected: !!account };
+  }),
+
   createYouTubePlaylist: protectedProcedure
     .input(z.object({ playlistId: z.string() }))
     .mutation(async ({ ctx, input }) => {
